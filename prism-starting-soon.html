@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="prism-theme.css">
+<style>
+/* ---- starting-soon specifics ---- */
+.bg{ justify-content:flex-start; padding-top:72px; }
+.avatar{ width:158px; height:158px; margin-bottom:16px; }
+.sub{ font-size:26px; margin-bottom:34px; }
+.timer{
+  font-family:'JetBrains Mono',monospace; font-size:88px; font-weight:700; letter-spacing:6px;
+  font-variant-numeric:tabular-nums; margin-bottom:6px;
+  background:linear-gradient(100deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c1)); background-size:280% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 26px rgba(130,170,255,0.5)); animation:shimmer 6s linear infinite;
+}
+.timer-label{ font-size:16px; color:#7b86ab; letter-spacing:5px; text-transform:uppercase; margin-bottom:8px; }
+.socials{ margin-top:40px; }
+#timer-settings{ display:inline-block; width:18px; height:18px; vertical-align:middle; margin-left:6px;
+  cursor:pointer; opacity:0.3; transition:opacity 0.2s; border-radius:50%; text-align:center; line-height:18px; font-size:14px; }
+#timer-settings:hover{ opacity:0.8; }
+/* entrance timing */
+.ent-avatar{ animation:entScaleIn 0.7s ease-out both, floaty 3.6s ease-in-out infinite; }
+.ent-timer{ animation:entFadeUp 0.6s ease-out 0.6s both, shimmer 6s linear infinite; }
+.ent-timer-label{ animation:entFadeUp 0.6s ease-out 0.7s both; }
+.ent-socials{ animation:entFadeUp 0.6s ease-out 0.85s both; }
+.ent-goal{ animation:entFadeUp 0.6s ease-out 1s both, flow 11s linear infinite; }
+</style>
+</head>
+<body data-goal="100" data-motes="72">
+<div class="bg">
+  <div class="grid-floor"></div>
+  <div class="particles" id="particles"></div>
+  <div class="vignette"></div>
+
+  <div class="content">
+    <div class="avatar ent-avatar"><img class="js-avatar" src="https://static-cdn.jtvnw.net/jtv_user_pictures/f8059656-f846-4bfa-9cd5-e70afba5692e-profile_image-300x300.png" alt="NeoTheFox98"></div>
+    <div class="holo-pill ent-logo"><span class="live-dot"></span>LIVE</div>
+    <div class="heading ent-heading">Starting Soon</div>
+    <div class="sub ent-sub">System initializing &middot; stand by</div>
+    <div id="timer" class="timer ent-timer">5:00</div>
+    <div class="timer-label ent-timer-label">Until we go live <span id="timer-settings" onclick="showTimerConfig()">&#9881;</span></div>
+
+    <div class="socials ent-socials" data-prism-socials></div>
+
+    <div class="goal ent-goal">
+      <div class="goal-top">
+        <span>Follower Goal</span>
+        <span><span class="n js-goal-now">&mdash;</span> / <span class="n js-goal-target">100</span></span>
+      </div>
+      <div class="goal-track"><div class="goal-fill js-goal-fill"></div></div>
+    </div>
+  </div>
+</div>
+<script src="prism-config.js"></script>
+<script src="prism-engine.js"></script>
+<script>
+/* ---- countdown ---- */
+var timerEl=document.getElementById('timer');
+var minutes=5, seconds=0, timerInterval=null;
+function getTimerMinutes(){
+  var q=new URLSearchParams(window.location.search).get('timer');
+  if(q){ var n=parseInt(q,10); if(n>0&&n<=120) return n; }
+  var s=localStorage.getItem('timer_minutes');
+  if(s){ var n2=parseInt(s,10); if(n2>0&&n2<=120) return n2; }
+  return 5;
+}
+function resetTimer(mins){
+  if(timerInterval){ clearInterval(timerInterval); }
+  minutes=mins; seconds=0; timerEl.textContent=minutes+':00';
+  timerInterval=setInterval(function(){
+    timerEl.textContent=minutes+':'+(seconds<10?'0':'')+seconds;
+    if(seconds===0){ if(minutes===0){ clearInterval(timerInterval); return; } minutes--; seconds=59; } else { seconds--; }
+  },1000);
+}
+function showTimerConfig(){
+  var cur=localStorage.getItem('timer_minutes'); var val=cur?parseInt(cur,10):5;
+  var input=prompt('Countdown duration in minutes (1-120):', val);
+  if(input!==null){ var n=parseInt(input,10); if(n>0&&n<=120){ localStorage.setItem('timer_minutes', n.toString()); resetTimer(n); } }
+}
+resetTimer(getTimerMinutes());
+</script>
+</body>
+</html>

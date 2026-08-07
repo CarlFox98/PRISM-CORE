@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM — Thank You (Follower)</title>
+<style>
+/* ============================================================
+   PRISM — Thank-You overlay (random follower)
+   An event card, same family as prism-shoutout.html: transparent,
+   self-contained, sits above your scene, idle until triggered.
+
+   Trigger a pick with:  the button (when you Interact with the
+   source), the Spacebar, or ?auto on the URL. It picks a random
+   follower and slides a PRISM card in, then fades out.
+
+   Follower list source (first that works wins):
+     1. prism-followers.json  next to this file  (array of names,
+        or {"followers":[...]}) — written by the Desktop\Streaming
+        "twitch-followers-export.html" utility.
+     2. the inline FALLBACK list below.
+     3. DecAPI newest follower (no list, but always something).
+
+   Preview the design any time with  ?demo  on the URL.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap');
+:root{
+  --ink:#EAF0FF; --ink-soft:#A9B4D6;
+  --glass:rgba(14,16,28,0.46); --glass-deep:rgba(10,12,22,0.72);
+  --c1:#57F2E4; --c2:#6C8BFF; --c3:#B983FF; --c4:#FF7ACb; --c5:#FFD86B;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
+  font-family:'Space Grotesk','Segoe UI',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+
+.stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+
+/* the card */
+.ty{ --hex:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  position:relative; width:820px; max-width:86vw; padding:2px; border-radius:26px; overflow:hidden;
+  background:linear-gradient(var(--glass),var(--glass)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1)) border-box;
+  background-size:100% 100%,320% 100%; border:1.6px solid transparent;
+  -webkit-backdrop-filter:blur(18px) saturate(150%); backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:0 24px 60px rgba(0,0,0,0.55), 0 0 30px rgba(120,140,255,0.16);
+  opacity:0; transform:translateY(46px) scale(0.96); pointer-events:none;
+  animation:flow 12s linear infinite;
+  transition:opacity 0.5s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1); }
+.ty.show{ opacity:1; transform:translateY(0) scale(1); }
+.ty-inner{ display:flex; flex-direction:column; align-items:center; text-align:center;
+  gap:6px; padding:44px 54px 46px; border-radius:24px; background:var(--glass-deep); }
+
+/* heart hex emblem */
+.ty-emblem{ position:relative; width:104px; height:104px; margin-bottom:12px;
+  filter:drop-shadow(0 0 34px rgba(255,122,203,0.4)); }
+.ty-emblem::before{ content:""; position:absolute; inset:0; -webkit-clip-path:var(--hex); clip-path:var(--hex);
+  background:linear-gradient(120deg,var(--c4),var(--c3),var(--c2),var(--c1),var(--c4));
+  background-size:320% 100%; animation:flow 9s linear infinite; }
+.ty-emblem span{ position:absolute; inset:4px; display:flex; align-items:center; justify-content:center;
+  -webkit-clip-path:var(--hex); clip-path:var(--hex); background:#0b0e18; font-size:44px; }
+
+.ty-eyebrow{ display:inline-flex; align-items:center; gap:10px; font-size:15px; font-weight:700; letter-spacing:6px;
+  text-transform:uppercase; color:var(--c1); text-shadow:0 0 12px rgba(87,242,228,0.5); margin-bottom:2px; }
+.ty-eyebrow .dot{ width:9px; height:9px; border-radius:50%; background:var(--c1);
+  box-shadow:0 0 8px var(--c1),0 0 16px var(--c1); animation:blip 1.5s ease-in-out infinite; }
+
+.ty-name{ font-size:76px; font-weight:700; line-height:1.08; letter-spacing:0.5px; max-width:700px; word-break:break-word;
+  background:linear-gradient(100deg,var(--c1),var(--c2),#ffffff 45%,var(--c3),var(--c4)); background-size:250% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 24px rgba(140,170,255,0.35)); animation:shimmer 7s linear infinite; }
+.ty-msg{ font-size:24px; color:var(--ink-soft); letter-spacing:1px; margin-top:8px; }
+.ty-msg b{ color:var(--ink); font-weight:600; }
+
+/* control bar — only visible when you Interact with the source, or open the file directly */
+#bar{ position:fixed; left:50%; bottom:26px; transform:translateX(-50%); display:flex; gap:12px; align-items:center;
+  font-size:13px; color:var(--ink-soft); background:rgba(10,12,22,0.72); padding:9px 14px; border-radius:12px;
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+#bar button{ font:inherit; font-weight:700; letter-spacing:0.5px; color:#0b0e18; border:0; cursor:pointer;
+  padding:9px 18px; border-radius:9px; background:linear-gradient(120deg,var(--c1),var(--c3),var(--c4)); background-size:200% 100%; animation:flow 8s linear infinite; }
+#bar.hidden{ display:none; }
+#note{ position:fixed; top:16px; left:50%; transform:translateX(-50%); font-size:13px; color:var(--ink-soft);
+  background:rgba(10,12,22,0.72); padding:6px 14px; border-radius:10px; }
+#note.hidden{ display:none; }
+
+@keyframes flow{ 0%{background-position:0% 50%} 100%{background-position:320% 50%} }
+@keyframes shimmer{ 0%{background-position:0% 0%} 100%{background-position:250% 0%} }
+@keyframes blip{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.8)} }
+@media (prefers-reduced-motion: reduce){ .ty,.ty-emblem::before,.ty-name,.ty-eyebrow .dot,#bar button{ animation:none !important; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="ty" id="card">
+    <div class="ty-inner">
+      <div class="ty-emblem"><span>💜</span></div>
+      <div class="ty-eyebrow"><span class="dot"></span><span>Thank you for the follow</span></div>
+      <div class="ty-name" id="name">Follower</div>
+      <div class="ty-msg" id="msg"></div>
+    </div>
+  </div>
+</div>
+
+<div id="note" class="hidden"></div>
+<div id="bar" class="hidden">
+  <button id="pick">🎉 Thank a follower</button>
+  <span>or press <b>Space</b> · <b>?hidebar</b> hides this · <b>?auto</b> picks on load</span>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- config ---------------- */
+  var CONFIG = {
+    channel: "NeoTheFox98",        // your Twitch login (for the DecAPI fallback)
+    listUrl: "prism-followers.json",// list written by the export utility (same folder)
+    autoHideSeconds: 8,             // card fades out after this; 0 = stay up
+    noRepeatUntilExhausted: true,   // don't repeat until everyone's been thanked once
+    messages: [
+      "Welcome to the pack — glad you're here! 🦊",
+      "Thanks for the follow. Enjoy the stream! 🎮",
+      "You just made the stream a little brighter ✨",
+      "Big thanks for following — see you in chat! 💬",
+    ],
+  };
+
+  /* Inline fallback list — used only if prism-followers.json isn't found.
+     The export utility keeps the JSON current; this is just a safety net. */
+  var FALLBACK = [
+    "SampleFox_01","NightOwlGamer","PixelPanda","QuietStorm88","RetroRacer",
+    "LunaByte","CaffeineKat","TheReal_Vex","MapleSyrupGG","Zephyr_Plays"
+  ];
+
+  /* ---------------- elements / state ---------------- */
+  var card = document.getElementById("card"),
+      nameEl = document.getElementById("name"),
+      msgEl = document.getElementById("msg"),
+      bar = document.getElementById("bar"),
+      note = document.getElementById("note");
+  var params = new URLSearchParams(location.search);
+  var names = [], pool = [], hideTimer = null, source = "";
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function showNote(t){ if(!t){ note.classList.add("hidden"); return; } note.textContent=t; note.classList.remove("hidden"); }
+
+  /* ---------------- data loading ---------------- */
+  function normalize(data){
+    var arr = Array.isArray(data) ? data : (data && Array.isArray(data.followers) ? data.followers : null);
+    if(!arr) return null;
+    return arr.map(function(x){ return typeof x === "string" ? x : (x && (x.name || x.user_name || x.login)); })
+              .map(function(s){ return (s||"").trim(); }).filter(Boolean);
+  }
+
+  function loadList(){
+    // 1) try the JSON list next to this file (works when hosted, or when the
+    //    browser allows sibling reads)
+    return fetch(CONFIG.listUrl, {cache:"no-store"})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(j){ var n = normalize(j); if(n && n.length){ names=n; source="prism-followers.json"; return; } throw 0; })
+      .catch(function(){
+        // 2) inline fallback
+        names = FALLBACK.slice(); source = "inline fallback list";
+        // 3) also grab the newest follower via DecAPI so at least that name is real
+        return fetch("https://decapi.me/twitch/followers/"+encodeURIComponent(CONFIG.channel))
+          .then(function(r){ return r.ok ? r.text() : ""; })
+          .then(function(t){ t=(t||"").trim();
+            if(t && !/error|unable|not found|must be/i.test(t) && names.indexOf(t)===-1){ names.unshift(t); }
+          }).catch(function(){});
+      });
+  }
+
+  /* ---------------- pick logic ---------------- */
+  function refill(){ pool = names.slice();
+    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; } }
+  function nextFollower(){ if(!names.length) return null;
+    if(CONFIG.noRepeatUntilExhausted){ if(!pool.length) refill(); return pool.pop(); }
+    return names[Math.floor(Math.random()*names.length)]; }
+
+  function pick(){
+    var who = nextFollower(); if(!who) return;
+    nameEl.textContent = who;
+    msgEl.innerHTML = esc(CONFIG.messages[Math.floor(Math.random()*CONFIG.messages.length)]);
+    card.classList.remove("show"); void card.offsetWidth; card.classList.add("show");
+    clearTimeout(hideTimer);
+    if(CONFIG.autoHideSeconds>0) hideTimer=setTimeout(function(){ card.classList.remove("show"); }, CONFIG.autoHideSeconds*1000);
+  }
+
+  /* ---------------- wire up ---------------- */
+  if(!params.has("hidebar")) bar.classList.remove("hidden");
+  document.getElementById("pick").addEventListener("click", pick);
+  document.addEventListener("keydown", function(e){ if(e.code==="Space"||e.code==="Enter"){ e.preventDefault(); pick(); } });
+
+  /* ---------------- demo / boot ---------------- */
+  if(params.has("demo")){
+    names = ["PixelWitch"]; source="demo";
+    nameEl.textContent="PixelWitch"; msgEl.innerHTML=esc(CONFIG.messages[0]);
+    card.classList.add("show");
+    return;
+  }
+
+  loadList().then(function(){
+    if(source==="inline fallback list") showNote("Using placeholder names — run the export utility to load your real followers");
+    else setTimeout(function(){ showNote(""); }, 10);
+    if(params.has("auto")) setTimeout(pick, 900);
+  });
+})();
+</script>
+</body>
+</html>

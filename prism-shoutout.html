@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM — Shoutout</title>
+<style>
+/* ============================================================
+   PRISM — Shoutout overlay
+   A mod types  !so @user  in chat -> the companion service
+   (prism_shoutout_service.py) pushes a payload here over a
+   local WebSocket, and this card slides in with the user's
+   hex avatar + an autoplaying clip, then fades out.
+
+   HOST THIS on your GitHub Pages repo (carlfox98.github.io/...)
+   so the Twitch clip can autoplay (the embed needs a real
+   domain as its "parent"). Add it as an OBS Browser Source,
+   1920x1080, transparent, above your scene.
+
+   Test layout with ?demo on the URL.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap');
+:root{
+  --ink:#EAF0FF; --ink-soft:#A9B4D6;
+  --glass:rgba(14,16,28,0.46); --glass-deep:rgba(10,12,22,0.72);
+  --c1:#57F2E4; --c2:#6C8BFF; --c3:#B983FF; --c4:#FF7ACb; --c5:#FFD86B;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
+  font-family:'Space Grotesk','Segoe UI',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+
+.stage{ position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; padding-bottom:70px; }
+
+/* the card */
+.so{ --hex:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display:flex; align-items:center; gap:26px; width:1080px; padding:2px; border-radius:24px; overflow:hidden;
+  background:linear-gradient(var(--glass),var(--glass)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1)) border-box;
+  background-size:100% 100%,320% 100%; border:1.6px solid transparent;
+  -webkit-backdrop-filter:blur(18px) saturate(150%); backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:0 24px 60px rgba(0,0,0,0.55), 0 0 30px rgba(120,140,255,0.16);
+  opacity:0; transform:translateY(70px) scale(0.96); pointer-events:none;
+  animation:flow 12s linear infinite;
+  transition:opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+.so.show{ opacity:1; transform:translateY(0) scale(1); }
+.so-inner{ display:flex; align-items:center; gap:28px; width:100%; padding:26px 30px; border-radius:22px; background:var(--glass-deep); }
+
+/* left: identity */
+.so-id{ display:flex; flex-direction:column; align-items:center; text-align:center; width:330px; flex-shrink:0; gap:4px; }
+.so-ava{ position:relative; width:132px; height:132px; margin-bottom:8px;
+  filter:drop-shadow(0 0 34px rgba(120,150,255,0.34)); }
+.so-ava::before{ content:""; position:absolute; inset:0; -webkit-clip-path:var(--hex); clip-path:var(--hex);
+  background:linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1));
+  background-size:320% 100%; animation:flow 9s linear infinite; }
+.so-ava img{ position:absolute; inset:4px; width:calc(100% - 8px); height:calc(100% - 8px); object-fit:cover;
+  background:#0b0e18; -webkit-clip-path:var(--hex); clip-path:var(--hex); }
+.so-eyebrow{ display:inline-flex; align-items:center; gap:9px; font-size:14px; font-weight:700; letter-spacing:5px;
+  text-transform:uppercase; color:var(--c1); text-shadow:0 0 12px rgba(87,242,228,0.5); }
+.so-eyebrow .dot{ width:9px; height:9px; border-radius:50%; background:var(--c1); box-shadow:0 0 8px var(--c1),0 0 16px var(--c1); animation:blip 1.4s ease-in-out infinite; }
+/* LIVE NOW state — magenta accent when the shouted user is streaming right now */
+.so.live .so-eyebrow{ color:var(--c4); text-shadow:0 0 12px rgba(255,122,203,0.6); }
+.so.live .so-eyebrow .dot{ background:var(--c4); box-shadow:0 0 8px var(--c4),0 0 16px var(--c4); animation-duration:0.9s; }
+.so-name{ font-size:44px; font-weight:700; line-height:1.06; letter-spacing:0.5px; max-width:320px; word-break:break-word;
+  background:linear-gradient(100deg,var(--c1),var(--c2),#ffffff 45%,var(--c3),var(--c4)); background-size:250% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px rgba(140,170,255,0.35)); animation:shimmer 7s linear infinite; }
+.so-cat{ font-size:16px; color:var(--ink-soft); letter-spacing:1px; }
+.so-cat b{ color:var(--ink); font-weight:600; }
+.so-handle{ margin-top:2px; font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--c3); letter-spacing:0.5px; }
+
+/* right: clip */
+.so-clip{ position:relative; width:600px; height:338px; flex-shrink:0; border-radius:16px; overflow:hidden;
+  background:#05060c; box-shadow:0 0 0 1.5px rgba(120,150,255,0.25), inset 0 0 0 1px rgba(255,255,255,0.05); }
+.so-clip iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+.so-clip video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#05060c; }
+.so-clip .noclip{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;
+  color:var(--ink-soft); font-size:16px; letter-spacing:2px; text-transform:uppercase;
+  background:radial-gradient(600px 400px at 50% 40%, rgba(108,139,255,0.14), transparent 70%); }
+.so-clip .noclip svg{ width:44px; height:44px; opacity:0.6; }
+.so-clip img.thumb{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+@keyframes flow{ 0%{background-position:0% 50%} 100%{background-position:320% 50%} }
+@keyframes shimmer{ 0%{background-position:0% 0%} 100%{background-position:250% 0%} }
+@keyframes blip{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.8)} }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="so" id="card">
+    <div class="so-inner">
+      <div class="so-id">
+        <div class="so-ava"><img id="ava" src="" alt=""></div>
+        <div class="so-eyebrow"><span class="dot"></span><span id="eyebrow">Shoutout</span></div>
+        <div class="so-name" id="name">Streamer</div>
+        <div class="so-handle" id="handle">@streamer</div>
+        <div class="so-cat" id="cat">Last seen streaming <b>&mdash;</b></div>
+      </div>
+      <div class="so-clip" id="clip">
+        <div class="noclip" id="noclip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg>
+          No recent clip
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var CFG = {
+    ws: 'ws://127.0.0.1:8777',   // companion service
+    hold: 18000,                 // ms the card stays before fading (if no clip length given)
+    parent: location.hostname || 'localhost'
+  };
+  var card=document.getElementById('card'), ava=document.getElementById('ava'),
+      nameEl=document.getElementById('name'), handleEl=document.getElementById('handle'),
+      catEl=document.getElementById('cat'), clip=document.getElementById('clip'), noclip=document.getElementById('noclip'),
+      eyebrowEl=document.getElementById('eyebrow');
+  var queue=[], busy=false;
+  var clipActive=false;   // are we currently telling the service a clip is playing?
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+  function sendEvt(o){ try{ if(ws && ws.readyState===1) ws.send(JSON.stringify(o)); }catch(e){} }
+  function clipStarted(){ if(!clipActive){ clipActive=true; sendEvt({type:'clipstart'}); } }
+  function clipEnded(){ if(clipActive){ clipActive=false; sendEvt({type:'clipend'}); } }
+
+  function clearClip(){
+    clipEnded();   // release audio ducking if a clip was playing
+    var v=clip.querySelector('video'); if(v){ try{ v.pause(); }catch(e){} v.removeAttribute('src'); v.remove(); }
+    var f=clip.querySelector('iframe'); if(f) f.remove();
+    var t=clip.querySelector('img.thumb'); if(t) t.remove();
+    noclip.style.display='flex';
+  }
+  function showThumb(url){
+    if(!url){ noclip.style.display='flex'; return; }
+    noclip.style.display='none';
+    var im=document.createElement('img'); im.className='thumb'; im.src=url; clip.appendChild(im);
+  }
+  function setClip(d){
+    clearClip();
+    if(d.clip){                       // direct mp4 — autoplays, no mature gate
+      noclip.style.display='none';
+      var v=document.createElement('video');
+      // muted autoplay is ALWAYS allowed; we unmute the moment it's actually playing
+      v.autoplay=true; v.muted=true; v.defaultMuted=true; v.playsInline=true; v.preload='auto';
+      v.setAttribute('autoplay',''); v.setAttribute('muted',''); v.setAttribute('playsinline','');
+      v.onerror=function(){ clipEnded(); v.remove(); showThumb(d.thumb); };
+      v.addEventListener('playing', function(){
+        clipStarted();   // tell the service real audio has begun → duck other sources
+        setTimeout(function(){ try{ v.muted=false; v.volume=1; }catch(e){} }, 250);
+      }, {once:true});
+      v.addEventListener('ended', clipEnded, {once:true});
+      v.src=d.clip;
+      clip.appendChild(v);
+      var tries=0;
+      (function kick(){ var p=v.play(); if(p && p.catch){ p.catch(function(){ if(tries++<20) setTimeout(kick,250); }); } })();
+    } else if(d.thumb){
+      showThumb(d.thumb);
+    } else {
+      noclip.style.display='flex';
+    }
+  }
+
+  function play(d){
+    busy=true;
+    nameEl.textContent = d.name || d.login || 'Streamer';
+    handleEl.textContent = '@' + (d.login || (d.name||'').toLowerCase());
+    if(d.live){
+      card.classList.add('live');
+      eyebrowEl.textContent = 'Live Now';
+      catEl.innerHTML = d.category ? ('Live now &middot; <b>'+esc(d.category)+'</b>') : 'Live right now &mdash; go watch!';
+    } else {
+      card.classList.remove('live');
+      eyebrowEl.textContent = 'Shoutout';
+      catEl.innerHTML = d.category ? ('Last seen streaming <b>'+esc(d.category)+'</b>') : 'Go give them a follow';
+    }
+    ava.src = d.avatar || '';
+    setClip(d);
+    // show
+    requestAnimationFrame(function(){ card.classList.add('show'); });
+    var hold = d.hold || CFG.hold;
+    setTimeout(function(){
+      card.classList.remove('show');
+      setTimeout(function(){ clearClip(); busy=false; next(); }, 700);
+    }, hold);
+  }
+  function next(){ if(busy) return; var d=queue.shift(); if(d) play(d); }
+  function enqueue(d){ queue.push(d); next(); }
+
+  /* ---- WebSocket link to the companion service ---- */
+  var ws=null, retry=0;
+  function connect(){
+    try{ ws=new WebSocket(CFG.ws); }catch(e){ schedule(); return; }
+    ws.onopen=function(){ retry=0; };
+    ws.onmessage=function(ev){
+      try{ var d=JSON.parse(ev.data); if(d && (d.login||d.name)) enqueue(d); }catch(e){}
+    };
+    ws.onclose=function(){ schedule(); };
+    ws.onerror=function(){ try{ws.close();}catch(e){} };
+  }
+  function schedule(){ retry=Math.min(retry+1,6); setTimeout(connect, 800*retry); }
+  connect();
+
+  /* ---- demo ---- */
+  if(new URLSearchParams(location.search).has('demo')){
+    enqueue({ name:'PixelWitch', login:'pixelwitch', category:'Hollow Knight: Silksong',
+      avatar:"data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#6C8BFF'/><stop offset='1' stop-color='#FF7ACb'/></linearGradient></defs><rect width='200' height='200' fill='url(#g)'/><circle cx='100' cy='78' r='38' fill='#ffffff' opacity='0.55'/></svg>"),
+      hold: 60000 });
+  }
+})();
+</script>
+</body>
+</html>

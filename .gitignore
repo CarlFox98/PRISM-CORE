@@ -1,0 +1,32 @@
+# ============================================================
+#  PRISM — repository hygiene
+# ============================================================
+
+# Python virtual environment — never commit; regenerate with:
+#   py -m venv prismenv
+#   prismenv\Scripts\python.exe -m pip install websockets requests
+prismenv/
+
+# Secrets — real Twitch credentials live only on the local machine
+prism-secrets.json
+**/prism-secrets.json
+*.secret
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Separate deployment repo (hosted via CarlFox98/streaming on GitHub Pages)
+github-pages/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# local push helper (not part of the project)
+push-to-github.bat

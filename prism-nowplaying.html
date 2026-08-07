@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM — Now Playing</title>
+<style>
+/* ============================================================
+   PRISM — Standalone Spotify "Now Playing" widget
+   Host this on GitHub Pages (HTTPS) and add it as its OWN OBS
+   Browser Source, on top of any scene. It reads your current
+   Spotify track and never needs per-scene setup.
+
+   ONE-TIME SETUP (see README):
+   1. Register this page's URL as a Redirect URI in your
+      Spotify app (the page prints the exact URL to use).
+   2. In OBS: right-click this Browser Source -> Interact ->
+      click CONNECT and log in. The token is stored inside OBS
+      and survives restarts.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@600&display=swap');
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
+  font-family:'Space Grotesk','Segoe UI',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+:root{
+  --ink:#EAF0FF; --ink-soft:#A9B4D6;
+  --glass:rgba(14,16,28,0.42); --glass-deep:rgba(10,12,22,0.72);
+  --c1:#57F2E4; --c2:#6C8BFF; --c3:#B983FF; --c4:#FF7ACb; --c5:#FFD86B;
+}
+.wrap{ position:absolute; top:8px; left:8px; }
+
+/* --- holo-glass card --- */
+.card{
+  width:452px; padding:2px; border-radius:18px; overflow:hidden;
+  background:linear-gradient(var(--glass),var(--glass)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1)) border-box;
+  background-size:100% 100%,320% 100%; border:1.5px solid transparent;
+  -webkit-backdrop-filter:blur(16px) saturate(150%); backdrop-filter:blur(16px) saturate(150%);
+  box-shadow:0 14px 36px rgba(0,0,0,0.5), 0 0 22px rgba(120,140,255,0.14);
+  animation:flow 11s linear infinite, rise 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+.inner{ display:flex; align-items:center; gap:14px; padding:12px 16px; border-radius:16px; background:var(--glass-deep); position:relative; overflow:hidden; }
+.inner::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(105deg,transparent 35%,rgba(190,205,255,0.06) 49%,rgba(255,255,255,0.10) 50%,rgba(190,205,255,0.06) 51%,transparent 66%);
+  background-size:250% 100%; mix-blend-mode:screen; animation:scan 7s ease-in-out infinite; }
+
+.spark{ width:18px; height:18px; flex-shrink:0; opacity:0.85; }
+.art{ width:56px; height:56px; border-radius:12px; object-fit:cover; flex-shrink:0; background:#0b0e18;
+  box-shadow:0 2px 12px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06); }
+.meta{ flex:1; min-width:0; }
+.title{ font-size:17px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 0 12px rgba(150,180,255,0.3); }
+.artist{ font-size:14px; font-weight:500; color:var(--c3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+.bar{ height:3px; margin-top:8px; border-radius:2px; background:rgba(255,255,255,0.09); overflow:hidden; }
+.fill{ height:100%; width:0%; border-radius:2px; background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4)); transition:width 0.6s linear; }
+.times{ display:flex; justify-content:space-between; margin-top:3px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#6d78a0; letter-spacing:0.5px; }
+.eq{ display:flex; align-items:flex-end; gap:2.5px; height:20px; flex-shrink:0; }
+.eq span{ width:3px; background:linear-gradient(180deg,var(--c1),var(--c3)); border-radius:2px; animation:eq 0.9s ease-in-out infinite; }
+.eq span:nth-child(2){ animation-delay:0.15s } .eq span:nth-child(3){ animation-delay:0.3s } .eq span:nth-child(4){ animation-delay:0.45s }
+.paused .eq span{ animation-play-state:paused; height:5px !important; opacity:0.5; }
+
+/* --- connect / status states --- */
+.connect{ padding:14px 18px; text-align:center; }
+.connect .cta{ font-size:14px; color:var(--ink); letter-spacing:1px; margin-bottom:4px; font-weight:600; }
+.connect .hint{ font-size:11.5px; color:var(--ink-soft); line-height:1.55; }
+.connect .url{ display:block; margin:8px 0; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--c1); word-break:break-all; }
+.btn{ margin-top:8px; border:none; cursor:pointer; color:#07131a; font-weight:700; font-size:13px; letter-spacing:1px;
+  padding:9px 26px; border-radius:50px; background:linear-gradient(120deg,var(--c1),var(--c2),var(--c3)); background-size:200% 100%; }
+.btn:hover{ filter:brightness(1.08); }
+.mini{ margin-top:8px; font-size:10px; color:#5b6785; }
+
+@keyframes flow{ 0%{background-position:0% 50%} 100%{background-position:320% 50%} }
+@keyframes rise{ 0%{opacity:0; transform:translateY(10px) scale(0.98)} 100%{opacity:1; transform:translateY(0) scale(1)} }
+@keyframes scan{ 0%,100%{background-position:130% 0; opacity:0.5} 50%{background-position:-30% 0; opacity:0.9} }
+@keyframes eq{ 0%,100%{height:5px} 50%{height:20px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="card">
+    <div class="inner" id="inner">
+      <!-- populated by JS -->
+      <div class="connect" id="boot"><div class="cta">Starting…</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  // ---- CONFIG ------------------------------------------------------------
+  // Your Spotify app's Client ID. Override at runtime with ?cid=XXXX if needed.
+  var CLIENT_ID = new URLSearchParams(location.search).get('cid') || 'a8793e9128944860af2dbe769651d44c';
+  var SCOPE = 'user-read-currently-playing';
+  // redirect_uri = THIS page's own URL (no query/hash). Register this in Spotify.
+  var REDIRECT_URI = location.origin + location.pathname;
+  var STORE = 'prism_np';                 // { refresh_token }
+  var VKEY  = 'prism_np_verifier';
+  var POLL_MS = 4000;
+
+  var inner = document.getElementById('inner');
+  var accessToken = null, expiresAt = 0, refreshToken = null;
+  var pollTimer = null, backoff = 0, lastTrack = null;
+
+  try { refreshToken = (JSON.parse(localStorage.getItem(STORE)||'{}')).refresh_token || null; } catch(e){}
+
+  // ---- helpers -----------------------------------------------------------
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function ms(t){ if(!t&&t!==0) return '0:00'; var m=Math.floor(t/60000),s=Math.floor((t%60000)/1000); return m+':'+(s<10?'0':'')+s; }
+
+  function showConnect(msg){
+    document.getElementById('card').classList.remove('paused');
+    inner.innerHTML =
+      '<div class="connect">'+
+        '<div class="cta">'+ (msg||'Connect Spotify') +'</div>'+
+        '<div class="hint">In OBS: right-click this source &rarr; <b>Interact</b> &rarr; click Connect.<br>'+
+        'First, add this exact Redirect URI in your Spotify app:</div>'+
+        '<span class="url">'+ esc(REDIRECT_URI) +'</span>'+
+        '<button class="btn" id="cbtn">Connect</button>'+
+      '</div>';
+    document.getElementById('cbtn').addEventListener('click', beginAuth);
+  }
+
+  function renderTrack(tr){
+    if(!tr || !tr.item){
+      // nothing playing / paused — keep last art if we have it, but mark paused
+      var art = lastTrack && lastTrack.art ? lastTrack.art : '';
+      document.getElementById('card').classList.add('paused');
+      inner.innerHTML = cardHTML({art:art, title:'Nothing playing', artist:'—', prog:0, dur:0, cur:0}, true);
+      return;
+    }
+    document.getElementById('card').classList.toggle('paused', tr.is_playing===false);
+    var it=tr.item;
+    var data={ art:(it.album&&it.album.images&&it.album.images[0]&&it.album.images[0].url)||'',
+      title:it.name, artist:(it.artists||[]).map(function(a){return a.name;}).join(', '),
+      dur:it.duration_ms, cur:tr.progress_ms, prog: it.duration_ms>0 ? Math.min(100, tr.progress_ms/it.duration_ms*100):0 };
+    lastTrack = data;
+    inner.innerHTML = cardHTML(data, tr.is_playing===false);
+  }
+
+  function cardHTML(d, paused){
+    var eq = '<div class="eq"><span></span><span></span><span></span><span></span></div>';
+    var spark = '<svg class="spark" viewBox="0 0 24 24" fill="#57F2E4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.59 14.41c-.19.24-.51.32-.78.17-2.18-1.33-4.92-1.63-8.15-.89-.36.08-.68-.18-.76-.55-.08-.36.18-.68.55-.76 3.52-.8 6.53-.46 8.94 1.01.26.16.34.48.2.76v.26zm1.23-2.79c-.23.3-.62.4-.95.22-2.5-1.54-6.31-1.98-9.27-1.08-.42.13-.86-.12-.99-.54s.12-.86.54-.99c3.36-1 7.59-.52 10.46 1.24.32.19.41.62.21.95v.2zm.11-2.9c-2.99-1.78-7.93-1.94-10.79-1.07-.46.14-.94-.12-1.08-.58s.12-.94.58-1.08c3.33-1.01 8.84-.82 12.32 1.24.4.24.54.77.3 1.17-.24.38-.77.52-1.15.28l-.18-.16z"/></svg>';
+    var artTag = d.art ? '<img class="art" src="'+esc(d.art)+'" alt="">' : '<div class="art"></div>';
+    return spark + artTag +
+      '<div class="meta">'+
+        '<div class="title">'+esc(d.title)+'</div>'+
+        '<div class="artist">'+esc(d.artist)+'</div>'+
+        '<div class="bar"><div class="fill" style="width:'+d.prog+'%"></div></div>'+
+        '<div class="times"><span>'+ms(d.cur)+'</span><span>'+ms(d.dur)+'</span></div>'+
+      '</div>' + eq;
+  }
+
+  // ---- PKCE auth ---------------------------------------------------------
+  function b64url(buf){ return btoa(String.fromCharCode.apply(null,new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function beginAuth(){
+    var v=new Uint8Array(64); crypto.getRandomValues(v);
+    var verifier=b64url(v).slice(0,120);
+    crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)).then(function(h){
+      localStorage.setItem(VKEY, verifier);
+      var url='https://accounts.spotify.com/authorize?response_type=code&client_id='+encodeURIComponent(CLIENT_ID)+
+        '&scope='+encodeURIComponent(SCOPE)+'&redirect_uri='+encodeURIComponent(REDIRECT_URI)+
+        '&code_challenge_method=S256&code_challenge='+b64url(h);
+      location.href=url;
+    });
+  }
+  function handleCallback(){
+    var p=new URLSearchParams(location.search);
+    if(p.get('error')){ showConnect('Auth cancelled'); cleanUrl(); return true; }
+    var code=p.get('code'), verifier=localStorage.getItem(VKEY);
+    if(code && verifier){
+      inner.innerHTML='<div class="connect"><div class="cta">Connecting…</div></div>';
+      fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams({grant_type:'authorization_code',code:code,redirect_uri:REDIRECT_URI,client_id:CLIENT_ID,code_verifier:verifier})})
+      .then(function(r){return r.json();}).then(function(d){
+        localStorage.removeItem(VKEY);
+        if(d.access_token){
+          accessToken=d.access_token; expiresAt=Date.now()+(d.expires_in||3600)*1000;
+          if(d.refresh_token){ refreshToken=d.refresh_token; localStorage.setItem(STORE, JSON.stringify({refresh_token:refreshToken})); }
+          cleanUrl(); startPolling();
+        } else { showConnect('Auth failed — retry'); cleanUrl(); }
+      }).catch(function(){ showConnect('Network error — retry'); cleanUrl(); });
+      return true;
+    }
+    return false;
+  }
+  function cleanUrl(){ try{ history.replaceState({}, document.title, location.pathname); }catch(e){} }
+
+  // ---- token + polling ---------------------------------------------------
+  function ensureToken(){
+    if(accessToken && Date.now() < expiresAt-30000) return Promise.resolve(true);
+    if(!refreshToken) return Promise.resolve(false);
+    return fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams({grant_type:'refresh_token',refresh_token:refreshToken,client_id:CLIENT_ID})})
+      .then(function(r){return r.json();}).then(function(d){
+        if(d.access_token){ accessToken=d.access_token; expiresAt=Date.now()+(d.expires_in||3600)*1000;
+          if(d.refresh_token){ refreshToken=d.refresh_token; localStorage.setItem(STORE, JSON.stringify({refresh_token:refreshToken})); }
+          return true;
+        }
+        // refresh_token invalid → force reconnect
+        refreshToken=null; localStorage.removeItem(STORE); return false;
+      }).catch(function(){ return true; /* transient: keep trying */ });
+  }
+
+  function tick(){
+    ensureToken().then(function(ok){
+      if(!ok){ showConnect('Connect Spotify'); schedule(POLL_MS); return; }
+      var ctrl=new AbortController(); var to=setTimeout(function(){ctrl.abort();},6000);
+      fetch('https://api.spotify.com/v1/me/player/currently-playing',{headers:{'Authorization':'Bearer '+accessToken},signal:ctrl.signal})
+      .then(function(r){
+        clearTimeout(to);
+        if(r.status===204){ renderTrack(null); backoff=0; return null; }
+        if(r.status===401){ accessToken=null; return null; }         // will refresh next tick
+        if(r.status===429){ backoff=Math.min(backoff+1,5); return null; }
+        if(!r.ok){ backoff=Math.min(backoff+1,5); return null; }
+        backoff=0; return r.json();
+      }).then(function(d){ if(d) renderTrack(d); })
+      .catch(function(){ clearTimeout(to); backoff=Math.min(backoff+1,5); /* keep last track shown */ })
+      .finally(function(){ schedule(POLL_MS + backoff*2000); });
+    });
+  }
+  function schedule(delay){ clearTimeout(pollTimer); pollTimer=setTimeout(tick, delay); }
+  function startPolling(){ clearTimeout(pollTimer); tick(); }
+
+  // ---- boot --------------------------------------------------------------
+  if(!handleCallback()){
+    if(refreshToken){ startPolling(); }
+    else { showConnect('Connect Spotify'); }
+  }
+})();
+</script>
+</body>
+</html>
