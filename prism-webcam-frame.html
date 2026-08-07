@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+/* ============================================================
+   PRISM — Holo-Glass Webcam Frame
+   The frame fills the whole browser source and leaves the
+   CENTER TRANSPARENT so your camera shows through.
+
+   HOW TO USE:
+   1. Add a Browser Source in OBS, size it to your cam area.
+   2. Put this frame source ABOVE your camera source.
+   3. (Optional) Add ?demo to the file URL to preview with a
+      fake camera fill.
+   Rename the callsign in .nameplate and the tag text below.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600&display=swap');
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
+  font-family:'Space Grotesk','Segoe UI',Arial,sans-serif; }
+:root{
+  --ink:#EAF0FF;
+  --c1:#57F2E4; --c2:#6C8BFF; --c3:#B983FF; --c4:#FF7ACb; --c5:#FFD86B;
+  --radius:26px;
+}
+.cam{ position:absolute; inset:0; }
+
+/* demo camera fill — only visible when body has .demo */
+.demo-cam{ display:none; }
+body.demo .demo-cam{ display:block; position:absolute; inset:0; border-radius:var(--radius); overflow:hidden;
+  background:
+    radial-gradient(420px 460px at 50% 42%, #3a4360 0%, #232838 45%, #14161f 100%),
+    linear-gradient(160deg,#1b2030,#0d0f16); }
+body.demo .demo-cam::after{ content:'CAM'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  color:rgba(180,195,235,0.18); font-size:120px; font-weight:700; letter-spacing:16px; }
+
+/* soft outer glow halo */
+.glow-ring{ position:absolute; inset:0; border-radius:calc(var(--radius) + 4px); pointer-events:none;
+  box-shadow:0 0 60px rgba(110,139,255,0.28), 0 0 120px rgba(185,131,255,0.12); }
+
+/* inner vignette + faint hairline just inside the rim */
+.inner-line{ position:absolute; inset:7px; border-radius:calc(var(--radius) - 5px); pointer-events:none;
+  border:1px solid rgba(180,200,255,0.10);
+  box-shadow:inset 0 0 40px rgba(0,0,0,0.35); }
+
+/* the animated iridescent rim — masked so the CENTER stays transparent */
+.ring{ position:absolute; inset:0; border-radius:var(--radius); padding:3px; pointer-events:none;
+  background:linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1));
+  background-size:320% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  animation:flow 9s linear infinite; }
+.ring.blur{ filter:blur(5px); opacity:0.6; }        /* bloom copy behind the crisp rim */
+
+@keyframes flow{ 0%{background-position:0% 50%} 100%{background-position:320% 50%} }
+
+/* glowing corner brackets */
+.bracket{ position:absolute; width:64px; height:64px; pointer-events:none;
+  border:3px solid var(--c1);
+  filter:drop-shadow(0 0 8px rgba(87,242,228,0.7));
+  animation:corner-pulse 3.5s ease-in-out infinite; }
+.bracket.tl{ top:14px; left:14px; border-right:none; border-bottom:none; border-radius:14px 0 0 0; }
+.bracket.tr{ top:14px; right:14px; border-left:none; border-bottom:none; border-radius:0 14px 0 0; border-color:var(--c3); filter:drop-shadow(0 0 8px rgba(185,131,255,0.7)); animation-delay:0.4s; }
+.bracket.bl{ bottom:14px; left:14px; border-right:none; border-top:none; border-radius:0 0 0 14px; border-color:var(--c2); filter:drop-shadow(0 0 8px rgba(108,139,255,0.7)); animation-delay:0.8s; }
+.bracket.br{ bottom:14px; right:14px; border-left:none; border-top:none; border-radius:0 0 14px 0; border-color:var(--c4); filter:drop-shadow(0 0 8px rgba(255,122,203,0.7)); animation-delay:1.2s; }
+@keyframes corner-pulse{ 0%,100%{opacity:0.85} 50%{opacity:0.35} }
+
+/* top-left holo tag */
+.tag{ position:absolute; top:22px; left:22px; z-index:5; display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px; border-radius:999px; font-size:13px; font-weight:600; letter-spacing:3px; color:var(--ink);
+  background:linear-gradient(rgba(15,17,30,0.72),rgba(15,17,30,0.72)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3)) border-box;
+  background-size:100% 100%,240% 100%; border:1.5px solid transparent;
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  text-shadow:0 0 10px rgba(150,180,255,0.4); box-shadow:0 4px 16px rgba(0,0,0,0.35);
+  animation:flow 8s linear infinite; }
+
+/* top-right REC indicator */
+.rec{ position:absolute; top:22px; right:22px; z-index:5; display:inline-flex; align-items:center; gap:8px;
+  padding:6px 14px; border-radius:999px; font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; letter-spacing:3px;
+  color:#ffd7ea;
+  background:linear-gradient(rgba(24,10,18,0.72),rgba(24,10,18,0.72)) padding-box,
+    linear-gradient(120deg,var(--c4),var(--c5)) border-box;
+  border:1.5px solid transparent; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  box-shadow:0 4px 16px rgba(0,0,0,0.35); }
+.rec .rec-dot{ width:10px; height:10px; border-radius:50%; background:var(--c4);
+  box-shadow:0 0 8px var(--c4),0 0 16px var(--c4); animation:blip 1.1s ease-in-out infinite; }
+@keyframes blip{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.25;transform:scale(0.75)} }
+
+/* bottom-center nameplate */
+.nameplate{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%); z-index:6;
+  display:inline-flex; align-items:center; gap:11px; padding:8px 20px 8px 8px; border-radius:999px;
+  background:linear-gradient(rgba(13,15,26,0.9),rgba(13,15,26,0.9)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1)) border-box;
+  background-size:100% 100%,320% 100%; border:1.6px solid transparent;
+  -webkit-backdrop-filter:blur(14px) saturate(150%); backdrop-filter:blur(14px) saturate(150%);
+  box-shadow:0 10px 30px rgba(0,0,0,0.5), 0 0 22px rgba(120,140,255,0.18);
+  animation:flow 10s linear infinite; }
+.nameplate img{ width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0;
+  border:1.5px solid transparent;
+  background:linear-gradient(#0b0e18,#0b0e18) padding-box,linear-gradient(135deg,var(--c1),var(--c3),var(--c4)) border-box;
+  box-shadow:0 0 10px rgba(120,150,255,0.3); }
+.nameplate .who{ font-size:17px; font-weight:700; letter-spacing:0.6px; color:var(--ink); text-shadow:0 0 12px rgba(150,180,255,0.35); }
+.nameplate .live{ display:inline-flex; align-items:center; gap:6px; margin-left:2px; font-size:11px; font-weight:700;
+  letter-spacing:2px; color:#7ffbe6; }
+.nameplate .live .ld{ width:8px; height:8px; border-radius:50%; background:var(--c1); box-shadow:0 0 8px var(--c1),0 0 14px var(--c1); animation:blip 1.6s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div class="cam">
+  <div class="demo-cam"></div>
+  <div class="glow-ring"></div>
+  <div class="ring blur"></div>
+  <div class="ring"></div>
+  <div class="inner-line"></div>
+  <span class="bracket tl"></span>
+  <span class="bracket tr"></span>
+  <span class="bracket bl"></span>
+  <span class="bracket br"></span>
+  <div class="tag">PRISM CAM</div>
+  <div class="rec"><span class="rec-dot"></span>REC</div>
+  <div class="nameplate">
+    <img src="https://static-cdn.jtvnw.net/jtv_user_pictures/f8059656-f846-4bfa-9cd5-e70afba5692e-profile_image-300x300.png" alt="NeoTheFox98">
+    <span class="who">NeoTheFox98</span>
+    <span class="live"><span class="ld"></span>LIVE</span>
+  </div>
+</div>
+<script>
+  // enable demo camera fill when the URL has ?demo
+  if (new URLSearchParams(location.search).has('demo')) document.body.classList.add('demo');
+</script>
+</body>
+</html>

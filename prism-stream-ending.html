@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="prism-theme.css">
+<style>
+/* ---- stream-ending specifics ---- */
+.avatar{ width:184px; height:184px; margin-bottom:22px; }
+.holo-pill{ font-size:24px; padding:9px 26px; margin-bottom:16px; }
+.holo-pill .live-dot{ background:var(--c4); box-shadow:0 0 10px var(--c4),0 0 18px var(--c4); }
+.heading{ font-size:112px; letter-spacing:3px; margin-bottom:12px; }
+.sub{ font-size:32px; margin-bottom:26px; }
+@keyframes wave-anim{ 0%,100%{transform:rotate(0deg)} 20%{transform:rotate(-7deg)} 40%{transform:rotate(7deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
+.goodbye{ margin-top:32px; font-size:24px; color:#7b86ab; letter-spacing:5px; text-transform:uppercase; }
+.sparkle-container{ position:relative; margin:20px auto 0; width:100%; height:180px; overflow:hidden; pointer-events:none; }
+.sparkle{ position:absolute; bottom:-10px; border-radius:50%; pointer-events:none; animation:sparkle-rise ease-out forwards; box-shadow:0 0 6px currentColor,0 0 12px currentColor; }
+@keyframes sparkle-rise{ 0%{transform:translateY(0) translateX(0) scale(1);opacity:1} 100%{transform:translateY(-200px) translateX(var(--drift,20px)) scale(0.2);opacity:0} }
+/* entrance timing */
+.ent-avatar{ animation:entScaleIn 0.7s ease-out both, wave-anim 2.4s ease-in-out infinite; }
+.ent-goodbye{ animation:entFadeUp 0.6s ease-out 0.8s both; }
+.ent-count{ animation:entFadeUp 0.6s ease-out 0.95s both, flow 10s linear infinite; }
+.ent-sparkles{ animation:entFadeUp 0.6s ease-out 1.1s both; }
+</style>
+</head>
+<body data-motes="72">
+<div class="bg">
+  <div class="grid-floor"></div>
+  <div class="particles" id="particles"></div>
+  <div class="vignette"></div>
+  <div class="content">
+    <div class="avatar ent-avatar"><img class="js-avatar" src="https://static-cdn.jtvnw.net/jtv_user_pictures/f8059656-f846-4bfa-9cd5-e70afba5692e-profile_image-300x300.png" alt="NeoTheFox98"></div>
+    <div class="holo-pill ent-logo"><span class="live-dot"></span>OFFLINE</div>
+    <div class="heading ent-heading">Thanks for Watching!</div>
+    <div class="sub ent-sub">Signal ending &middot; feed closing</div>
+    <div class="socials ent-socials" data-prism-socials></div>
+    <div class="goodbye ent-goodbye">See you in the next stream</div>
+    <div class="tagline ent-count"><span class="v js-followcount">&mdash;</span><span class="k">followers &middot; thank you</span></div>
+    <div class="sparkle-container ent-sparkles" id="sparkleContainer"></div>
+  </div>
+</div>
+<script src="prism-config.js"></script>
+<script src="prism-engine.js"></script>
+<script>
+/* ---- rising sparkles (scene-specific) ---- */
+(function(){
+  var C2=['#57F2E4','#6C8BFF','#B983FF','#FF7ACb','#FFD86B'];
+  var c=document.getElementById('sparkleContainer'); if(!c) return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function spawn(){
+    var s=document.createElement('div'); s.className='sparkle';
+    var sz=3+Math.random()*5; s.style.width=sz+'px'; s.style.height=sz+'px';
+    s.style.left=(5+Math.random()*90)+'%'; s.style.color=C2[Math.floor(Math.random()*C2.length)];
+    s.style.setProperty('--drift',(Math.random()*60-30)+'px');
+    var dur=4+Math.random()*3; s.style.animationDuration=dur+'s';
+    c.appendChild(s); setTimeout(function(){ s.remove(); }, dur*1000);
+  }
+  spawn(); setInterval(spawn, 250+Math.random()*200);
+})();
+</script>
+</body>
+</html>

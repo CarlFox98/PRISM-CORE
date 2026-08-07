@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="prism-theme.css">
+<style>
+/* ---- be-right-back specifics ---- */
+.avatar{ width:184px; height:184px; margin-bottom:22px; }
+.holo-pill{ font-size:24px; padding:9px 26px; margin-bottom:16px; }
+.heading{ font-size:120px; letter-spacing:4px; margin-bottom:12px; }
+.sub{ font-size:32px; margin-bottom:26px; }
+@keyframes nap{ 0%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} 60%{transform:translateY(0)} }
+.ent-avatar{ animation:entScaleIn 0.7s ease-out both, nap 2.8s ease-in-out infinite; }
+.ent-latest{ animation:entFadeUp 0.6s ease-out 0.8s both, flow 10s linear infinite; }
+</style>
+</head>
+<body data-motes="72">
+<div class="bg">
+  <div class="grid-floor"></div>
+  <div class="particles" id="particles"></div>
+  <div class="vignette"></div>
+  <div class="content">
+    <div class="avatar ent-avatar"><img class="js-avatar" src="https://static-cdn.jtvnw.net/jtv_user_pictures/f8059656-f846-4bfa-9cd5-e70afba5692e-profile_image-300x300.png" alt="NeoTheFox98"></div>
+    <div class="holo-pill ent-logo"><span class="live-dot"></span>LIVE</div>
+    <div class="heading ent-heading">Be Right Back</div>
+    <div class="sub ent-sub">Away from keyboard &middot; back shortly</div>
+    <div class="socials ent-socials" data-prism-socials></div>
+    <div class="tagline ent-latest js-latest-wrap" hidden>
+      <span class="k">Latest follow</span><span class="star">&#10022;</span><span class="v js-latest"></span>
+    </div>
+  </div>
+</div>
+<script src="prism-config.js"></script>
+<script src="prism-engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+/* ============================================================
+   PRISM — Info Panels  ·  Holo-Glass / Iridescent
+   Shared stylesheet for the standalone info panels:
+     prism-about.html   prism-rules.html   prism-schedule.html
+     prism-setup.html   prism-faq.html
+   The 22nd-century take on the old Win98 "About" windows.
+   Edit the palette below to retune every panel at once.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+:root{
+  --ink:#EAF0FF; --ink-soft:#A9B4D6; --ink-dim:#7C88AE;
+  --glass:rgba(14,16,28,0.44); --glass-deep:rgba(10,12,22,0.66);
+  --c1:#57F2E4; --c2:#6C8BFF; --c3:#B983FF; --c4:#FF7ACb; --c5:#FFD86B;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ min-height:100%; font-family:'Space Grotesk','Segoe UI',Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; color:var(--ink); }
+body{
+  padding:34px 20px;
+  background:
+    radial-gradient(1000px 700px at 14% 8%, rgba(87,242,228,0.12), transparent 60%),
+    radial-gradient(1000px 780px at 88% 14%, rgba(108,139,255,0.16), transparent 60%),
+    radial-gradient(1100px 820px at 80% 92%, rgba(185,131,255,0.14), transparent 60%),
+    radial-gradient(900px 760px at 10% 94%, rgba(255,122,203,0.10), transparent 60%),
+    linear-gradient(140deg,#05060c 0%, #080a14 45%, #0b0713 100%);
+  background-attachment:fixed;
+}
+
+/* ---------- the panel card ---------- */
+.panel{
+  position:relative; width:100%; max-width:560px; margin:0 auto; border-radius:20px; padding:1.6px;
+  background:
+    linear-gradient(var(--glass),var(--glass)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5),var(--c1)) border-box;
+  background-size:100% 100%, 320% 100%;
+  border:1.6px solid transparent;
+  -webkit-backdrop-filter:blur(16px) saturate(150%); backdrop-filter:blur(16px) saturate(150%);
+  box-shadow:0 24px 60px rgba(0,0,0,0.5), 0 0 30px rgba(120,140,255,0.14);
+  animation:flow 13s linear infinite;
+}
+.panel-inner{ border-radius:18px; background:var(--glass-deep); overflow:hidden; }
+
+/* ---------- window chrome (PRISM take on the old titlebar) ---------- */
+.chrome{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:10px 16px; border-bottom:1px solid rgba(140,160,255,0.14);
+  background:linear-gradient(90deg, rgba(87,242,228,0.10), rgba(108,139,255,0.05) 45%, rgba(255,122,203,0.10));
+}
+.chrome-id{ display:inline-flex; align-items:center; gap:9px;
+  font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px;
+  text-transform:uppercase; color:var(--ink-soft); }
+.chrome-id .glyph{ color:var(--c1); font-size:13px; text-shadow:0 0 10px rgba(87,242,228,0.7);
+  animation:blip 2.4s ease-in-out infinite; }
+.chrome-btns{ display:inline-flex; gap:8px; }
+.chrome-btns span{ width:12px; height:12px; border-radius:50%; display:block; }
+.chrome-btns span:nth-child(1){ background:var(--c1); box-shadow:0 0 9px var(--c1); }
+.chrome-btns span:nth-child(2){ background:var(--c5); box-shadow:0 0 9px var(--c5); }
+.chrome-btns span:nth-child(3){ background:var(--c4); box-shadow:0 0 9px var(--c4); }
+
+/* ---------- title plate ---------- */
+.plate{ padding:24px 22px 4px; text-align:center; }
+.eyebrow{ display:inline-flex; align-items:center; gap:8px; margin-bottom:9px;
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--c1); text-shadow:0 0 12px rgba(87,242,228,0.45); }
+.eyebrow .dot{ width:8px; height:8px; border-radius:50%; background:var(--c1);
+  box-shadow:0 0 8px var(--c1),0 0 15px var(--c1); animation:blip 1.5s ease-in-out infinite; }
+.heading{
+  font-size:40px; font-weight:700; letter-spacing:3px; line-height:1.16; padding-bottom:0.08em;
+  background:linear-gradient(100deg,var(--c1),var(--c2) 22%,#ffffff 46%,#ffffff 54%,var(--c3) 78%,var(--c4));
+  background-size:250% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 26px rgba(140,170,255,0.30)); animation:shimmer 7s linear infinite;
+}
+
+/* ---------- body ---------- */
+.body{ padding:16px 26px 28px; font-size:15.5px; line-height:1.66; }
+.body p{ color:var(--ink-soft); margin:0 0 12px; }
+.body p:last-child{ margin-bottom:0; }
+.lead{ color:var(--ink); font-weight:600; font-size:18px; margin-bottom:4px !important; }
+.lead .wave{ display:inline-block; animation:wavehand 2.6s ease-in-out infinite; transform-origin:70% 70%; }
+
+/* section with an iridescent icon chip */
+.sec{ margin-top:18px; }
+.sec-h{ display:flex; align-items:center; gap:11px; margin-bottom:3px;
+  font-weight:700; font-size:15px; letter-spacing:0.4px; color:var(--ink); }
+.ic{ flex-shrink:0; width:30px; height:30px; border-radius:9px; display:grid; place-items:center; font-size:15px;
+  background:linear-gradient(rgba(13,15,26,0.9),rgba(13,15,26,0.9)) padding-box,
+    linear-gradient(135deg,var(--c1),var(--c3),var(--c4)) border-box;
+  border:1.4px solid transparent; box-shadow:0 0 12px rgba(120,150,255,0.22); }
+.ic svg{ width:16px; height:16px; stroke:var(--c1); }
+.pill svg{ width:16px; height:16px; fill:currentColor; }
+.notice .tag svg{ width:15px; height:15px; vertical-align:-2px; stroke:var(--c4); margin-right:2px; }
+
+/* numbered rules */
+.rules{ list-style:none; display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+.rules li{ display:flex; align-items:flex-start; gap:13px; color:var(--ink-soft); }
+.rules .n{ flex-shrink:0; width:27px; height:27px; border-radius:8px; display:grid; place-items:center;
+  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px; color:var(--ink);
+  background:linear-gradient(rgba(13,15,26,0.92),rgba(13,15,26,0.92)) padding-box,
+    linear-gradient(135deg,var(--c1),var(--c2),var(--c3),var(--c4)) border-box;
+  border:1.3px solid transparent; box-shadow:0 0 10px rgba(120,150,255,0.20); }
+
+/* callout / notice */
+.notice{ margin-top:18px; padding:13px 15px; border-radius:13px; font-size:13.5px; line-height:1.55; color:var(--ink-soft);
+  background:linear-gradient(rgba(38,14,26,0.42),rgba(20,14,30,0.42)) padding-box,
+    linear-gradient(120deg,var(--c4),var(--c3),var(--c4)) border-box;
+  border:1.4px solid transparent; }
+.notice b{ color:var(--c4); }
+.notice .tag{ font-weight:700; color:var(--c4); }
+
+.tip{ margin-top:6px; font-style:italic; color:var(--ink-dim); font-size:13.5px; }
+
+/* holo pills (socials etc.) */
+.pills{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+.pill{ display:inline-flex; align-items:center; gap:9px; padding:9px 16px; border-radius:999px;
+  font-size:14px; color:var(--ink); text-decoration:none; letter-spacing:0.3px;
+  background:linear-gradient(rgba(13,15,26,0.88),rgba(13,15,26,0.88)) padding-box,
+    linear-gradient(120deg,var(--c1),var(--c2),var(--c3),var(--c4)) border-box;
+  background-size:100% 100%,260% 100%; border:1.4px solid transparent;
+  box-shadow:0 4px 16px rgba(0,0,0,0.3),0 0 12px rgba(120,140,255,0.12);
+  animation:flow 10s linear infinite; transition:transform 0.2s, box-shadow 0.2s; }
+.pill:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(120,150,255,0.26); }
+.pill .h{ font-family:'JetBrains Mono',monospace; color:var(--c1); font-weight:600; }
+
+/* spec groups (setup) */
+.group{ margin-top:20px; }
+.group:first-child{ margin-top:8px; }
+.group-h{ display:flex; align-items:center; gap:11px; margin-bottom:11px;
+  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--c1); }
+.group-h::after{ content:""; flex:1; height:1px;
+  background:linear-gradient(90deg,rgba(87,242,228,0.5),rgba(185,131,255,0.25),transparent); }
+.spec{ display:flex; flex-direction:column; gap:9px; }
+.spec .row{ display:flex; gap:12px; align-items:baseline; }
+.spec .k{ flex-shrink:0; width:132px; font-weight:600; color:var(--ink); font-size:14px; }
+.spec .v{ color:var(--ink-soft); font-size:14px; }
+.spec .v b{ color:var(--ink); font-weight:600; }
+
+/* FAQ accordion */
+.faq{ display:flex; flex-direction:column; gap:11px; margin-top:6px; }
+.faq details{ border-radius:13px; overflow:hidden;
+  background:linear-gradient(rgba(16,18,30,0.6),rgba(16,18,30,0.6)) padding-box,
+    linear-gradient(120deg,var(--c2),var(--c3),var(--c4)) border-box;
+  border:1.3px solid transparent; }
+.faq summary{ list-style:none; cursor:pointer; padding:13px 16px; display:flex; align-items:center; gap:12px;
+  font-weight:600; font-size:15px; color:var(--ink); user-select:none; }
+.faq summary::-webkit-details-marker{ display:none; }
+.faq summary .q{ flex-shrink:0; width:24px; height:24px; border-radius:7px; display:grid; place-items:center;
+  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12px; color:#0b0e18;
+  background:linear-gradient(135deg,var(--c1),var(--c3)); box-shadow:0 0 10px rgba(120,150,255,0.3); }
+.faq summary .chev{ margin-left:auto; color:var(--ink-dim); transition:transform 0.25s; font-size:13px; }
+.faq details[open] summary .chev{ transform:rotate(180deg); color:var(--c1); }
+.faq .a{ padding:0 16px 14px 52px; color:var(--ink-soft); font-size:14px; line-height:1.6; }
+
+.foot{ margin-top:20px; padding-top:14px; border-top:1px solid rgba(140,160,255,0.12);
+  text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px;
+  text-transform:uppercase; color:var(--ink-dim); }
+
+/* ---------- motion ---------- */
+@keyframes flow{ 0%{background-position:0% 0%,0% 50%;} 100%{background-position:0% 0%,320% 50%;} }
+@keyframes shimmer{ 0%{background-position:0% 0%} 100%{background-position:250% 0%} }
+@keyframes blip{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.82)} }
+@keyframes wavehand{ 0%,60%,100%{transform:rotate(0)} 15%{transform:rotate(16deg)} 30%{transform:rotate(-8deg)} 45%{transform:rotate(14deg)} }
+
+@media (prefers-reduced-motion: reduce){
+  .panel,.pill,.heading,.chrome-id .glyph,.eyebrow .dot,.lead .wave{ animation:none !important; }
+}

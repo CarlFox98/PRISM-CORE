@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRISM — Holo-Glass Chat Preview</title>
+<style>
+  /* ---- Preview stage only (NOT part of the overlay CSS) ------------------ */
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    /* Fake "stream scene" behind the glass so the blur + iridescence read.
+       On stream this is transparent and your gameplay/webcam shows through. */
+    background:
+      radial-gradient(1200px 700px at 15% 10%, #1b2a4a 0%, transparent 60%),
+      radial-gradient(1000px 800px at 90% 80%, #3a1b46 0%, transparent 55%),
+      radial-gradient(900px 900px at 60% 30%, #123b3a 0%, transparent 60%),
+      linear-gradient(135deg, #05060c 0%, #0a0b16 55%, #0c0716 100%);
+    overflow: hidden;
+  }
+  /* moving "scene" specks so the glass clearly refracts a live background */
+  body::before {
+    content: ""; position: fixed; inset: -20%;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(120,200,255,.7), transparent),
+      radial-gradient(2px 2px at 70% 60%, rgba(255,140,220,.6), transparent),
+      radial-gradient(1.5px 1.5px at 40% 80%, rgba(150,255,220,.6), transparent),
+      radial-gradient(1.5px 1.5px at 85% 25%, rgba(255,220,140,.6), transparent),
+      radial-gradient(2px 2px at 55% 45%, rgba(180,160,255,.6), transparent);
+    background-size: 400px 400px;
+    animation: drift 40s linear infinite; opacity:.5;
+  }
+  @keyframes drift { to { transform: translate(60px,-40px) rotate(4deg); } }
+
+  .preview-shell {
+    position: relative; z-index: 2;
+    max-width: 440px; margin: 0 auto; padding: 28px 14px 40px;
+    height: 100vh; display: flex; flex-direction: column;
+  }
+  .preview-caption {
+    color: #7f8bb0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    text-align: center; margin: 0 0 14px;
+  }
+
+  /* ======================================================================= */
+  /* ==========  PRISM OVERLAY CSS (identical to the .css file)  =========== */
+  /* ======================================================================= */
+  :root {
+    --prism-ink:#EAF0FF; --prism-ink-soft:#A9B4D6;
+    --prism-glass:rgba(14,16,28,0.42); --prism-glass-deep:rgba(10,12,22,0.60);
+    --prism-c1:#57F2E4; --prism-c2:#6C8BFF; --prism-c3:#B983FF; --prism-c4:#FF7ACb; --prism-c5:#FFD86B;
+  }
+  .chat, .chat--list {
+    background:transparent; border:none; border-radius:0; padding:4px 4px 8px 4px;
+    width:100%; flex:1; overflow-y:auto; overflow-x:hidden;
+  }
+  .chat::before {
+    content:"PRISM // LIVE FEED"; display:block; position:sticky; top:0; z-index:20;
+    margin:0 2px 12px 2px; padding:9px 16px; color:var(--prism-ink);
+    font-size:12px; font-weight:600; letter-spacing:4px; text-transform:uppercase; text-align:center;
+    border-radius:12px;
+    background:
+      linear-gradient(var(--prism-glass-deep),var(--prism-glass-deep)) padding-box,
+      linear-gradient(115deg,var(--prism-c1),var(--prism-c2),var(--prism-c3),var(--prism-c4),var(--prism-c5),var(--prism-c1)) border-box;
+    background-size:100% 100%,300% 100%;
+    border:1.5px solid transparent;
+    -webkit-backdrop-filter:blur(14px) saturate(160%); backdrop-filter:blur(14px) saturate(160%);
+    text-shadow:0 0 14px rgba(120,170,255,0.35);
+    box-shadow:0 8px 30px rgba(0,0,0,0.45),0 0 22px rgba(120,140,255,0.18),inset 0 1px 0 rgba(255,255,255,0.10);
+    user-select:none; animation:prism-flow 9s linear infinite;
+  }
+  .chat__item, .chat__item-transform-wrapper {
+    position:relative; margin:0 2px 11px 2px; padding:1.5px; border-radius:14px;
+    background:
+      linear-gradient(var(--prism-glass),var(--prism-glass)) padding-box,
+      linear-gradient(120deg,var(--prism-c1),var(--prism-c2),var(--prism-c3),var(--prism-c4),var(--prism-c5),var(--prism-c1)) border-box;
+    background-size:100% 100%,320% 100%;
+    border:1.5px solid transparent;
+    -webkit-backdrop-filter:blur(16px) saturate(150%); backdrop-filter:blur(16px) saturate(150%);
+    box-shadow:0 10px 28px rgba(0,0,0,0.42),0 0 18px rgba(110,139,255,0.10),inset 0 1px 0 rgba(255,255,255,0.08);
+    animation:prism-rise 0.42s cubic-bezier(0.16,1,0.3,1) both, prism-flow 11s linear infinite;
+  }
+  .chat__item-inner {
+    position:relative; border-radius:12px; padding:9px 12px;
+    background:linear-gradient(180deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.00) 22%),var(--prism-glass-deep);
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 7px;
+    font-size:14px; line-height:1.55; overflow:hidden;
+  }
+  .chat__item-inner::after {
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(105deg,transparent 30%,rgba(180,200,255,0.06) 48%,rgba(255,255,255,0.10) 50%,rgba(180,200,255,0.06) 52%,transparent 70%);
+    background-size:250% 100%; mix-blend-mode:screen; animation:prism-scan 7s ease-in-out infinite;
+  }
+  .chat__metadata { display:flex; align-items:center; order:-1; margin-right:6px; }
+  .chat__metadata-inner { display:inline-flex; align-items:center; gap:5px; }
+  .chat__avatar {
+    width:32px; height:32px; border-radius:9px; margin-right:7px; display:inline-block; vertical-align:middle; flex-shrink:0;
+    border:1.5px solid transparent;
+    background:linear-gradient(#0c0e18,#0c0e18) padding-box,linear-gradient(135deg,var(--prism-c1),var(--prism-c3),var(--prism-c4)) border-box;
+    box-shadow:0 0 12px rgba(120,150,255,0.28),inset 0 0 0 1px rgba(255,255,255,0.06);
+  }
+  .chat__user {
+    display:inline-block; padding:2px 11px; margin-right:2px; border-radius:999px;
+    font-weight:700; font-size:12.5px; letter-spacing:0.6px; color:var(--prism-ink); white-space:nowrap;
+    background:linear-gradient(rgba(18,20,34,0.72),rgba(18,20,34,0.72)) padding-box,linear-gradient(120deg,var(--prism-c1),var(--prism-c2),var(--prism-c3),var(--prism-c4)) border-box;
+    background-size:100% 100%,260% 100%; border:1px solid transparent;
+    text-shadow:0 0 12px rgba(150,180,255,0.45); box-shadow:0 0 14px rgba(120,140,255,0.16);
+    animation:prism-flow 8s linear infinite;
+  }
+  .chat__badges { display:inline-flex; align-items:center; gap:3px; flex-shrink:0; filter:saturate(1.25) drop-shadow(0 0 3px rgba(140,160,255,0.35)); }
+  .chat__badge { width:18px; height:18px; display:inline-block; border-radius:5px; }
+  .chat__message {
+    color:var(--prism-ink); font-size:14px; font-weight:400; word-break:break-word; flex:1 1 100%;
+    padding:4px 2px 1px 2px; line-height:1.62; text-shadow:0 1px 6px rgba(0,0,0,0.35);
+  }
+  .chat__emote { display:inline-block; vertical-align:middle; filter:drop-shadow(0 0 4px rgba(140,170,255,0.30)); }
+  .chat__cheermote { display:inline-flex; align-items:center; gap:2px; vertical-align:middle; }
+  .chat__cheermote--amount { font-weight:700; color:var(--prism-c3); text-shadow:0 0 10px rgba(185,131,255,0.5); }
+  .chat__item:first-child {
+    box-shadow:0 12px 34px rgba(0,0,0,0.5),0 0 26px rgba(120,150,255,0.30),inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .chat__item:first-child .chat__item-inner::after { animation-duration:4.5s; opacity:1; }
+  .chat::-webkit-scrollbar { width:7px; }
+  .chat::-webkit-scrollbar-track { background:rgba(16,18,30,0.4); border-radius:8px; }
+  .chat::-webkit-scrollbar-thumb { border-radius:8px; background:linear-gradient(180deg,var(--prism-c1),var(--prism-c2),var(--prism-c3),var(--prism-c4)); box-shadow:0 0 8px rgba(120,150,255,0.4); }
+
+  @keyframes prism-flow { 0%{background-position:0% 0%,0% 50%;} 100%{background-position:0% 0%,300% 50%;} }
+  @keyframes prism-rise { 0%{opacity:0;transform:translateY(12px) scale(0.965);filter:blur(4px);} 60%{opacity:1;filter:blur(0);} 100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);} }
+  @keyframes prism-scan { 0%,100%{background-position:130% 0;opacity:0.55;} 50%{background-position:-30% 0;opacity:0.9;} }
+</style>
+</head>
+<body>
+  <div class="preview-shell">
+    <p class="preview-caption">preview · glass refracts a simulated scene · new lines drop live</p>
+    <div class="chat"><div class="chat--list" id="feed"></div></div>
+  </div>
+
+<script>
+  // ---- SoundAlerts-style DOM builder + demo feed --------------------------
+  function av(a,b){
+    const s = `<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+      <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0' stop-color='${a}'/><stop offset='1' stop-color='${b}'/></linearGradient></defs>
+      <rect width='32' height='32' rx='9' fill='url(#g)'/></svg>`;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(s);
+  }
+  function badge(c){
+    const s = `<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'>
+      <rect width='18' height='18' rx='5' fill='${c}'/>
+      <circle cx='9' cy='9' r='3.4' fill='rgba(255,255,255,.85)'/></svg>`;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(s);
+  }
+  const emote = "data:image/svg+xml;utf8," + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><circle cx='11' cy='11' r='10' fill='#FFD86B'/><circle cx='7.5' cy='9' r='1.6' fill='#222'/><circle cx='14.5' cy='9' r='1.6' fill='#222'/><path d='M6 13 Q11 17 16 13' stroke='#222' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");
+
+  const MSGS = [
+    {u:"Nova_Rider",   a:["#57F2E4","#6C8BFF"], b:["#B983FF"],           m:"this overlay looks like it fell out of the year 2187 ✨"},
+    {u:"pixel_witch",  a:["#FF7ACb","#B983FF"], b:["#57F2E4","#FFD86B"], m:'the iridescent edges are unreal <img class="chat__emote" src="'+emote+'" width="20">'},
+    {u:"grumbot",      a:["#6C8BFF","#57F2E4"], b:[],                    m:"chat is officially from the future now"},
+    {u:"Aria.exe",     a:["#FFD86B","#FF7ACb"], b:["#6C8BFF"],           m:"the glass blur over gameplay is going to look SO clean"},
+    {u:"deltaWolf",    a:["#B983FF","#FF7ACb"], b:["#57F2E4"],           m:'Cheer100 love the holo panes <span class="chat__cheermote"><span class="chat__cheermote--amount">x100</span></span>'},
+    {u:"lumen",        a:["#57F2E4","#FFD86B"], b:[],                    m:"each message literally floats in. peak 22nd century vibes"},
+    {u:"K3RN3L",       a:["#6C8BFF","#B983FF"], b:["#FF7ACb","#57F2E4"], m:"okay the hue drift on the borders is hypnotic"},
+    {u:"soft_static",  a:["#FF7ACb","#57F2E4"], b:["#FFD86B"],           m:"instant follow just for the chat design honestly"},
+  ];
+
+  const feed = document.getElementById('feed');
+  function line(d){
+    const item = document.createElement('div');
+    item.className = 'chat__item';
+    const badges = d.b.map(c=>`<img class="chat__badge" src="${badge(c)}">`).join('');
+    item.innerHTML =
+      `<div class="chat__item-transform-wrapper"><div class="chat__item-inner">
+         <span class="chat__metadata"><span class="chat__metadata-inner">
+           <img class="chat__avatar" src="${av(d.a[0],d.a[1])}">
+           <span class="chat__badges">${badges}</span>
+         </span></span>
+         <span class="chat__user">${d.u}</span>
+         <span class="chat__message">${d.m}</span>
+       </div></div>`;
+    // newest on top (matches :first-child highlight)
+    feed.insertBefore(item, feed.firstChild);
+    while (feed.children.length > 9) feed.removeChild(feed.lastChild);
+  }
+
+  // seed a few, then stream new lines
+  MSGS.slice(0,5).reverse().forEach(line);
+  let i = 5;
+  setInterval(()=>{ line(MSGS[i % MSGS.length]); i++; }, 2600);
+</script>
+</body>
+</html>

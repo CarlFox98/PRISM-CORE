@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="prism-theme.css">
+<style>
+/* ---- technical-difficulties specifics ---- */
+.content{ z-index:5; }
+.scanlines{ position:absolute; inset:0; z-index:4; pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0px,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px); }
+.noise{ position:absolute; inset:0; z-index:3; pointer-events:none; opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:256px 256px; }
+
+.avatar{ width:172px; height:172px; margin-bottom:20px; }
+.ent-avatar{ animation:entScaleIn 0.7s ease-out both, floaty 3.4s ease-in-out infinite; }
+
+/* "signal disrupted" pill uses the warm end of the palette */
+.holo-pill{ font-size:20px; letter-spacing:5px;
+  background:linear-gradient(rgba(15,17,30,0.9),rgba(15,17,30,0.9)) padding-box,
+    linear-gradient(120deg,var(--c4),var(--c5),var(--c3),var(--c4)) border-box; }
+.holo-pill .live-dot{ background:var(--c4); box-shadow:0 0 10px var(--c4),0 0 18px var(--c4); animation:blip 1s ease-in-out infinite; }
+
+.heading{ font-size:96px; letter-spacing:3px;
+  animation:shimmer 7s linear infinite, glitch 5s steps(1) infinite; }
+@keyframes glitch{ 0%,92%,100%{transform:translate(0,0)} 93%{transform:translate(-3px,1px)} 94%{transform:translate(3px,-1px)} 95%{transform:translate(-2px,0)} 96%{transform:translate(2px,1px)} 97%{transform:translate(0,0)} }
+.divider{ width:200px; height:2px; margin:14px auto 18px; background:linear-gradient(90deg,transparent,var(--c1),var(--c3),var(--c4),transparent); filter:blur(0.4px); }
+.message{ font-size:28px; color:var(--ink-soft); letter-spacing:3px; line-height:1.6; font-weight:500; }
+.message .accent{ color:var(--c4); }
+
+/* signal icon top-right */
+.signal-icon{ position:absolute; top:44px; right:48px; z-index:6; line-height:0; }
+.signal-icon svg{ width:70px; height:70px; filter:drop-shadow(0 0 18px rgba(255,122,203,0.3)); opacity:0.55; }
+
+/* diagnostics tray */
+.icon-tray{ position:absolute; bottom:44px; right:34px; z-index:6; display:flex; gap:14px; align-items:flex-end; }
+.icon-tray .icon-item{ display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 12px 9px; border-radius:14px;
+  background:linear-gradient(var(--glass),var(--glass)) padding-box,linear-gradient(120deg,rgba(120,150,255,0.35),rgba(87,242,228,0.25)) border-box;
+  border:1.5px solid transparent; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); transition:all 0.5s; box-shadow:0 8px 22px rgba(0,0,0,0.35); }
+.icon-tray svg{ width:50px; height:50px; opacity:0.55; }
+.icon-tray .icon-label{ font-size:12px; color:rgba(169,180,214,0.75); letter-spacing:1px; white-space:nowrap; }
+.icon-item .icon-check{ font-size:11px; font-family:'JetBrains Mono',monospace; transition:color 0.5s; }
+.icon-item.state-error{ background:linear-gradient(rgba(40,14,26,0.5),rgba(40,14,26,0.5)) padding-box,linear-gradient(120deg,var(--c4),var(--c4)) border-box; }
+.icon-item.state-error svg{ opacity:1; filter:drop-shadow(0 0 16px rgba(255,122,203,0.7)); }
+.icon-item.state-error .icon-label, .icon-item.state-error .icon-check{ color:var(--c4); }
+.icon-item.state-warn{ background:linear-gradient(rgba(40,32,10,0.5),rgba(40,32,10,0.5)) padding-box,linear-gradient(120deg,var(--c5),var(--c5)) border-box; }
+.icon-item.state-warn svg{ opacity:0.9; filter:drop-shadow(0 0 14px rgba(255,216,107,0.6)); }
+.icon-item.state-warn .icon-label, .icon-item.state-warn .icon-check{ color:var(--c5); }
+.icon-item.state-ok{ background:linear-gradient(rgba(10,34,30,0.5),rgba(10,34,30,0.5)) padding-box,linear-gradient(120deg,var(--c1),var(--c1)) border-box; }
+.icon-item.state-ok svg{ opacity:0.7; filter:drop-shadow(0 0 12px rgba(87,242,228,0.5)); }
+.icon-item.state-ok .icon-label{ color:rgba(87,242,228,0.85); }
+.icon-item.state-ok .icon-check{ color:#4fe0b0; }
+
+/* status line (bottom-center) */
+.stream-status{ position:absolute; bottom:44px; left:50%; z-index:6; transform:translateX(-50%); display:inline-flex; align-items:center; gap:12px;
+  font-family:'JetBrains Mono',monospace; font-size:19px; color:rgba(169,180,214,0.7); letter-spacing:3px; text-transform:uppercase;
+  padding:9px 22px; border-radius:999px; white-space:nowrap;
+  background:linear-gradient(var(--glass-deep),var(--glass-deep)) padding-box,linear-gradient(120deg,rgba(120,150,255,0.4),rgba(185,131,255,0.3)) border-box;
+  border:1.5px solid transparent; -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); transition:opacity 0.5s; }
+.status-dot{ width:12px; height:12px; border-radius:50%; background:rgba(140,170,255,0.35); transition:background 0.5s; }
+.status-dot.offline{ background:var(--c4); box-shadow:0 0 8px rgba(255,122,203,0.5); animation:pulse-dot 2s ease-in-out infinite; }
+.status-dot.live{ background:#4fe0b0; box-shadow:0 0 8px rgba(79,224,176,0.6); }
+.status-dot.error{ background:var(--c5); box-shadow:0 0 8px rgba(255,216,107,0.5); animation:pulse-dot 1s ease-in-out infinite; }
+@keyframes pulse-dot{ 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+/* back overlay */
+.back-announcement{ position:absolute; inset:0; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:rgba(6,8,16,0.92); opacity:0; pointer-events:none; transition:opacity 0.6s ease; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+.back-announcement.visible{ opacity:1; }
+.back-text{ font-size:88px; font-weight:700; letter-spacing:8px; margin-bottom:16px;
+  background:linear-gradient(100deg,var(--c1),var(--c2),#ffffff,var(--c3),var(--c4)); background-size:250% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 0 40px rgba(140,170,255,0.4)); animation:shimmer 6s linear infinite; }
+.back-sub{ font-size:26px; color:var(--ink-soft); letter-spacing:5px; }
+
+/* entrance timing */
+.ent-logo{ animation:entFadeUp 0.6s ease-out 0.2s both, flow 8s linear infinite; }
+.ent-heading{ animation:entFadeUp 0.6s ease-out 0.35s both, shimmer 7s linear infinite, glitch 5s steps(1) infinite; }
+.ent-divider{ animation:entFadeUp 0.6s ease-out 0.5s both; }
+.ent-message{ animation:entFadeUp 0.6s ease-out 0.65s both; }
+.ent-status{ animation:entFadeUp 0.6s ease-out 0.8s both; }
+.ent-tray{ animation:entScaleIn 0.7s ease-out 1s both; }
+</style>
+</head>
+<body data-motes="64">
+<div class="bg">
+  <div class="grid-floor"></div>
+  <div class="particles" id="particles"></div>
+  <div class="vignette"></div>
+  <div class="noise"></div>
+  <div class="scanlines"></div>
+
+  <div class="signal-icon">
+    <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="95" r="8" fill="#57F2E4"/>
+      <path d="M25,68 Q60,48 95,68" fill="none" stroke="#57F2E4" stroke-width="6" stroke-linecap="round"/>
+      <path d="M10,48 Q60,20 110,48" fill="none" stroke="#6C8BFF" stroke-width="6" stroke-linecap="round"/>
+      <path d="M2,30 Q60,-2 118,30" fill="none" stroke="#FF7ACb" stroke-width="6" stroke-linecap="round" stroke-dasharray="12 10" opacity="0.55"/>
+      <line x1="22" y1="22" x2="98" y2="98" stroke="#FF7ACb" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+    </svg>
+  </div>
+
+  <div class="icon-tray ent-tray">
+    <div class="icon-item" id="itemPc">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="12" y="18" width="96" height="66" rx="8" fill="none" stroke="#6C8BFF" stroke-width="7"/>
+        <rect x="22" y="28" width="76" height="46" rx="4" fill="#6C8BFF" opacity="0.08"/>
+        <rect x="45" y="84" width="30" height="6" rx="3" fill="#6C8BFF"/>
+        <rect x="55" y="90" width="10" height="16" rx="2" fill="#6C8BFF"/>
+        <line x1="35" y1="44" x2="55" y2="58" stroke="#6C8BFF" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+        <line x1="55" y1="44" x2="35" y2="58" stroke="#6C8BFF" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+      <span class="icon-label">PC LINK</span>
+      <span class="icon-check" id="checkPc"></span>
+    </div>
+    <div class="icon-item" id="itemOverlay">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="18" width="100" height="84" rx="8" fill="none" stroke="#8FA6E8" stroke-width="7"/>
+        <line x1="10" y1="42" x2="110" y2="42" stroke="#8FA6E8" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="26" cy="30" r="4.5" fill="#FF7ACb" opacity="0.6"/>
+        <circle cx="42" cy="30" r="4.5" fill="#57F2E4" opacity="0.6"/>
+        <circle cx="58" cy="30" r="4.5" fill="#6C8BFF" opacity="0.6"/>
+        <line x1="28" y1="56" x2="65" y2="56" stroke="#8FA6E8" stroke-width="4" stroke-linecap="round" opacity="0.5"/>
+        <line x1="28" y1="68" x2="80" y2="68" stroke="#8FA6E8" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+        <line x1="40" y1="80" x2="55" y2="92" stroke="#8FA6E8" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+        <line x1="55" y1="80" x2="40" y2="92" stroke="#8FA6E8" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+      <span class="icon-label">OVERLAY</span>
+    </div>
+    <div class="icon-item" id="itemGame">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="38" width="100" height="44" rx="14" fill="none" stroke="#6C8BFF" stroke-width="7"/>
+        <circle cx="32" cy="60" r="8" fill="none" stroke="#6C8BFF" stroke-width="4"/>
+        <line x1="28" y1="52" x2="28" y2="68" stroke="#6C8BFF" stroke-width="4" stroke-linecap="round"/>
+        <line x1="24" y1="60" x2="40" y2="60" stroke="#6C8BFF" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="78" cy="55" r="4" fill="#FF7ACb"/>
+        <circle cx="88" cy="60" r="4" fill="#FF7ACb"/>
+        <circle cx="78" cy="65" r="4" fill="#FF7ACb"/>
+        <circle cx="68" cy="60" r="4" fill="#FF7ACb"/>
+      </svg>
+      <span class="icon-label">GAME</span>
+    </div>
+    <div class="icon-item" id="itemAudio">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="42" y="12" width="36" height="58" rx="18" fill="none" stroke="#FF7ACb" stroke-width="7"/>
+        <path d="M30,58 Q60,82 90,58" fill="none" stroke="#FF7ACb" stroke-width="7" stroke-linecap="round"/>
+        <line x1="60" y1="70" x2="60" y2="98" stroke="#FF7ACb" stroke-width="7" stroke-linecap="round"/>
+        <line x1="42" y1="98" x2="78" y2="98" stroke="#FF7ACb" stroke-width="7" stroke-linecap="round"/>
+      </svg>
+      <span class="icon-label">AUDIO</span>
+      <span class="icon-check" id="checkAudio"></span>
+    </div>
+    <div class="icon-item" id="itemPower">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="35" y="30" width="50" height="45" rx="8" fill="none" stroke="#8FA6E8" stroke-width="7"/>
+        <rect x="50" y="15" width="6" height="18" rx="3" fill="#8FA6E8"/>
+        <rect x="64" y="15" width="6" height="18" rx="3" fill="#8FA6E8"/>
+        <path d="M85,52 Q108,52 108,80" fill="none" stroke="#8FA6E8" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+      <span class="icon-label">POWER</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="avatar ent-avatar"><img class="js-avatar" src="https://static-cdn.jtvnw.net/jtv_user_pictures/f8059656-f846-4bfa-9cd5-e70afba5692e-profile_image-300x300.png" alt="NeoTheFox98"></div>
+    <div class="holo-pill ent-logo"><span class="live-dot"></span>SIGNAL DISRUPTED</div>
+    <div class="heading ent-heading">Technical Difficulties</div>
+    <div class="divider ent-divider"></div>
+    <div class="message ent-message">Re-establishing the <span class="accent">connection</span><br>&mdash; back with you in a moment</div>
+  </div>
+
+  <div class="stream-status ent-status" id="streamStatus">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">CHECKING...</span>
+  </div>
+  <div class="back-announcement" id="backAnnouncement">
+    <div class="back-text">We're back!</div>
+    <div class="back-sub">Resuming stream shortly</div>
+  </div>
+</div>
+<script src="prism-config.js"></script>
+<script src="prism-engine.js"></script>
+<script>
+/* ---- OBS + Twitch status checker (auto "We're back!") ---- */
+const CONFIG = {
+  twitch: { clientId: 'gng055rb0vi7jd3rz6gt7e87e61wle', clientSecret: 'xiiab71q3on7bmj25laznewgwuulga', channel: 'NeoTheFox98' },
+  obs: { enabled: true, host: 'localhost', port: 4455, password: '', sceneToSwitch: 'Starting Soon' },
+  pollInterval: 30000, minShowTime: 15000
+};
+const dot = document.getElementById('statusDot');
+const statusText = document.getElementById('statusText');
+const announcement = document.getElementById('backAnnouncement');
+let accessToken = null, isLive = false, shownAt = Date.now();
+let obsWs = null, obsReqId = 0, obsPending = {};
+
+function setObsItemState(id, state, label) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'icon-item';
+  if (state) el.classList.add('state-' + state);
+  const check = el.querySelector('.icon-check');
+  if (check) check.textContent = label || '';
+}
+function setStatus(state, text) {
+  dot.className = 'status-dot';
+  if (state) dot.classList.add(state);
+  statusText.textContent = text;
+}
+function showBackMessage() {
+  announcement.classList.add('visible');
+  setTimeout(() => switchOBSScene(), 3000);
+  setTimeout(() => announcement.classList.remove('visible'), 8000);
+}
+async function sendOBSReq(requestType, requestData) {
+  return new Promise((resolve, reject) => {
+    if (!obsWs || obsWs.readyState !== WebSocket.OPEN) { reject(new Error('OBS not connected')); return; }
+    const rid = 'r' + (++obsReqId);
+    obsPending[rid] = { resolve, reject };
+    obsWs.send(JSON.stringify({ op: 6, d: { requestType, requestId: rid, requestData: requestData || {} } }));
+    setTimeout(() => { if (obsPending[rid]) { obsPending[rid].reject(new Error('OBS timeout')); delete obsPending[rid]; } }, 5000);
+  });
+}
+async function connectOBS() {
+  if (!CONFIG.obs.enabled) return;
+  try {
+    obsWs = new WebSocket(`ws://${CONFIG.obs.host}:${CONFIG.obs.port}`);
+    obsWs.onmessage = async (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.op === 0) {
+        const id = { op: 1, d: { rpcVersion: 1 } };
+        if (CONFIG.obs.password && msg.d.authentication) {
+          const { challenge, salt } = msg.d.authentication;
+          const enc = new TextEncoder();
+          const h1 = await crypto.subtle.digest('SHA-256', enc.encode(CONFIG.obs.password + salt));
+          const h1hex = Array.from(new Uint8Array(h1)).map(b => b.toString(16).padStart(2, '0')).join('');
+          const h2 = await crypto.subtle.digest('SHA-256', enc.encode(h1hex + challenge));
+          id.d.authentication = Array.from(new Uint8Array(h2)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        obsWs.send(JSON.stringify(id));
+      }
+      if (msg.op === 2) { setObsItemState('itemPc', 'ok', 'OK'); startOBSPolling(); }
+      if (msg.op === 7) {
+        const p = obsPending[msg.d.requestId];
+        if (p) { delete obsPending[msg.d.requestId]; p.resolve(msg.d); }
+      }
+    };
+    obsWs.onerror = () => { setObsItemState('itemPc', 'error', 'NO OBS'); };
+    obsWs.onclose = () => { obsWs = null; setObsItemState('itemPc', 'error', 'DISCONNECTED'); setTimeout(connectOBS, 10000); };
+  } catch (e) { setObsItemState('itemPc', 'error', 'NO OBS'); }
+}
+async function switchOBSScene() {
+  if (!obsWs || obsWs.readyState !== WebSocket.OPEN) return;
+  try { await sendOBSReq('SetCurrentProgramScene', { sceneName: CONFIG.obs.sceneToSwitch }); } catch (e) {}
+}
+async function startOBSPolling() {
+  const poll = async () => {
+    if (!obsWs || obsWs.readyState !== WebSocket.OPEN) return;
+    try {
+      const audioResp = await sendOBSReq('GetInputList', { inputKind: 'wasapi_output_capture' });
+      const inputs = audioResp.inputs || [];
+      const desktopAudio = inputs.find(i => i.inputName && i.inputName.includes('Desktop'));
+      if (desktopAudio) {
+        const muteResp = await sendOBSReq('GetInputMute', { inputName: desktopAudio.inputName });
+        setObsItemState('itemAudio', muteResp.inputMuted ? 'warn' : 'ok', muteResp.inputMuted ? 'MUTED' : 'OK');
+      } else { setObsItemState('itemAudio', 'warn', 'NO SRC'); }
+    } catch (e) { setObsItemState('itemAudio', 'warn', '--'); }
+    try {
+      const streamResp = await sendOBSReq('GetStreamStatus');
+      if (streamResp.outputActive && !isLive) setStatus('live', 'OBS STREAMING');
+    } catch (e) {}
+  };
+  poll(); setInterval(poll, 30000);
+}
+async function getTwitchToken() {
+  try {
+    const url = `https://id.twitch.tv/oauth2/token?client_id=${CONFIG.twitch.clientId}&client_secret=${CONFIG.twitch.clientSecret}&grant_type=client_credentials`;
+    const res = await fetch(url, { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    accessToken = data.access_token; return true;
+  } catch (e) { console.warn('Twitch token failed:', e); return false; }
+}
+async function checkStream() {
+  if (!accessToken) { const ok = await getTwitchToken(); if (!ok) { setStatus('error', 'API ERROR'); return; } }
+  try {
+    const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${CONFIG.twitch.channel}`, { headers: { 'Client-ID': CONFIG.twitch.clientId, 'Authorization': 'Bearer ' + accessToken } });
+    if (res.status === 401) { accessToken = null; return checkStream(); }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    isLive = data.data && data.data.length > 0;
+    if (isLive) { setStatus('live', 'STREAM LIVE'); if (Date.now() - shownAt >= CONFIG.minShowTime) showBackMessage(); }
+    else { setStatus('offline', 'STREAM OFFLINE'); }
+  } catch (e) { setStatus('error', 'CHECK FAILED'); }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  shownAt = Date.now();
+  if (!CONFIG.twitch.clientId.includes('YOUR_')) {
+    setTimeout(() => { checkStream(); setInterval(checkStream, CONFIG.pollInterval); setInterval(() => { accessToken = null; }, 50 * 60 * 1000); }, 2000);
+    connectOBS();
+  } else { setStatus('error', 'SETUP REQUIRED'); statusText.textContent = 'SETUP REQUIRED'; }
+});
+</script>
+</body>
+</html>
