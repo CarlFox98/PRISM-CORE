@@ -7,6 +7,12 @@ REM ============================================================
 title PRISM Shoutout Service
 cd /d "%~dp0"
 
+REM UTF-8 so the PRISM banner / box-drawing / glyphs render correctly.
+chcp 65001 >nul
+set "PYTHONUTF8=1"
+set "PYTHONIOENCODING=utf-8"
+set "PRISM_FORCE_COLOR=1"
+
 set "PY=%~dp0prismenv\Scripts\python.exe"
 
 if not exist "%PY%" (

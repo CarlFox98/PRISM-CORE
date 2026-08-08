@@ -46,25 +46,28 @@ PNG exports for Twitch upload live in `twitch-panels/`.
 - **`prism-nowplaying.html`** — standalone Spotify now-playing card. Self-hosted
   OAuth; see `PRISM-NOWPLAYING-README.md`. Its Spotify client id must match
   `spotifyClientId` in `prism-config.js`.
-- **`prism-shoutout.html` + `prism_shoutout_service.py`** — a mod types
+- **`prism-shoutout.html` + the `prism-shoutout/` package** — a mod types
   `!so @user` in chat and a PRISM card slides in with the streamer's avatar,
-  last category, and an autoplaying recent clip. See `PRISM-SHOUTOUT-README.md`.
-  Launch with `Start-PRISM-Shoutout.bat`.
+  last category, and an autoplaying recent clip. The service is the modular
+  [`prism-shoutout/`](prism-shoutout/README.md) Python package;
+  `prism_shoutout_service.py` at the repo root is a thin launcher shim for it.
+  See `PRISM-SHOUTOUT-README.md`; launch with `Start-PRISM-Shoutout.bat`.
 
 ## Local setup (shoutout service)
 
-The Python service and its virtual environment (`prismenv/`) are **not** in this
-repo. Recreate the environment once:
+The service code lives in the `prism-shoutout/` package (versioned here). Its
+virtual environment (`prismenv/`) is **not** in the repo — recreate it once:
 
 ```
 py -m venv prismenv
-prismenv\Scripts\python.exe -m pip install websockets requests
+prismenv\Scripts\python.exe -m pip install -r prism-shoutout\requirements.txt
 ```
 
-Then copy `prism-secrets.example.json` to `prism-secrets.json`, fill in your
-Twitch app credentials, and run `Start-PRISM-Shoutout.bat`. **Secrets stay local
-and are gitignored** — nothing is ever committed. Verify them any time with
-`prismenv/PRISM-Check.bat`.
+Then copy `prism-secrets.example.json` to `prismenv\prism-secrets.json`, fill in
+your Twitch app credentials, and run `Start-PRISM-Shoutout.bat`. The launchers
+set `PRISM_SECRETS` to that file, so the service finds it no matter where it's
+started from. **Secrets stay local and are gitignored** — nothing is ever
+committed. Verify them any time with `prismenv\PRISM-Check.bat`.
 
 ## Hosting
 
@@ -103,11 +106,11 @@ drifting from source.
 
 Versioning follows [SemVer](https://semver.org); see [CHANGELOG.md](CHANGELOG.md).
 
-> **Roadmap / known duplication:** the shoutout service currently exists twice —
-> the tracked monolith `prism_shoutout_service.py` and the newer modular
-> `prism-shoutout/` package (which lives only inside `prismenv/`). The package is
-> the intended canonical implementation; consolidating onto it (and versioning it
-> here) is the next planned step, pending a live test run.
+The shoutout **service** is the modular `prism-shoutout/` package (its own
+[README](prism-shoutout/README.md) and `docs/`). Both `prism_shoutout_service.py`
+(repo root) and `prismenv/prism_shoutout_service.py` are thin shims that import
+this one package, so there's a single source of truth. `run.bat` inside the
+package runs it directly via `python -m prism_shoutout`.
 
 ## License
 

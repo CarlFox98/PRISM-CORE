@@ -1,0 +1,27 @@
+# --- secrets: never commit real credentials ---
+prism-secrets.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# --- virtual environments ---
+.venv/
+venv/
+env/
+# the code historically lived inside a venv named "prismenv"; ignore its guts
+prismenv/
+Lib/
+Scripts/
+Include/
+pyvenv.cfg
+
+# --- editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

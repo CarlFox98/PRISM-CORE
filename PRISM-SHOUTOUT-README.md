@@ -42,20 +42,26 @@ and idle until a shout fires. It auto-connects to the service on
 ## 3. Run the service
 --------------------------------------------------------------------
 ```
-pip install websockets requests
+prismenv\Scripts\python.exe -m pip install -r prism-shoutout\requirements.txt
 ```
 
-Open `prism_shoutout_service.py` and set (top of file, or as env vars):
+Credentials are **not** in code — they load from `prismenv\prism-secrets.json`
+(git-ignored). Copy `prism-secrets.example.json` there and fill in:
 
-- `CHANNEL` → `NeoTheFox98`  (already set)
-- `CLIENT_ID` → your SYSFOX app Client ID  (already filled in)
-- `CLIENT_SECRET` → your SYSFOX app **Client Secret**  ← the only thing you must add
+- `CHANNEL` → `NeoTheFox98`
+- `CLIENT_ID` → your SYSFOX app Client ID
+- `CLIENT_SECRET` → your SYSFOX app **Client Secret**
+- `OBS_WS_PASSWORD` → (optional) for audio ducking
 
-Then run it (keep it running while you stream):
+Then run it (keep it running while you stream) — double-click
+`Start-PRISM-Shoutout.bat`, or:
 
 ```
 python prism_shoutout_service.py
 ```
+
+(The service itself lives in the modular `prism-shoutout/` package;
+`prism_shoutout_service.py` is just a launcher shim.)
 
 You'll see `[chat] listening…` and `[overlay] connected` once OBS loads the
 source. Have a mod (or you) type `!so @someone` — the card appears.
