@@ -88,7 +88,9 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
   "use strict";
   // ---- CONFIG ------------------------------------------------------------
   // Your Spotify app's Client ID. Override at runtime with ?cid=XXXX if needed.
-  var CLIENT_ID = new URLSearchParams(location.search).get('cid') || 'a8793e9128944860af2dbe769651d44c';
+  var CLIENT_ID = new URLSearchParams(location.search).get('cid')
+    || (window.PRISM_CONFIG && window.PRISM_CONFIG.spotifyClientId)
+    || 'a8793e9128944860af2dbe769651d44c';   // fallback = single source in prism-config.js
   var SCOPE = 'user-read-currently-playing';
   // redirect_uri = THIS page's own URL (no query/hash). Register this in Spotify.
   var REDIRECT_URI = location.origin + location.pathname;

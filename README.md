@@ -1,5 +1,7 @@
 # PRISM
 
+[![PRISM CI](https://github.com/CarlFox98/PRISM-CORE/actions/workflows/ci.yml/badge.svg)](https://github.com/CarlFox98/PRISM-CORE/actions/workflows/ci.yml)
+
 A cohesive **holo-glass / iridescent** overlay system for the Twitch channel
 [**NeoTheFox98**](https://twitch.tv/NeoTheFox98). Every scene, panel, and widget
 shares one design language — a five-colour prism palette, animated gradient
@@ -59,10 +61,10 @@ py -m venv prismenv
 prismenv\Scripts\python.exe -m pip install websockets requests
 ```
 
-Then copy `prismenv/prism-shoutout/prism-secrets.example.json` to
-`prism-secrets.json`, fill in your Twitch app credentials, and run
-`Start-PRISM-Shoutout.bat`. **Secrets stay local and are gitignored** — nothing
-is ever committed.
+Then copy `prism-secrets.example.json` to `prism-secrets.json`, fill in your
+Twitch app credentials, and run `Start-PRISM-Shoutout.bat`. **Secrets stay local
+and are gitignored** — nothing is ever committed. Verify them any time with
+`prismenv/PRISM-Check.bat`.
 
 ## Hosting
 
@@ -77,6 +79,35 @@ fine as local `file://` Browser Sources.
 Edit the palette variables `--c1`…`--c5` at the top of `prism-theme.css` and
 `prism-panels.css` to retune the entire set at once. Edit `prism-config.js` to
 change identity (channel, socials, goal).
+
+## Development
+
+Clone, then enable the guards once:
+
+```
+git config core.hooksPath .githooks     # blocks secrets from being committed
+```
+
+Checks (also run in CI on every push via `.github/workflows/ci.yml`):
+
+```
+node scripts/test-socials.mjs      # config + scene load-order integrity
+bash scripts/scan-secrets.sh       # credential scan
+node --check prism-config.js prism-engine.js
+```
+
+To update the **hosted** overlays (now-playing, shoutout, thank-you), edit the
+source files here, run `deploy-to-pages.bat` to copy them into `github-pages/`,
+then push that separate `streaming` repo. This keeps the hosted copies from
+drifting from source.
+
+Versioning follows [SemVer](https://semver.org); see [CHANGELOG.md](CHANGELOG.md).
+
+> **Roadmap / known duplication:** the shoutout service currently exists twice —
+> the tracked monolith `prism_shoutout_service.py` and the newer modular
+> `prism-shoutout/` package (which lives only inside `prismenv/`). The package is
+> the intended canonical implementation; consolidating onto it (and versioning it
+> here) is the next planned step, pending a live test run.
 
 ## License
 

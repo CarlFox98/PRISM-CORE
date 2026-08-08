@@ -1,0 +1,31 @@
+name: PRISM CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: JS syntax check
+        run: |
+          for f in prism-config.js prism-engine.js; do
+            echo "checking $f"; node --check "$f"
+          done
+
+      - name: Config / scene integrity test
+        run: node scripts/test-socials.mjs
+
+      - name: Python service syntax
+        run: python3 -m py_compile prism_shoutout_service.py
+
+      - name: Secret scan
+        run: bash scripts/scan-secrets.sh
