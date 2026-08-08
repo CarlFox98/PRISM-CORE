@@ -1,0 +1,43 @@
+{
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "schemes": [
+    {
+      "name": "PRISM",
+      "background": "#0B0E18",
+      "foreground": "#EAF0FF",
+      "cursorColor": "#57F2E4",
+      "selectionBackground": "#6C8BFF",
+      "black": "#0B0713",
+      "red": "#F07878",
+      "green": "#57F2E4",
+      "yellow": "#FFD86B",
+      "blue": "#6C8BFF",
+      "purple": "#B983FF",
+      "cyan": "#57F2E4",
+      "white": "#A9B4D6",
+      "brightBlack": "#5F5E5A",
+      "brightRed": "#FF7ACB",
+      "brightGreen": "#57F2E4",
+      "brightYellow": "#FFD86B",
+      "brightBlue": "#6C8BFF",
+      "brightPurple": "#B983FF",
+      "brightCyan": "#57F2E4",
+      "brightWhite": "#EAF0FF"
+    }
+  ],
+  "profiles": [
+    {
+      "name": "PRISM Shoutout",
+      "commandline": "cmd.exe /k \"C:\\Users\\NeoTheFox98\\Pictures\\OBS Assets\\overlays\\PRISM\\prismenv\\Start-PRISM-Shoutout.bat\"",
+      "startingDirectory": "C:\\Users\\NeoTheFox98\\Pictures\\OBS Assets\\overlays\\PRISM\\prismenv",
+      "colorScheme": "PRISM",
+      "font": { "face": "Cascadia Mono", "size": 11 },
+      "opacity": 82,
+      "useAcrylic": true,
+      "padding": "14",
+      "cursorShape": "bar",
+      "suppressApplicationTitle": true,
+      "tabTitle": "PRISM Shoutout"
+    }
+  ]
+}

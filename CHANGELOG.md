@@ -3,6 +3,23 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.2.0] — 2026-08-07
+
+### Changed
+- **Merged the shoutout service into the repo.** The modular `prism-shoutout/`
+  Python package (previously only inside the gitignored `prismenv/`) is now
+  versioned here and is the single source of truth. The old monolithic
+  `prism_shoutout_service.py` is replaced by a thin launcher shim that imports
+  the package; `prismenv/prism_shoutout_service.py` is now a shim to the same
+  package. Removed the duplicate package copy from `prismenv/`.
+- Launchers export `PRISM_SECRETS` (→ `prismenv/prism-secrets.json`) so the
+  service finds credentials regardless of the working directory; added UTF-8
+  setup to the top-level launcher for correct console rendering.
+
+### Notes
+- No behavior change intended — verified all package modules import and resolve
+  credentials. Do one `!so` test before relying on it live.
+
 ## [1.1.0] — 2026-08-07
 
 ### Added
