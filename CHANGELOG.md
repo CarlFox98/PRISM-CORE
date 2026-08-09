@@ -3,6 +3,25 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.3.0] — 2026-08-07
+
+### Added
+- **DecAPI resilience.** `prism-engine.js` caches the last good avatar, follower
+  count, and latest follower in `localStorage` (per channel), paints them
+  instantly on load, and falls back to them during brief DecAPI outages — the
+  overlay no longer blanks when the endpoint hiccups. Identical behavior when
+  DecAPI is healthy.
+- **Follower list refresh** — `scripts/refresh-followers.py` + `refresh-followers.bat`
+  pull your real follower list from Twitch Helix (using the stream-manager
+  token) and write `prism-followers.json`. Requires the `moderator:read:followers`
+  scope (re-authorize stream-manager once if the token lacks it).
+- **Offline fonts** — `scripts/fetch-fonts.py` + `fetch-fonts.bat` download the
+  woff2 files into `fonts/` and rewrite `fonts/prism-fonts.css` to use them.
+
+### Changed
+- `prism-theme.css` and `prism-panels.css` now import fonts via the single
+  `fonts/prism-fonts.css` aggregator (online by default; local after fetch).
+
 ## [1.2.0] — 2026-08-07
 
 ### Changed
