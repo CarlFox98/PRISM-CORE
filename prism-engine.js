@@ -92,31 +92,57 @@
   function each(sel, fn){ Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
   function fmt(n){ return (''+n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
+  /* last-good cache — keeps the overlay populated across brief DecAPI outages
+     and OBS restarts. Keyed per channel; degrades silently if storage is off. */
+  var LS = 'prism_' + CH + '_';
+  function cacheGet(k){ try{ return localStorage.getItem(LS + k); }catch(e){ return null; } }
+  function cacheSet(k, v){ try{ localStorage.setItem(LS + k, v); }catch(e){} }
+
+  function applyAvatar(url){
+    if(!/^https?:\/\//.test(url)) return;
+    each('img.js-avatar', function(img){ img.src = url; });
+  }
+  function applyFollows(n){
+    if(isNaN(n)) return;
+    each('.js-followcount', function(el){ el.textContent = fmt(n); });
+    each('.js-goal-now', function(el){ el.textContent = fmt(n); });
+    if(GOAL > 0){
+      each('.js-goal-target', function(el){ el.textContent = fmt(GOAL); });
+      var pct = Math.max(0, Math.min(100, (n / GOAL) * 100));
+      each('.js-goal-fill', function(el){ el.style.width = pct.toFixed(1) + '%'; });
+    }
+  }
+  function applyLatest(name){
+    if(!name) return;
+    each('.js-latest', function(el){ el.textContent = name; });
+    each('.js-latest-wrap', function(el){ el.hidden = false; });
+  }
+
   function loadAvatar(){
     get('avatar').then(function(url){
-      if(/^https?:\/\//.test(url)) each('img.js-avatar', function(img){ img.src = url; });
-    }).catch(function(){});
+      applyAvatar(url); cacheSet('avatar', url);
+    }).catch(function(){ applyAvatar(cacheGet('avatar')); });
   }
   function loadFollows(){
     get('followcount').then(function(txt){
       var n = parseInt(txt.replace(/[^0-9]/g,''), 10);
       if(isNaN(n)) return;
-      each('.js-followcount', function(el){ el.textContent = fmt(n); });
-      each('.js-goal-now', function(el){ el.textContent = fmt(n); });
-      if(GOAL>0){
-        each('.js-goal-target', function(el){ el.textContent = fmt(GOAL); });
-        var pct = Math.max(0, Math.min(100, (n/GOAL)*100));
-        each('.js-goal-fill', function(el){ el.style.width = pct.toFixed(1)+'%'; });
-      }
-    }).catch(function(){});
+      applyFollows(n); cacheSet('follows', String(n));
+    }).catch(function(){ applyFollows(parseInt(cacheGet('follows'), 10)); });
   }
   function loadLatest(){
     get('followers').then(function(name){
       if(!name) return;
-      each('.js-latest', function(el){ el.textContent = name; });
-      each('.js-latest-wrap', function(el){ el.hidden = false; });
-    }).catch(function(){ /* endpoint may require broadcaster auth; stays hidden */ });
+      applyLatest(name); cacheSet('latest', name);
+    }).catch(function(){ applyLatest(cacheGet('latest')); /* endpoint may need broadcaster auth */ });
   }
+
+  /* paint last-good values immediately, before the first network round-trip */
+  (function primeFromCache(){
+    applyAvatar(cacheGet('avatar'));
+    applyFollows(parseInt(cacheGet('follows'), 10));
+    applyLatest(cacheGet('latest'));
+  })();
 
   function refresh(){ loadAvatar(); loadFollows(); loadLatest(); }
   refresh();

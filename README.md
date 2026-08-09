@@ -104,6 +104,15 @@ source files here, run `deploy-to-pages.bat` to copy them into `github-pages/`,
 then push that separate `streaming` repo. This keeps the hosted copies from
 drifting from source.
 
+Helper scripts (run on your machine):
+
+- `refresh-followers.bat` — pull your real follower list from Twitch into
+  `prism-followers.json` (needs the `moderator:read:followers` scope).
+- `fetch-fonts.bat` — download the fonts into `fonts/` for fully offline overlays.
+
+The engine also caches last-good avatar / follower count / latest follower in
+`localStorage`, so brief DecAPI outages don't blank the overlay.
+
 Versioning follows [SemVer](https://semver.org); see [CHANGELOG.md](CHANGELOG.md).
 
 The shoutout **service** is the modular `prism-shoutout/` package (its own

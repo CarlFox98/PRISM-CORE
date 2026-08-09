@@ -1,0 +1,8 @@
+/* ============================================================
+   PRISM — font aggregator (single place both stylesheets import)
+   Default: pulls the fonts from Google (online, same as before).
+   Run scripts/fetch-fonts (or fetch-fonts.bat) once to download the
+   woff2 files into this folder — the script then REWRITES this file
+   with local @font-face rules, making the overlays fully offline.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');

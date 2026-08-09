@@ -4,7 +4,7 @@
    links this file, then adds only its own scene-specific rules.
    Edit the palette or motion here and it changes everywhere.
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+@import url('fonts/prism-fonts.css');   /* one place for fonts; run fetch-fonts to go offline */
 
 :root{
   --ink:#EAF0FF; --ink-soft:#A9B4D6;

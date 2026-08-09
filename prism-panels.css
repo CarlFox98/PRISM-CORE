@@ -6,7 +6,7 @@
    The 22nd-century take on the old Win98 "About" windows.
    Edit the palette below to retune every panel at once.
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import url('fonts/prism-fonts.css');   /* one place for fonts; run fetch-fonts to go offline */
 
 :root{
   --ink:#EAF0FF; --ink-soft:#A9B4D6; --ink-dim:#7C88AE;
