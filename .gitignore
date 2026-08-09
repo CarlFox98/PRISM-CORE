@@ -30,3 +30,6 @@ Desktop.ini
 
 # local push helper (not part of the project)
 push-to-github.bat
+
+# maintenance service logs (local, per-machine)
+maintenance-logs/
