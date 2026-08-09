@@ -3,6 +3,18 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.4.0] — 2026-08-09
+
+### Added
+- **Maintenance service** — `scripts/prism-maintenance.py` runs non-destructive
+  health checks (venv/deps, `prism-secrets.json` validity, secret-not-committed,
+  git status vs origin, config/scene integrity, DecAPI reachability) plus light
+  cleanup (repo `__pycache__`, prune old logs), writing a timestamped report to
+  `maintenance-logs/`. `install-maintenance-task.bat` registers a silent weekly
+  Windows Task Scheduler job (Sundays 4:00 AM via `pythonw`);
+  `prism-maintenance.bat` runs it on demand; `uninstall-maintenance-task.bat`
+  removes it. Logs are gitignored.
+
 ## [1.3.0] — 2026-08-07
 
 ### Added

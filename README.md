@@ -121,6 +121,22 @@ The shoutout **service** is the modular `prism-shoutout/` package (its own
 this one package, so there's a single source of truth. `run.bat` inside the
 package runs it directly via `python -m prism_shoutout`.
 
+## Maintenance service
+
+A weekly health check + cleanup you can set and forget:
+
+```
+install-maintenance-task.bat     # register the silent weekly Windows task (Sun 4 AM)
+prism-maintenance.bat            # run it now, in a window, to see the report
+uninstall-maintenance-task.bat   # remove the scheduled task
+```
+
+It verifies the venv/deps, that `prism-secrets.json` is valid and *not* tracked
+by git, whether the repo is behind `origin`, the config/scene integrity test, and
+DecAPI reachability — then clears stray `__pycache__` and prunes old logs. Every
+run writes a timestamped report to `maintenance-logs/` (gitignored). It's
+read-only apart from that housekeeping — it never pulls, pushes, or edits code.
+
 ## License
 
 Released under the [MIT License](LICENSE) © 2026 NeoTheFox98 (CarlFox98). Fork
