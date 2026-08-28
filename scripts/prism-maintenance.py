@@ -136,6 +136,50 @@ def check_reachability():
         add("WARN", "DecAPI reachable", "unreachable: %s" % e)
 
 
+def check_version():
+    """VERSION must match the newest CHANGELOG entry, and exist only once."""
+    vpath = os.path.join(REPO, "VERSION")
+    if not os.path.isfile(vpath):
+        add("WARN", "Version", "VERSION file missing")
+        return
+    ver = open(vpath, encoding="utf-8").read().strip()
+    dupes = [p for p in glob.glob(os.path.join(REPO, "*", "VERSION")) if os.path.isfile(p)]
+    changelog = None
+    for c in (os.path.join(REPO, "docs", "CHANGELOG.md"), os.path.join(REPO, "CHANGELOG.md")):
+        if os.path.isfile(c):
+            changelog = c
+            break
+    latest = None
+    if changelog:
+        m = re.search(r"^##\s*\[([0-9][^\]]*)\]", open(changelog, encoding="utf-8").read(), re.M)
+        latest = m.group(1) if m else None
+    problems = []
+    if dupes:
+        problems.append("duplicate VERSION file(s): %s"
+                        % ", ".join(os.path.relpath(d, REPO) for d in dupes))
+    if latest and latest != ver:
+        problems.append("VERSION=%s but newest changelog entry is %s" % (ver, latest))
+    add("WARN" if problems else "OK", "Version",
+        "; ".join(problems) if problems else "%s (matches changelog, single source)" % ver)
+
+
+def check_fonts():
+    """If fonts are vendored, every url() in the aggregator must resolve."""
+    css = os.path.join(REPO, "fonts", "prism-fonts.css")
+    if not os.path.isfile(css):
+        add("WARN", "Fonts", "fonts/prism-fonts.css missing")
+        return
+    body = open(css, encoding="utf-8").read()
+    if "googleapis" in body:
+        add("OK", "Fonts", "online mode (Google import) — run fetch-fonts to vendor them")
+        return
+    refs = re.findall(r"url\('([^']+)'\)", body)
+    missing = [r for r in refs if not os.path.isfile(os.path.join(REPO, "fonts", r))]
+    add("FAIL" if missing else "OK", "Fonts",
+        ("missing %d file(s): %s" % (len(missing), ", ".join(missing[:3])))
+        if missing else "local, %d files all present" % len(refs))
+
+
 def cleanup():
     targets = (glob.glob(os.path.join(REPO, "__pycache__"))
                + glob.glob(os.path.join(REPO, "scripts", "__pycache__"))
@@ -156,7 +200,8 @@ def cleanup():
 
 
 CHECKS = [check_python, check_deps, check_secrets, check_secret_not_tracked,
-          check_git, check_integrity, check_reachability, cleanup]
+          check_git, check_integrity, check_version, check_fonts,
+          check_reachability, cleanup]
 
 
 def main():

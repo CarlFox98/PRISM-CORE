@@ -3,6 +3,29 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.5.0] — 2026-08-28
+
+### Changed
+- **Self-hosted social icons.** The social pills now draw inline SVG brand
+  glyphs (X, YouTube, Telegram, Steam) in `currentColor` instead of loading
+  images from Google's favicon service. Set `PRISM_CONFIG.iconStyle = "favicon"`
+  to restore the old images, or give a social its own `svg` path to add a brand.
+- **Fonts are now vendored.** `fonts/` holds the 30 woff2 files and
+  `fonts/prism-fonts.css` declares them locally, so overlays need no network
+  for fonts at all. Re-run `fetch-fonts.bat` to refresh them.
+- Docs and banners moved into `docs/` and `branding/`.
+
+### Security
+- The tech-difficulties overlay no longer embeds a Twitch client secret; live
+  detection uses DecAPI. The secret was purged from all git history — **it was
+  public, so it must be rotated.**
+- `scan-secrets.sh` now matches camelCase and kebab-case key names
+  (`clientSecret`, `apiKey`, `accessToken`, …). It previously only caught
+  snake_case, which is how the above secret slipped past the hook and CI.
+
+### Added
+- The integrity test fails if a configured social has no inline icon.
+
 ## [1.4.0] — 2026-08-09
 
 ### Added
