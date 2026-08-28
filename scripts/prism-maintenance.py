@@ -180,6 +180,35 @@ def check_fonts():
         if missing else "local, %d files all present" % len(refs))
 
 
+def check_pages_sync():
+    """Hosted github-pages copies must match the canonical source files."""
+    pages = os.path.join(REPO, "github-pages")
+    if not os.path.isdir(pages):
+        add("OK", "Hosted overlays", "no github-pages/ folder here; skipped")
+        return
+    pairs = [("prism-nowplaying.html", "index.html"),
+             ("prism-shoutout.html", "prism-shoutout.html"),
+             ("prism-thank-you.html", "prism-thank-you.html"),
+             ("prism-followers.json", "prism-followers.json")]
+    drift, missing = [], []
+    for src, dst in pairs:
+        s, d = os.path.join(REPO, src), os.path.join(pages, dst)
+        if not os.path.isfile(s):
+            continue
+        if not os.path.isfile(d):
+            missing.append(dst)
+        elif open(s, "rb").read() != open(d, "rb").read():
+            drift.append(dst)
+    problems = []
+    if missing:
+        problems.append("missing: " + ", ".join(missing))
+    if drift:
+        problems.append("stale: " + ", ".join(drift))
+    add("WARN" if problems else "OK", "Hosted overlays",
+        ("; ".join(problems) + " — run deploy-to-pages.bat") if problems
+        else "all %d in sync with source" % len(pairs))
+
+
 def cleanup():
     targets = (glob.glob(os.path.join(REPO, "__pycache__"))
                + glob.glob(os.path.join(REPO, "scripts", "__pycache__"))
@@ -201,7 +230,7 @@ def cleanup():
 
 CHECKS = [check_python, check_deps, check_secrets, check_secret_not_tracked,
           check_git, check_integrity, check_version, check_fonts,
-          check_reachability, cleanup]
+          check_pages_sync, check_reachability, cleanup]
 
 
 def main():
