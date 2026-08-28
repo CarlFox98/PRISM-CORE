@@ -22,6 +22,10 @@ window.PRISM_CONFIG = {
   goal: 100,
   avatarFallback: "https://static-cdn.jtvnw.net/jtv_user_pictures/f8059656-f846-4bfa-9cd5-e70afba5692e-profile_image-300x300.png",
   spotifyClientId: "a8793e9128944860af2dbe769651d44c",
+  // "svg" = inline brand icons, no network (default). "favicon" = the old
+  // Google favicon images. Add a custom brand by giving a social its own
+  // `svg: "<path d>"` below.
+  iconStyle: "svg",
   socials: [
     { icon: "x.com",              alt: "X",     label: "@NeoTheFox98",  url: "https://x.com/NeoTheFox98" },
     { icon: "youtube.com",        alt: "YT",    label: "/NeoTheFox-98", url: "https://www.youtube.com/@NeoTheFox-98" },

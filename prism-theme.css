@@ -124,6 +124,9 @@ html, body { width:1920px; height:1080px; overflow:hidden;
 .social-item:nth-child(4){ animation-delay:0s,1.2s; }
 .social-item:hover{ transform:translateY(-4px) scale(1.05); box-shadow:0 10px 30px rgba(120,150,255,0.28); }
 .social-item .ico{ width:20px; height:20px; border-radius:5px; }
+/* inline brand SVGs (no network): inherit the ink colour + a soft holo glow */
+.social-item svg.ico{ border-radius:0; display:block; color:var(--ink); fill:currentColor;
+  filter:drop-shadow(0 0 6px rgba(140,170,255,0.45)); }
 
 /* ---------- follower goal bar (live data) ---------- */
 .goal{ width:560px; max-width:72vw; margin:30px auto 0; }

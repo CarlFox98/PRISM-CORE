@@ -181,14 +181,16 @@
 <script>
 /* ---- OBS + Twitch status checker (auto "We're back!") ---- */
 const CONFIG = {
-  twitch: { clientId: 'gng055rb0vi7jd3rz6gt7e87e61wle', clientSecret: 'REDACTED_ROTATE_THIS', channel: 'NeoTheFox98' },
+  // Live detection uses DecAPI (no secrets, no token) — never embed a client
+  // secret in a browser source; anyone who opens the page can read it.
+  twitch: { channel: 'NeoTheFox98' },
   obs: { enabled: true, host: 'localhost', port: 4455, password: '', sceneToSwitch: 'Starting Soon' },
   pollInterval: 30000, minShowTime: 15000
 };
 const dot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
 const announcement = document.getElementById('backAnnouncement');
-let accessToken = null, isLive = false, shownAt = Date.now();
+let isLive = false, shownAt = Date.now();
 let obsWs = null, obsReqId = 0, obsPending = {};
 
 function setObsItemState(id, state, label) {
@@ -269,31 +271,25 @@ async function startOBSPolling() {
   };
   poll(); setInterval(poll, 30000);
 }
-async function getTwitchToken() {
-  try {
-    const url = `https://id.twitch.tv/oauth2/token?client_id=${CONFIG.twitch.clientId}&client_secret=${CONFIG.twitch.clientSecret}&grant_type=client_credentials`;
-    const res = await fetch(url, { method: 'POST' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    accessToken = data.access_token; return true;
-  } catch (e) { console.warn('Twitch token failed:', e); return false; }
-}
 async function checkStream() {
-  if (!accessToken) { const ok = await getTwitchToken(); if (!ok) { setStatus('error', 'API ERROR'); return; } }
+  // DecAPI returns an uptime string when live, or "<channel> is offline" when
+  // not — no auth, no secret. Matches prism-engine.js's approach.
   try {
-    const res = await fetch(`https://api.twitch.tv/helix/streams?user_login=${CONFIG.twitch.channel}`, { headers: { 'Client-ID': CONFIG.twitch.clientId, 'Authorization': 'Bearer ' + accessToken } });
-    if (res.status === 401) { accessToken = null; return checkStream(); }
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 6000);
+    const res = await fetch('https://decapi.me/twitch/uptime/' + encodeURIComponent(CONFIG.twitch.channel), { signal: ctrl.signal });
+    clearTimeout(to);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    isLive = data.data && data.data.length > 0;
+    const text = (await res.text()).trim();
+    isLive = !!text && !/offline|error|unable|not found|must be/i.test(text);
     if (isLive) { setStatus('live', 'STREAM LIVE'); if (Date.now() - shownAt >= CONFIG.minShowTime) showBackMessage(); }
     else { setStatus('offline', 'STREAM OFFLINE'); }
   } catch (e) { setStatus('error', 'CHECK FAILED'); }
 }
 document.addEventListener('DOMContentLoaded', () => {
   shownAt = Date.now();
-  if (!CONFIG.twitch.clientId.includes('YOUR_')) {
-    setTimeout(() => { checkStream(); setInterval(checkStream, CONFIG.pollInterval); setInterval(() => { accessToken = null; }, 50 * 60 * 1000); }, 2000);
+  if (CONFIG.twitch.channel) {
+    setTimeout(() => { checkStream(); setInterval(checkStream, CONFIG.pollInterval); }, 2000);
     connectOBS();
   } else { setStatus('error', 'SETUP REQUIRED'); statusText.textContent = 'SETUP REQUIRED'; }
 });

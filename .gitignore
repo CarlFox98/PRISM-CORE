@@ -30,6 +30,7 @@ Desktop.ini
 
 # local push helper (not part of the project)
 push-to-github.bat
+force-push-history-rewrite.bat
 
 # maintenance service logs (local, per-machine)
 maintenance-logs/

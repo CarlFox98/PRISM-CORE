@@ -20,7 +20,18 @@ if (!cfg || !Array.isArray(cfg.socials) || cfg.socials.length === 0) fail('confi
   if (!s.icon)  fail(`socials[${i}] missing icon`);
 });
 
-// 2) Every engine scene must load prism-config.js BEFORE prism-engine.js.
+// 2) Every configured social must have an inline icon (or its own svg path),
+//    so nothing silently falls back to the network favicon service.
+const engineSrc = fs.readFileSync(url('../prism-engine.js'), 'utf8');
+const iconKeys = [...engineSrc.matchAll(/^\s*'([a-z0-9.\-]+)':\s*'M/gim)].map(m => m[1]);
+if (iconKeys.length === 0) fail('no inline brand icons found in prism-engine.js');
+(cfg?.socials || []).forEach((s, i) => {
+  if (!s.svg && !iconKeys.includes(s.icon)) {
+    fail(`socials[${i}] ("${s.icon}") has no inline icon — add one to ICONS or give it an svg path`);
+  }
+});
+
+// 3) Every engine scene must load prism-config.js BEFORE prism-engine.js.
 const scenes = [
   'prism-be-right-back.html', 'prism-stream-ending.html', 'prism-starting-soon.html',
   'prism-tech-difficulties.html', 'prism-wallpaper.html',
@@ -35,6 +46,6 @@ for (const f of scenes) {
 }
 
 console.log(ok
-  ? `✓ config OK — ${cfg.socials.length} socials, ${scenes.length} scenes verified (config→engine order)`
+  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order)`
   : '✗ integrity checks failed');
 process.exit(ok ? 0 : 1);

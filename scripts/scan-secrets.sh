@@ -30,7 +30,8 @@ done
 
 # 2) Content patterns. A "secret" = a real quoted literal (>=12 chars) assigned to
 #    a secret-named key, or an oauth: token. Placeholders/examples are ignored.
-SECRET_KEY='(client_secret|secret_key|api[_-]?key|access[_-]?token|refresh[_-]?token|password|passwd)'
+# matches snake_case, camelCase and kebab-case key names alike
+SECRET_KEY='(client[_-]?secret|clientsecret|secret[_-]?key|api[_-]?key|apikey|access[_-]?token|accesstoken|refresh[_-]?token|refreshtoken|auth[_-]?token|oauth[_-]?token|password|passwd|pwd)'
 # value literal right after : or = (whitespace only between), 12+ non-space chars
 VALUE='["'"'"'][^"'"'"']{12,}["'"'"']'
 PLACEHOLDER='your_|example|changeme|change_me|xxxx|<[a-z]|_here|placeholder|\*\*\*'
