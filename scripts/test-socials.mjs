@@ -9,7 +9,7 @@ const fail = (m) => { console.error('  ✗ ' + m); ok = false; };
 
 // 1) Load config the way the browser would (config.js sets window.PRISM_CONFIG).
 const g = {};
-new Function('window', fs.readFileSync(url('../prism-config.js'), 'utf8'))(g);
+new Function('window', fs.readFileSync(url('../core/prism-config.js'), 'utf8'))(g);
 const cfg = g.PRISM_CONFIG;
 
 if (!cfg) fail('prism-config.js did not define window.PRISM_CONFIG');
@@ -22,7 +22,7 @@ if (!cfg || !Array.isArray(cfg.socials) || cfg.socials.length === 0) fail('confi
 
 // 2) Every configured social must have an inline icon (or its own svg path),
 //    so nothing silently falls back to the network favicon service.
-const engineSrc = fs.readFileSync(url('../prism-engine.js'), 'utf8');
+const engineSrc = fs.readFileSync(url('../core/prism-engine.js'), 'utf8');
 const iconKeys = [...engineSrc.matchAll(/^\s*'([a-z0-9.\-]+)':\s*'M/gim)].map(m => m[1]);
 if (iconKeys.length === 0) fail('no inline brand icons found in prism-engine.js');
 (cfg?.socials || []).forEach((s, i) => {
@@ -33,8 +33,8 @@ if (iconKeys.length === 0) fail('no inline brand icons found in prism-engine.js'
 
 // 3) Every engine scene must load prism-config.js BEFORE prism-engine.js.
 const scenes = [
-  'prism-be-right-back.html', 'prism-stream-ending.html', 'prism-starting-soon.html',
-  'prism-tech-difficulties.html', 'prism-wallpaper.html',
+  'scenes/prism-be-right-back.html', 'scenes/prism-stream-ending.html', 'scenes/prism-starting-soon.html',
+  'scenes/prism-tech-difficulties.html', 'scenes/prism-wallpaper.html',
 ];
 for (const f of scenes) {
   const h = fs.readFileSync(url('../' + f), 'utf8');

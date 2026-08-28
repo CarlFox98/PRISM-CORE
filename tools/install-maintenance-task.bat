@@ -6,12 +6,12 @@ REM  Re-run to update; run uninstall-maintenance-task.bat to remove.
 REM  Edit /D and /ST below to change the day/time.
 REM ============================================================
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 set "TN=PRISM Weekly Maintenance"
-set "PYW=%~dp0prismenv\Scripts\pythonw.exe"
+set "PYW=%~dp0..\prismenv\Scripts\pythonw.exe"
 if not exist "%PYW%" set "PYW=pythonw"
-set "SCRIPT=%~dp0scripts\prism-maintenance.py"
+set "SCRIPT=%~dp0..\scripts\prism-maintenance.py"
 
 schtasks /Create /TN "%TN%" /TR "\"%PYW%\" \"%SCRIPT%\"" /SC WEEKLY /D SUN /ST 04:00 /F
 

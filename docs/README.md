@@ -8,6 +8,34 @@ shares one design language — a five-colour prism palette, animated gradient
 borders, drifting light motes, and live Twitch data — all rendered at
 **1920×1080** and ready to drop into OBS as Browser Sources.
 
+## Repository layout
+
+```
+core/      shared theme, panels css, chat css, prism-config.js, prism-engine.js
+scenes/    full-screen OBS scenes          panels/   standalone Twitch info panels
+widgets/   now-playing + shoutout overlays data/     follower list, secrets example
+fonts/     vendored woff2 + aggregator     tools/    .bat/.sh launchers
+scripts/   python/node tooling             docs/     README, CHANGELOG, LICENSE
+prism-shoutout/  the shoutout service package     branding/  banners
+```
+
+Scenes reference shared assets as `../core/…`, so they open correctly straight
+from disk. The two deploy steps (`scripts/build-obs-set.py` and
+`scripts/deploy-pages.py`) flatten those paths when they emit a deployed copy.
+
+## OBS scene set
+
+PRISM is a switchable set for the local stream-manager. Build it with:
+
+```
+python scripts/build-obs-set.py        # writes <OBS Assets>/overlays/prism-holo/
+```
+
+Then pick **prism-holo** in the stream-manager dashboard; it copies the set into
+`overlays/active/`, which OBS serves. The set folder is deliberately *not* named
+`prism` — Windows paths are case-insensitive, so `overlays/prism` would collide
+with the `overlays/PRISM` source repo.
+
 ## Design system
 
 Two shared cores drive everything, so retheming or re-pointing identity happens
@@ -51,7 +79,7 @@ PNG exports for Twitch upload live in `twitch-panels/`.
   last category, and an autoplaying recent clip. The service is the modular
   [`prism-shoutout/`](prism-shoutout/README.md) Python package;
   `prism_shoutout_service.py` at the repo root is a thin launcher shim for it.
-  See `PRISM-SHOUTOUT-README.md`; launch with `Start-PRISM-Shoutout.bat`.
+  See `PRISM-SHOUTOUT-README.md`; launch with `tools\Start-PRISM-Shoutout.bat`.
 
 ## Local setup (shoutout service)
 
@@ -64,7 +92,7 @@ prismenv\Scripts\python.exe -m pip install -r prism-shoutout\requirements.txt
 ```
 
 Then copy `prism-secrets.example.json` to `prismenv\prism-secrets.json`, fill in
-your Twitch app credentials, and run `Start-PRISM-Shoutout.bat`. The launchers
+your Twitch app credentials, and run `tools\Start-PRISM-Shoutout.bat`. The launchers
 set `PRISM_SECRETS` to that file, so the service finds it no matter where it's
 started from. **Secrets stay local and are gitignored** — nothing is ever
 committed. Verify them any time with `prismenv\PRISM-Check.bat`.
@@ -96,19 +124,19 @@ Checks (also run in CI on every push via `.github/workflows/ci.yml`):
 ```
 node scripts/test-socials.mjs      # config + scene load-order integrity
 bash scripts/scan-secrets.sh       # credential scan
-node --check prism-config.js prism-engine.js
+node --check core/prism-config.js core/prism-engine.js
 ```
 
 To update the **hosted** overlays (now-playing, shoutout, thank-you), edit the
-source files here, run `deploy-to-pages.bat` to copy them into `github-pages/`,
+source files here, run `tools\deploy-to-pages.bat` to copy them into `github-pages/`,
 then push that separate `streaming` repo. This keeps the hosted copies from
 drifting from source.
 
 Helper scripts (run on your machine):
 
-- `refresh-followers.bat` — pull your real follower list from Twitch into
+- `tools\refresh-followers.bat` — pull your real follower list from Twitch into
   `prism-followers.json` (needs the `moderator:read:followers` scope).
-- `fetch-fonts.bat` — download the fonts into `fonts/` for fully offline overlays.
+- `tools\fetch-fonts.bat` — download the fonts into `fonts/` for fully offline overlays.
 
 The engine also caches last-good avatar / follower count / latest follower in
 `localStorage`, so brief DecAPI outages don't blank the overlay.
@@ -126,9 +154,9 @@ package runs it directly via `python -m prism_shoutout`.
 A weekly health check + cleanup you can set and forget:
 
 ```
-install-maintenance-task.bat     # register the silent weekly Windows task (Sun 4 AM)
-prism-maintenance.bat            # run it now, in a window, to see the report
-uninstall-maintenance-task.bat   # remove the scheduled task
+tools\install-maintenance-task.bat     # register the silent weekly Windows task (Sun 4 AM)
+tools\prism-maintenance.bat            # run it now, in a window, to see the report
+tools\uninstall-maintenance-task.bat   # remove the scheduled task
 ```
 
 It verifies the venv/deps, that `prism-secrets.json` is valid and *not* tracked

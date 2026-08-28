@@ -3,6 +3,30 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.6.0] — 2026-08-28
+
+### Changed
+- **Restructured the repo.** Root went from 33 loose files to 2. Source is now
+  `core/` (theme + config + engine), `scenes/`, `panels/`, `widgets/`, `data/`,
+  `tools/` (launchers), alongside the existing `scripts/`, `fonts/`, `docs/`.
+  Scenes reference shared assets as `../core/…`, so they still open correctly
+  straight from disk.
+
+### Added
+- **PRISM is a switchable stream-manager scene set.** `scripts/build-obs-set.py`
+  flattens and renames the source into `<OBS Assets>/overlays/prism-holo/` using
+  the same scene filenames as the other sets; stream-manager's `scene_sets` is
+  now config-driven (`config.json`) and lists `prism-holo`, so it can be picked
+  from the dashboard and copied into `overlays/active/`.
+- `scripts/deploy-pages.py` replaces the copy logic in the pages deploy so the
+  hosted overlays get the same path-flattening treatment.
+
+### Fixed
+- The set builder refuses to write into the source repo, and the set folder is
+  named `prism-holo` rather than `prism` — on case-insensitive Windows paths
+  `overlays/prism` resolves to the `overlays/PRISM` repo, which the build's
+  clear-target step would have wiped.
+
 ## [1.5.0] — 2026-08-28
 
 ### Changed

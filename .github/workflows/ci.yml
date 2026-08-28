@@ -17,7 +17,7 @@ jobs:
 
       - name: JS syntax check
         run: |
-          for f in prism-config.js prism-engine.js; do
+          for f in core/prism-config.js core/prism-engine.js; do
             echo "checking $f"; node --check "$f"
           done
 

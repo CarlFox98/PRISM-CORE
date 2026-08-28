@@ -4,7 +4,7 @@
    links this file, then adds only its own scene-specific rules.
    Edit the palette or motion here and it changes everywhere.
    ============================================================ */
-@import url('fonts/prism-fonts.css');   /* one place for fonts; run fetch-fonts to go offline */
+@import url('../fonts/prism-fonts.css');   /* one place for fonts; run fetch-fonts to go offline */
 
 :root{
   --ink:#EAF0FF; --ink-soft:#A9B4D6;

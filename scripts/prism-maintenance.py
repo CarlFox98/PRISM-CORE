@@ -40,7 +40,7 @@ def run(cmd, cwd=REPO, timeout=90):
 
 def _channel():
     try:
-        txt = open(os.path.join(REPO, "prism-config.js"), encoding="utf-8").read()
+        txt = open(os.path.join(REPO, "core", "prism-config.js"), encoding="utf-8").read()
         m = re.search(r"channel:\s*[\"']([^\"']+)[\"']", txt)
         if m:
             return m.group(1)
@@ -186,10 +186,10 @@ def check_pages_sync():
     if not os.path.isdir(pages):
         add("OK", "Hosted overlays", "no github-pages/ folder here; skipped")
         return
-    pairs = [("prism-nowplaying.html", "index.html"),
-             ("prism-shoutout.html", "prism-shoutout.html"),
-             ("prism-thank-you.html", "prism-thank-you.html"),
-             ("prism-followers.json", "prism-followers.json")]
+    pairs = [(os.path.join("widgets", "prism-nowplaying.html"), "index.html"),
+             (os.path.join("widgets", "prism-shoutout.html"), "prism-shoutout.html"),
+             (os.path.join("scenes", "prism-thank-you.html"), "prism-thank-you.html"),
+             (os.path.join("data", "prism-followers.json"), "prism-followers.json")]
     drift, missing = [], []
     for src, dst in pairs:
         s, d = os.path.join(REPO, src), os.path.join(pages, dst)
@@ -197,8 +197,12 @@ def check_pages_sync():
             continue
         if not os.path.isfile(d):
             missing.append(dst)
-        elif open(s, "rb").read() != open(d, "rb").read():
-            drift.append(dst)
+        else:
+            src_txt = open(s, encoding="utf-8").read()
+            for a, b in (("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/")):
+                src_txt = src_txt.replace(a, b)
+            if src_txt != open(d, encoding="utf-8").read():
+                drift.append(dst)
     problems = []
     if missing:
         problems.append("missing: " + ", ".join(missing))
