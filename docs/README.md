@@ -52,7 +52,7 @@ Live-data hooks: add `class="js-avatar"`, `js-followcount`, `js-goal-fill`,
 `js-goal-now`, `js-goal-target`, or `js-latest` to any element and the engine
 fills it. Socials render into any `<div class="socials" data-prism-socials></div>`.
 
-## Scenes (full-screen, load `prism-theme.css` + `prism-config.js` + `prism-engine.js`)
+## Scenes — `scenes/` (load `../core/prism-theme.css` + `prism-config.js` + `prism-engine.js`)
 
 - `prism-starting-soon.html` — countdown (configurable via `?timer=` or the gear)
 - `prism-be-right-back.html`
@@ -60,16 +60,16 @@ fills it. Socials render into any `<div class="socials" data-prism-socials></div
 - `prism-tech-difficulties.html`
 - `prism-wallpaper.html`
 - `prism-webcam-frame.html`
-- `prism-chat-preview.html` — styled with `prism-chat-holo-iridescent.css`
-- `prism-thank-you.html` — random-follower shout (reads `prism-followers.json`)
+- `prism-chat-preview.html` — styled with `../core/prism-chat-holo-iridescent.css`
+- `prism-thank-you.html` — random-follower shout (reads `../data/prism-followers.json`)
 
-## Info panels (standalone, load `prism-panels.css`)
+## Info panels — `panels/` (standalone, load `../core/prism-panels.css`)
 
 `prism-about.html` · `prism-rules.html` · `prism-schedule.html` ·
 `prism-setup.html` · `prism-faq.html`
 PNG exports for Twitch upload live in `twitch-panels/`.
 
-## Widgets
+## Widgets — `widgets/`
 
 - **`prism-nowplaying.html`** — standalone Spotify now-playing card. Self-hosted
   OAuth; see `PRISM-NOWPLAYING-README.md`. Its Spotify client id must match

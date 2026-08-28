@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
-# Copy the canonical overlays into github-pages/ so the hosted copies never
-# drift from source. Then commit/push the separate 'streaming' repo yourself.
+# Deploy the hosted overlays into github-pages/, flattening the source layout
+# (core/, data/) the same way scripts/build-obs-set.py does. Then commit and
+# push the separate 'streaming' repo yourself, or use tools/deploy-to-pages.bat
+# which does all of it in one go.
 set -eu
 cd "$(git rev-parse --show-toplevel)"
-[ -d github-pages ] || { echo "github-pages/ not found"; exit 1; }
 
-cp -v prism-nowplaying.html github-pages/index.html
-cp -v prism-shoutout.html   github-pages/prism-shoutout.html
-cp -v prism-thank-you.html  github-pages/prism-thank-you.html
-cp -v prism-followers.json  github-pages/prism-followers.json
+python3 scripts/deploy-pages.py "$@"
 
 echo ""
-echo "Deployed. Next: cd github-pages && git add -A && git commit -m 'sync overlays' && git push"
+echo "Next: cd github-pages && git add -A && git commit -m 'sync hosted overlays' && git push"

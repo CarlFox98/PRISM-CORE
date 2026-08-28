@@ -15,7 +15,7 @@ Usage (see refresh-followers.bat for a filled-in launcher):
     python scripts/refresh-followers.py \
         --token  "<path>\\.twitch_user_token.json" \
         --env    "<path>\\.env"            # reads TWITCH_CLIENT_ID/SECRET \
-        --out    "prism-followers.json"
+        --out    "data/prism-followers.json"
 """
 import argparse
 import datetime as _dt
@@ -131,7 +131,7 @@ def main():
     ap.add_argument("--env", default=os.getenv("PRISM_TWITCH_ENV", ""))
     ap.add_argument("--client-id", default=os.getenv("TWITCH_CLIENT_ID", ""))
     ap.add_argument("--client-secret", default=os.getenv("TWITCH_CLIENT_SECRET", ""))
-    ap.add_argument("--out", default=os.path.join(repo, "prism-followers.json"))
+    ap.add_argument("--out", default=os.path.join(repo, "data", "prism-followers.json"))
     a = ap.parse_args()
 
     if not a.token or not os.path.isfile(a.token):

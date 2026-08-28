@@ -14,7 +14,7 @@ and never breaks.
 
 1. **Publish to GitHub Pages**
    - Create a public repo (e.g. `stream-overlays`).
-   - Upload `prism-nowplaying.html` (uploading it as `index.html` gives the
+   - Upload `widgets/prism-nowplaying.html` (uploading it as `index.html` gives the
      cleanest URL).
    - Settings → Pages → Deploy from branch → `main` / root → Save.
    - Your URL will be like: `https://<username>.github.io/stream-overlays/`
@@ -37,5 +37,5 @@ That's it. The card shows your current track and auto-refreshes.
 - Nothing playing → the card shows a paused state; it keeps the last art briefly.
 - The widget self-computes its redirect URI from its own address, so it works at
   any repo/path — just register whatever URL it prints.
-- To retheme, edit the `--c1`…`--c5` palette variables at the top (same as the
+- To retheme, edit the `--c1`…`--c5` palette variables in `core/prism-theme.css` (same as the
   rest of the PRISM set).

@@ -3,6 +3,22 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.6.1] — 2026-08-28
+
+### Fixed
+- `tools/deploy-to-pages.sh` still used the pre-restructure flat copy logic; it
+  now calls `scripts/deploy-pages.py` like the .bat does.
+- `scripts/refresh-followers.py` wrote to the repo root instead of
+  `data/prism-followers.json`.
+- Docs (`README`, shoutout and now-playing guides) updated for the new layout.
+- Dropped a stale `.gitignore` entry for a deleted one-time script.
+
+### Added
+- Maintenance checks: **Launchers** (every path a `tools/*.bat` points at must
+  exist — catches a future move breaking them) and **OBS scene set** (flags a
+  `prism-holo` build that has drifted from source).
+- CI now byte-compiles everything in `scripts/`, not just the service shim.
+
 ## [1.6.0] — 2026-08-28
 
 ### Changed

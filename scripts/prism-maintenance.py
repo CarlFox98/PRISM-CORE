@@ -213,6 +213,56 @@ def check_pages_sync():
         else "all %d in sync with source" % len(pairs))
 
 
+def check_launchers():
+    """Every path a tools/*.bat points at must still exist (catches moves)."""
+    tools = os.path.join(REPO, "tools")
+    if not os.path.isdir(tools):
+        add("WARN", "Launchers", "tools/ not found")
+        return
+    broken, checked = [], 0
+    for name in sorted(os.listdir(tools)):
+        if not name.lower().endswith(".bat"):
+            continue
+        body = open(os.path.join(tools, name), encoding="utf-8", errors="ignore").read()
+        for ref in set(re.findall(r"%~dp0\.\.\\([A-Za-z0-9_\\.-]+)", body)):
+            checked += 1
+            if not os.path.exists(os.path.join(REPO, ref.replace("\\", os.sep))):
+                broken.append("%s -> %s" % (name, ref))
+    add("WARN" if broken else "OK", "Launchers",
+        ("broken: " + "; ".join(broken)) if broken
+        else "%d referenced path(s) all exist" % checked)
+
+
+def check_obs_set():
+    """The built OBS scene set should match the current source."""
+    parent = os.path.abspath(os.path.join(REPO, ".."))
+    out = os.path.join(parent, "prism-holo")
+    if not os.path.isdir(out):
+        add("OK", "OBS scene set", "not built here — run scripts/build-obs-set.py")
+        return
+    pairs = {"prism-starting-soon.html": "starting-soon.html",
+             "prism-be-right-back.html": "be-right-back.html",
+             "prism-stream-ending.html": "stream-ending.html",
+             "prism-tech-difficulties.html": "tech-difficulties.html"}
+    stale = []
+    for src, dst in pairs.items():
+        s = os.path.join(REPO, "scenes", src)
+        d = os.path.join(out, dst)
+        if not os.path.isfile(s):
+            continue
+        if not os.path.isfile(d):
+            stale.append(dst + " (missing)")
+            continue
+        txt = open(s, encoding="utf-8").read()
+        for a, b in (("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/")):
+            txt = txt.replace(a, b)
+        if txt != open(d, encoding="utf-8").read():
+            stale.append(dst)
+    add("WARN" if stale else "OK", "OBS scene set",
+        ("stale: %s — run scripts/build-obs-set.py" % ", ".join(stale)) if stale
+        else "in sync with source")
+
+
 def cleanup():
     targets = (glob.glob(os.path.join(REPO, "__pycache__"))
                + glob.glob(os.path.join(REPO, "scripts", "__pycache__"))
@@ -234,7 +284,8 @@ def cleanup():
 
 CHECKS = [check_python, check_deps, check_secrets, check_secret_not_tracked,
           check_git, check_integrity, check_version, check_fonts,
-          check_pages_sync, check_reachability, cleanup]
+          check_pages_sync, check_obs_set, check_launchers,
+          check_reachability, cleanup]
 
 
 def main():

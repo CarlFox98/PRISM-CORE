@@ -8,7 +8,7 @@ Two pieces:
 
 | File | What it is | Where it runs |
 |------|------------|---------------|
-| `prism-shoutout.html` | the on-screen overlay | **hosted** (GitHub Pages) → OBS Browser Source |
+| `widgets/prism-shoutout.html` | the on-screen overlay | **hosted** (GitHub Pages) → OBS Browser Source |
 | `prism_shoutout_service.py` | watches chat, does Twitch lookups, drives the overlay | on your PC (Python) |
 
 The overlay must be **hosted** (not a local file) so the Twitch clip can
@@ -17,12 +17,14 @@ autoplay — the clip embed requires a real domain as its "parent", and your
 
 --------------------------------------------------------------------
 ## 1. Host the overlay
+
+*(Easiest: run `tools\deploy-to-pages.bat`, which copies and pushes for you.)*
 --------------------------------------------------------------------
-Add `prism-shoutout.html` to your existing Pages repo (the `streaming`
+Add `widgets/prism-shoutout.html` to your existing Pages repo (the `streaming`
 one). From that repo folder:
 
 ```
-copy "C:\Users\NeoTheFox98\Pictures\OBS Assets\overlays\PRISM\prism-shoutout.html" .
+copy "C:\Users\NeoTheFox98\Pictures\OBS Assets\overlays\PRISM\widgets\prism-shoutout.html" .
 git add prism-shoutout.html
 git commit -m "PRISM shoutout overlay"
 git push
@@ -46,7 +48,7 @@ prismenv\Scripts\python.exe -m pip install -r prism-shoutout\requirements.txt
 ```
 
 Credentials are **not** in code — they load from `prismenv\prism-secrets.json`
-(git-ignored). Copy `prism-secrets.example.json` there and fill in:
+(git-ignored). Copy `data/prism-secrets.example.json` there and fill in:
 
 - `CHANNEL` → `NeoTheFox98`
 - `CLIENT_ID` → your SYSFOX app Client ID
@@ -54,7 +56,7 @@ Credentials are **not** in code — they load from `prismenv\prism-secrets.json`
 - `OBS_WS_PASSWORD` → (optional) for audio ducking
 
 Then run it (keep it running while you stream) — double-click
-`Start-PRISM-Shoutout.bat`, or:
+`tools\Start-PRISM-Shoutout.bat`, or:
 
 ```
 python prism_shoutout_service.py
