@@ -27,9 +27,33 @@ from .twitch_api import helix_get, clip_mp4
 _last_clips = {}
 
 
+# how many streamers to remember clip history for before evicting the oldest
+_MAX_TRACKED_LOGINS = 500
+
+
 def _seen(login):
-    """Per-streamer deque of recently shown clip ids."""
-    return _last_clips.setdefault(login, deque(maxlen=config.CLIP_HISTORY))
+    """Per-streamer deque of recently shown clip ids (least-recently-used first).
+
+    Re-inserting on every access makes eviction LRU rather than first-seen —
+    otherwise the streamers you shout out most often, being the earliest keys,
+    would be the first ones forgotten.
+    """
+    dq = _last_clips.pop(login, None)
+    if dq is None:
+        while len(_last_clips) >= _MAX_TRACKED_LOGINS:
+            _last_clips.pop(next(iter(_last_clips)))   # least recently used
+        dq = deque(maxlen=config.CLIP_HISTORY)
+    _last_clips[login] = dq
+    return dq
+
+
+def prime(seen_by_login):
+    """Rehydrate the per-streamer clip memory (used to restore it from the log)."""
+    for login, ids in (seen_by_login or {}).items():
+        dq = _seen(login)
+        for cid in list(ids)[-config.CLIP_HISTORY:]:
+            if cid and cid not in dq:
+                dq.append(cid)
 
 
 def pick_recent(clips, login):
@@ -154,10 +178,14 @@ def lookup(login):
         "name": u.get("display_name") or login,
         "login": u.get("login") or login,
         "avatar": u.get("profile_image_url", ""),
+        "offline": u.get("offline_image_url", ""),   # backdrop when there's no clip
         "category": game,
         "live": live,          # currently streaming? -> overlay shows LIVE NOW
         "clip": mp4_url,       # direct signed mp4 (preferred)
         "thumb": clip_thumb,   # fallback image
         "clipId": clip_id,     # (kept for reference)
         "hold": _hold_ms(clip_dur, mp4_url),
+        "volume": config.CLIP_VOLUME,      # overlay ramps the clip up to this
+        "fadeMs": config.CLIP_FADE_IN_MS,  # ... over this long
+        "noclipHold": config.NOCLIP_HOLD_MS,  # cap the stay if the clip dies
     }

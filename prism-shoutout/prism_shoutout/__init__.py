@@ -20,7 +20,25 @@ The logic is split into focused modules:
 Run it with:  python -m prism_shoutout
 """
 
-__version__ = "1.0.0"
+def _read_version():
+    """The PRISM repo's VERSION file when we're inside it, else "unknown".
+
+    A hardcoded string here drifted to 1.0.0 while the repo was at 1.6.1, which
+    made the package's own version useless for telling which build is running.
+    """
+    try:
+        from pathlib import Path
+        p = Path(__file__).resolve().parents[2] / "VERSION"
+        if p.is_file():
+            v = p.read_text(encoding="utf-8").strip()
+            if v:
+                return v
+    except Exception:
+        pass
+    return "unknown"
+
+
+__version__ = _read_version()
 
 from .service import run  # noqa: E402  (convenience re-export)
 

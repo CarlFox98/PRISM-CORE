@@ -97,6 +97,10 @@ service on `ws://127.0.0.1:8777`.
 
 > To preview the card design any time, open the overlay with `?demo` on the URL.
 
+The overlay is self-contained apart from `../fonts/prism-fonts.css`, which
+`scripts/deploy-pages.py` rewrites and ships alongside the hosted copy — nothing
+is fetched from Google at load time.
+
 ### 4. Run the service
 
 From this folder:
@@ -114,16 +118,29 @@ loads the overlay, `[overlay] connected`. Have a mod (or you) type
 ## Options at a glance
 
 - **Mods only** by default (`MODS_ONLY`). The broadcaster is always allowed.
-- **Raids** auto-shout the raider (`RAID_SHOUTOUT`).
+- **`!so` accepts** `@name`, `name`, or a pasted `twitch.tv/name` link, and
+  answers to `COMMAND_ALIASES` (`!shoutout`) as well.
+- **Raids** auto-shout the raider (`RAID_SHOUTOUT`), gated by `BLOCKLIST`,
+  `RAID_ALLOWLIST` and — if you turn it on — `RAID_REQUIRE_APPROVAL`, which
+  holds the card until a mod types `!so ok`.
+- **Mod controls:** `!so skip`, `!so clear`, `!so off` / `!so on`, `!so ok`,
+  `!so status`. A bare word is a control; `!so @skip` still shouts out a
+  streamer called *skip*.
+- **Card states:** a plain shoutout is teal, a streamer who is **live right
+  now** is magenta, and a **raid** is gold with the viewer count in the eyebrow
+  ("Raid · 42 viewers") and a warmer glow on the hex.
 - **Chat posting** is on by default but only fires if `BOT_USERNAME` + `BOT_OAUTH`
   are set; otherwise the card shows silently.
 - **Clip choice:** random among the **newest `CLIP_RECENT_POOL`** clips within
   `CLIP_RECENT_DAYS` (7); if there are none that recent, a **random pick among
   the most popular** clips within `CLIP_POPULAR_DAYS` (30). Both avoid the last
   `CLIP_HISTORY` shown so repeats rotate, then fall back to a "no clip" card.
+- **Clip volume:** clips play up to `CLIP_VOLUME` (0.85) and fade in over
+  `CLIP_FADE_IN_MS`, so they arrive together with the duck instead of on top of it.
 - **Audio ducking:** lowers every OBS audio source except those in
-  `DUCK_EXCLUDE` while a clip plays, then fades them back. Requires obs-websocket
-  and `OBS_WS_PASSWORD`.
+  `DUCK_EXCLUDE` while a clip plays, then fades them back. `DUCK_LEVELS` sets
+  per-source amounts — keep your mic up, drop the game hard. Requires
+  obs-websocket and `OBS_WS_PASSWORD`.
 
 Every setting lives in [`prism_shoutout/config.py`](prism_shoutout/config.py) and
 is documented in [`docs/configuration.md`](docs/configuration.md).

@@ -69,6 +69,21 @@ Selection is two-tier: random among the newest `CLIP_RECENT_POOL` clips within
 - Posting requires **both** `BOT_USERNAME` and `BOT_OAUTH` (an `oauth:…` token
   for that account). Without them the card still shows; it just stays silent.
 
+## The clip audio sounds doubled
+
+More than one overlay is connected — usually a browser tab left open next to
+the OBS Browser Source. Every connected overlay receives and plays the same
+card, so you hear the clip twice, slightly out of phase. The console warns
+`N overlays connected — they will ALL play the clip` when this happens; close
+the spare one.
+
+## A card fired twice for the same person
+
+It shouldn't any more: the same login is refused while its card is queued or on
+screen, plus `REPEAT_GUARD_SEC` after it leaves. If you *want* to re-fire
+someone sooner, `!so clear` releases the guard (`!so skip` deliberately does
+not).
+
 ## Port already in use
 
 - Another instance may still be running on `8777`. Close old console windows, or

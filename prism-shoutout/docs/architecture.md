@@ -57,17 +57,45 @@ State is intentionally small and in-memory:
 - `clips._last_clips` — per-login `deque` of recently shown clip IDs.
 - `overlay.clients` — set of connected overlay WebSockets.
 - `obs_duck._duck` — saved original volumes + count of clips currently playing.
-- `service._recent` — per-login cooldown timestamps.
+- `service._until` — per-login timestamp before which a repeat is refused.
+- `service._screen_free_at` — when the overlay is expected to finish everything
+  it has been sent, so the repeat guard can outlive a queued card.
+- `service._enabled` / `service._pending_raid` — flipped by the mod controls.
+- `obs_duck._conn` — the single held obs-websocket connection.
+- `obs_duck._targets` — the cached list of sources to lower (`DUCK_TARGET_TTL`).
 
-Nothing is persisted to disk, so restarting the service is always safe.
+The one thing that *is* persisted is the shoutout log (`SHOUTOUT_LOG`). It is
+read once at startup to prime `clips._last_clips`, so clip rotation survives a
+restart; everything else is still rebuilt from scratch each run, so restarting
+the service is always safe.
+
+The service also tracks two derived things worth naming: `_reserved` (the
+logins whose guard came from a booked card, so `!so clear` releases exactly
+those) and `_MAX_GUARDS` (a hard ceiling on `_until`, since expiry alone is not
+a bound during a raid train).
 
 ## Concurrency notes
 
 - The whole app runs on one asyncio event loop.
 - `clips.lookup()` does blocking `requests` calls, so `do_shoutout` runs it in a
   thread via `asyncio.to_thread` to avoid stalling the loop.
-- Ducking is guarded by an `asyncio.Lock` and a watchdog (`MAX_DUCK_SEC`) so a
-  lost `clipend` can never leave your audio stuck low.
+- **Every user of the OBS socket must hold `_duck_lock`.** One connection is
+  held open and `_obs_req` reads until it sees its own reply, so two concurrent
+  callers would steal each other's responses — or, on newer `websockets`,
+  raise `ConcurrencyError` and tear the socket down mid-fade. `emergency_restore`
+  takes the lock for exactly this reason: at shutdown an overlay handler can
+  still be releasing its duck.
+- `_req` has a hard `OBS_REQ_TIMEOUT`. Because the connection is long-lived, a
+  half-open socket is a realistic steady state, and a bare `recv` would hang
+  forever *while holding the lock* — stranding the watchdog that exists to
+  restore your audio. A hang is not an exception, so it is made into one.
+- The watchdog (`MAX_DUCK_SEC`) is the only retry for a failed restore, so it is
+  cancelled only once `_duck["saved"]` is actually empty, and it retries a few
+  times before giving up. `_duck_up` clears `saved` on success only — clearing
+  it in a `finally` would erase the levels the recovery needs.
+- `service._main` awaits `server.wait_closed()` before the exit restore:
+  `close()` only schedules the shutdown, and a handler still in its `finally` is
+  releasing the duck on the same socket.
 
 ## Extending it
 

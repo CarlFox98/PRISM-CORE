@@ -25,7 +25,17 @@ jobs:
         run: node scripts/test-socials.mjs
 
       - name: Python service syntax
-        run: python3 -m py_compile prism_shoutout_service.py scripts/*.py
+        run: |
+          python3 -m py_compile prism_shoutout_service.py scripts/*.py
+          python3 -m py_compile prism-shoutout/prism_shoutout/*.py
+
+      - name: Shoutout service tests
+        run: |
+          python3 -m pip install --quiet -r prism-shoutout/requirements.txt
+          cd prism-shoutout && python3 -m unittest discover -s tests
+
+      - name: Shoutout overlay queue test
+        run: node scripts/test-shoutout-overlay.mjs
 
       - name: Secret scan
         run: bash scripts/scan-secrets.sh

@@ -3,6 +3,146 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.7.0] — 2026-08-31
+
+Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
+
+### Added
+- **Shoutout safety gates.** A raid used to reach the screen with nothing in
+  front of it: no blocklist, no threshold, no human. There are now three gates
+  in `config.py` — `BLOCKLIST` (never shouted, by command or raid),
+  `RAID_ALLOWLIST` (if set, only these are auto-shouted on raid) and
+  `RAID_REQUIRE_APPROVAL`, which parks the raid and waits for a mod to type
+  `!so ok` (lapsing after `RAID_APPROVAL_TTL`).
+- **Mod controls.** `!so skip` retires the card on screen, `!so clear` also
+  drops the queue behind it, `!so off` / `!so on` stop and resume shoutouts
+  (raids included), `!so ok` approves a pending raid and `!so status` prints
+  the state. `skip` and `clear` are pushed to the overlay over the existing
+  WebSocket, so they land mid-clip — killing the service is no longer the only
+  way out of a bad card. A bare word is a control; `!so @skip` still shouts out
+  a streamer called *skip*.
+
+- **A repeat guard that outlives the card.** The same login is now refused
+  while its card is queued or on screen, plus `REPEAT_GUARD_SEC` (30s) after it
+  leaves, and the overlay refuses new work once it is `MAX_QUEUE_SEC` backed up.
+  The overlay independently drops a login it is already showing or holding, and
+  caps the queue at five.
+- **Clip volume is configurable.** `CLIP_VOLUME` (0.85) and `CLIP_FADE_IN_MS`
+  ride along in the card payload; the overlay ramps the clip up to that ceiling
+  instead of snapping to 1.0 at a fixed 250ms. With the fade matched to
+  `DUCK_FADE_MS` the clip now arrives together with the duck rather than on top
+  of it — that overlap used to be the loudest moment of the card.
+- **Per-source duck levels.** `DUCK_LEVELS` sets how much each OBS input keeps
+  while a clip plays, falling back to `DUCK_KEEP`. One flat level dropped your
+  mic along with the game, which is backwards — you talk over the clip.
+- **Raids look like raids.** The payload carries `raid` and `raiders`, and the
+  card has a third state next to `.live`: gold eyebrow reading "Raid · 42
+  viewers", gold pulse, warmer glow on the hex. The viewer count used to be
+  printed to the console and thrown away. Raids also get their own chat line
+  (`CHAT_TEMPLATE_RAID`, with a `{viewers}` placeholder).
+- **`RAID_MIN_VIEWERS`** (2) ignores drive-by raids, which previously earned the
+  same full-length card and audio duck as a five-hundred-viewer one.
+- **Card polish.** A time-remaining rail along the card's bottom edge, drawn in
+  the PRISM spectrum; a staggered reveal so the card assembles (hex, clip, then
+  the text) instead of arriving as one block; and a `prefers-reduced-motion`
+  block for anyone opening the overlay outside OBS.
+- **The no-clip card uses the streamer's offline banner.** `offline_image_url`
+  was already in the `/users` response and was being discarded; inactive
+  streamers got a grey play icon on exactly the shoutouts that needed the most
+  help. The label now sits as a caption so the art reads.
+- **A shoutout log.** `SHOUTOUT_LOG` records one JSONL line per shoutout, and
+  the service reads it back at startup to restore clip rotation — previously
+  nothing was persisted, so a restart forgot what it had shown and could replay
+  the same clip. Best-effort: a log that can't be written never costs a shoutout.
+- `COMMAND_ALIASES` (`!shoutout`), and `!so` now accepts a pasted
+  `twitch.tv/name` link as well as `@name` — mods paste links.
+- `ALLOW_SELF_SHOUTOUT` (off): `!so @yourself` no longer plays your own clip to
+  your own chat.
+- The console warns when more than one overlay is connected, since every one of
+  them plays the clip and the audio doubles up.
+- **Tests.** `tests/test_shoutout.py` (59 cases) covers the safety gates, the
+  repeat guard and the clip-selection logic where the "same clip every time"
+  bug lived; `scripts/test-shoutout-overlay.mjs` drives the overlay's queue in a
+  stubbed DOM via a new inert `window.PRISM_SHOUTOUT` test hook.
+
+### Changed
+- **One held obs-websocket connection instead of two handshakes per shoutout.**
+  `_duck_down` and `_duck_up` each opened, authenticated and closed their own
+  socket, putting a round-trip in the path of something that has to feel
+  instant. The connection is now held and reopened only when a request fails —
+  deliberately without inspecting socket state, which moved between
+  `websockets` releases.
+- **The duck no longer re-discovers your OBS inputs on every clip.** It probed
+  `GetInputList` plus a `GetInputVolume` per input, then read every volume
+  again — roughly 2N sequential round-trips before the fade could start. The
+  list is cached for `DUCK_TARGET_TTL` (60s) and dropped on reconnect.
+- CI now byte-compiles `prism-shoutout/prism_shoutout/*.py` and runs both test
+  suites. It previously compiled only the launcher shim and `scripts/`, so a
+  syntax error in the ten modules that are the actual service passed CI.
+
+### Fixed
+- **A failed *restore* no longer leaves your mix down either.** The first pass
+  fixed the failed duck-*down* path and left the mirror image: `_duck_up`
+  cleared the saved levels in a `finally`, so a restore that failed erased the
+  very levels it needed, and the watchdog had already been cancelled. Levels are
+  now cleared on success only, the watchdog is cancelled only once they are
+  actually back, and it retries.
+- **The OBS socket is only ever used under `_duck_lock`.** `emergency_restore`
+  ran unlocked, and `server.close()` only *schedules* the overlay shutdown — so
+  at exit it could race a handler still releasing its duck on the same held
+  connection, tearing the socket down mid-fade. The service now awaits
+  `server.wait_closed()` first.
+- **`OBS_REQ_TIMEOUT` on every OBS request.** Holding the connection open made a
+  half-open socket a realistic state, where a bare `recv` hangs forever holding
+  the lock — stranding the watchdog that exists to un-duck your audio.
+- **The overlay no longer cuts the following card short.** A clip that errored
+  during the 700ms exit window armed a hold timer that outlived its own card and
+  fired partway through the next one, retiring it early and pulling an extra
+  card off the queue. Covered by a regression test.
+- **Screen time is no longer booked for a card nothing received.** With OBS
+  closed, `broadcast` still returned and the service reserved the card's
+  duration, so after a few `!so` it began refusing shoutouts because of a queue
+  that did not exist. `broadcast` now reports how many overlays took the card.
+- **The mid-lookup guard covers the lookup.** It was 3 seconds against a lookup
+  of up to five Twitch calls, so a slow Twitch let a second trigger through and
+  posted the chat line twice.
+- `!so clear` releases only the guards from booked cards, not shoutouts still
+  mid-lookup; a malformed payload can no longer strand the overlay with
+  `busy` stuck true; repeated `!so skip` no longer postpones the exit.
+- **A failed duck no longer leaves your mix down.** `_duck_down()` saves the
+  original levels *before* it fades, so if the OBS socket dropped mid-fade the
+  handler zeroed `active` and returned, leaving sources lowered with nothing
+  scheduled to raise them — audible for the rest of the stream. It now restores
+  on that path, and arms the watchdog to retry if the restore fails too.
+- **A clip that fails mid-play no longer holds a dead frame.** The service sizes
+  the card from the clip's duration before anyone knows the MP4 plays, so a
+  signed URL that 404'd two seconds in left a still thumbnail on screen for up
+  to 41 seconds. The overlay now caps what is left at `NOCLIP_HOLD_MS`.
+- **A missing avatar no longer paints a broken image inside the hex.** `ava.src`
+  was set to `''`, which resolves against the page URL; the hex now falls back
+  to the first letter of the name, and the same fallback covers an avatar URL
+  that fails to load.
+- **Long display names no longer wrap mid-word.** The identity column was 330px
+  in a 1080px card — roughly 55px of the available width was going unused while
+  a 13-character name wrapped and shoved the rest of the column around. The
+  column is now 376px and the name is measured and fitted to it.
+- **The overlay no longer loads fonts from Google.** v1.5.0 vendored the fonts
+  so overlays need no network; the shoutout card missed that pass and still
+  blocked on a Google request as OBS loaded the source — the one moment where a
+  slow response shows a flash of fallback type on stream. It now imports
+  `../fonts/prism-fonts.css`, and `scripts/deploy-pages.py` copies `fonts/` into
+  the hosted folder (it rewrote the path but never shipped the files).
+  *The thank-you, webcam-frame and now-playing overlays still need this pass.*
+- `prism_shoutout.__version__` read `1.0.0` while the repo was at 1.6.1; it now
+  reads the `VERSION` file so it can't drift again.
+- `service._until` and `clips._last_clips` are bounded — both grew for the life
+  of the process. `_until` has a hard cap as well as expiry (a raid train holds
+  hundreds of live guards), and clip memory evicts least-recently-used rather
+  than first-seen, which had it forgetting your regulars first.
+- `do_shoutout` is wrapped end to end. `overlay.broadcast` and `chat.post_chat`
+  sat outside the try, so a failure in either killed the task silently with an
+  unretrieved-exception warning and no console line.
+
 ## [1.6.1] — 2026-08-28
 
 ### Fixed

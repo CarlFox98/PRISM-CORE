@@ -1,6 +1,10 @@
 # --- secrets: never commit real credentials ---
 prism-secrets.json
 
+# --- runtime output ---
+# append-only record of shoutouts; also restores clip rotation across restarts
+shoutout-log.jsonl
+
 # --- Python ---
 __pycache__/
 *.py[cod]

@@ -27,6 +27,10 @@ FILES = {
 FLATTEN = [("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/")]
 TEXT_EXT = (".html", ".css", ".js", ".json")
 
+# folders copied wholesale (the overlays @import fonts/prism-fonts.css, so the
+# woff2 files have to be there or the hosted page silently falls back)
+DIRS = {"fonts": "fonts"}
+
 
 def copy_flat(src, dst):
     if not src.lower().endswith(TEXT_EXT):
@@ -58,8 +62,32 @@ def main():
         if not a.dry_run:
             copy_flat(os.path.join(REPO, src), os.path.join(PAGES, dst))
 
+    copied_dirs = 0
+    for src, dst in DIRS.items():
+        src_dir = os.path.join(REPO, src)
+        if not os.path.isdir(src_dir):
+            print("  WARNING: %s/ not found — skipping" % src)
+            continue
+        names = [f for f in sorted(os.listdir(src_dir))
+                 if os.path.isfile(os.path.join(src_dir, f))]
+        print("  %-38s -> %s/  (%d files)" % (src + "/", dst, len(names)))
+        if not a.dry_run:
+            out_dir = os.path.join(PAGES, dst)
+            os.makedirs(out_dir, exist_ok=True)
+            # copy file by file rather than replacing the folder: the target is
+            # inside a git repo, and an rmtree there churns history for
+            # unchanged binaries and is one wrong path away from real damage
+            for name in names:
+                copy_flat(os.path.join(src_dir, name), os.path.join(out_dir, name))
+            stale = [f for f in sorted(os.listdir(out_dir))
+                     if os.path.isfile(os.path.join(out_dir, f)) and f not in names]
+            for f in stale:
+                print("    NOTE: %s/%s is no longer in the source — remove it by hand" % (dst, f))
+            copied_dirs += 1
+
     print("\n(dry run — nothing written)" if a.dry_run
-          else "\nDeployed %d file(s) into github-pages/." % len(FILES))
+          else "\nDeployed %d file(s) and %d folder(s) into github-pages/."
+               % (len(FILES), copied_dirs))
     return 0
 
 

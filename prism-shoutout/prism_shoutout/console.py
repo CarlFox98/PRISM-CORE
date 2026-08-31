@@ -43,6 +43,7 @@ _TAGS = {
     "clip":    (C1, ""),
     "duck":    (C5, ""),
     "lookup":  (ERR, ""),
+    "log":     (SOFT, ""),
 }
 
 _W = 42                 # inner width of the config box
