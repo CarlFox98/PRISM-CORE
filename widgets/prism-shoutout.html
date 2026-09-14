@@ -161,6 +161,8 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
     volume: 0.85,                // clip playback ceiling (service overrides per card)
     fadeMs: 320,                 // ramp the clip up over this long, with the duck
     noclipHold: 8000,            // cap the stay once a clip has failed
+    startMs: 8000,               // give up if playback never actually begins
+    stallMs: 3000,               // ... or if it stops advancing mid-clip
     parent: location.hostname || 'localhost'
   };
   var card=document.getElementById('card'), ava=document.getElementById('ava'),
@@ -170,6 +172,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
       avaLetter=document.getElementById('avaLetter'), railEl=document.getElementById('rail');
   var queue=[], busy=false, holdTimer=null, exitTimer=null, onScreen='', fadeTimer=null;
   var cardStart=0, cardHold=0, cardNoclipHold=0;  // so a dying clip can shorten what's left
+  var stallTimer=null;           // watches that the clip is actually progressing
   var clipActive=false;   // are we currently telling the service a clip is playing?
 
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
@@ -192,7 +195,48 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
     }, ms/steps);
   }
 
+  /* A starved <video> is not an <video> in error: if the MP4 stops arriving
+     mid-playback (CDN hiccup, a stale signed URL, a decode stumble) the element
+     just stops advancing. No 'error', no 'ended' — so without this watchdog
+     nothing releases the duck, nothing shortens the card, and a frozen frame
+     sits on screen for the clip's full runtime while your game audio stays
+     lowered until the service's 65s safety timeout. */
+  function clearStallWatch(){
+    if(stallTimer){ clearInterval(stallTimer); stallTimer=null; }
+  }
+  function watchPlayback(v, d){
+    clearStallWatch();
+    var started = false, lastTime = -1, lastMoved = Date.now();
+    var startMs = (typeof d.startMs === 'number') ? d.startMs : CFG.startMs;
+    var stallMs = (typeof d.stallMs === 'number') ? d.stallMs : CFG.stallMs;
+    v.addEventListener('playing', function(){ started = true; lastMoved = Date.now(); });
+    stallTimer = setInterval(function(){
+      if(!v || !v.parentNode){ clearStallWatch(); return; }   // already gone
+      if(v.ended){ clearStallWatch(); return; }               // finished normally
+      var idle = Date.now() - lastMoved;
+      if(!started){
+        if(idle > startMs) failClip(v, d, 'never started');
+        return;
+      }
+      var t = v.currentTime || 0;
+      if(t > lastTime + 0.05){ lastTime = t; lastMoved = Date.now(); return; }
+      if(idle > stallMs) failClip(v, d, 'stalled at ' + t.toFixed(1) + 's');
+    }, 500);
+  }
+  // One path for every way a clip can die, so the duck is always released.
+  function failClip(v, d, why){
+    clearStallWatch();
+    if(fadeTimer){ clearInterval(fadeTimer); fadeTimer=null; }
+    try{ console.warn('[prism-shoutout] clip ' + (why || 'failed')); }catch(e){}
+    clipEnded();                       // release the OBS duck immediately
+    try{ v.pause(); }catch(e){}
+    if(v.parentNode) v.remove();
+    if(d && d.thumb){ showThumb(d.thumb); } else { showNoClip(d); }
+    shortenHold();
+  }
+
   function clearClip(){
+    clearStallWatch();
     if(fadeTimer){ clearInterval(fadeTimer); fadeTimer=null; }
     clipEnded();   // release audio ducking if a clip was playing
     var v=clip.querySelector('video'); if(v){ try{ v.pause(); }catch(e){} v.removeAttribute('src'); v.remove(); }
@@ -273,16 +317,17 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
       // muted autoplay is ALWAYS allowed; we unmute the moment it's actually playing
       v.autoplay=true; v.muted=true; v.defaultMuted=true; v.playsInline=true; v.preload='auto';
       v.setAttribute('autoplay',''); v.setAttribute('muted',''); v.setAttribute('playsinline','');
-      v.onerror=function(){ clipEnded(); v.remove(); if(d.thumb){ showThumb(d.thumb); } else { showNoClip(d); } shortenHold(); };
+      v.onerror=function(){ failClip(v, d, 'errored'); };
       var vol  = (typeof d.volume === 'number') ? d.volume : CFG.volume;
       var fade = (typeof d.fadeMs === 'number') ? d.fadeMs : CFG.fadeMs;
       v.addEventListener('playing', function(){
         clipStarted();   // tell the service real audio has begun → duck other sources
         fadeInAudio(v, vol, fade);
       }, {once:true});
-      v.addEventListener('ended', clipEnded, {once:true});
+      v.addEventListener('ended', function(){ clearStallWatch(); clipEnded(); }, {once:true});
       v.src=d.clip;
       clip.appendChild(v);
+      watchPlayback(v, d);
       var tries=0;
       (function kick(){ var p=v.play(); if(p && p.catch){ p.catch(function(){ if(tries++<20) setTimeout(kick,250); }); } })();
     } else if(d.thumb){

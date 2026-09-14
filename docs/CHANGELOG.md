@@ -3,6 +3,36 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.7.1] — 2026-09-13
+
+### Fixed
+- **Shoutout clips no longer freeze on screen.** A starved `<video>` is not a
+  `<video>` in error: when the MP4 stops arriving mid-playback (a CDN hiccup, a
+  signed URL that has gone stale while the card waited in the queue, a decode
+  stumble) the element simply stops advancing. No `error` fires, no `ended`
+  fires — so nothing released the OBS duck and nothing shortened the card. The
+  result was a frozen frame holding the screen for the clip's full runtime
+  while game and music audio stayed lowered until the service's 65-second
+  safety timeout.
+
+  The overlay now watches that `currentTime` is actually advancing and routes a
+  stall into the same recovery path as an outright error: release the duck,
+  fall back to the thumbnail, shorten the card. Two thresholds, both
+  overridable per card from the service payload:
+  `CFG.startMs` (8s — playback never began) and `CFG.stallMs` (3s — it stopped
+  advancing). Detection lands within ~3.5s of a freeze.
+
+  Every way a clip can die now goes through one `failClip()` path, so the duck
+  is released exactly once regardless of which one happened.
+
+### Changed
+- `scripts/test-shoutout-overlay.mjs` models playback rather than stubbing it
+  away: a controlled clock that drives intervals as well as timeouts, a DOM with
+  working `appendChild`/`remove`/`querySelector` and captured event listeners,
+  and a socket that records the `clipstart`/`clipend` traffic ducking depends on.
+  33 checks, including a stalled clip, a clip that never starts, a clip that
+  plays through untouched, and an outright error.
+
 ## [1.7.0] — 2026-08-31
 
 Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
