@@ -16,8 +16,14 @@ scenes/    full-screen OBS scenes          panels/   standalone Twitch info pane
 widgets/   now-playing + shoutout overlays data/     follower list, secrets example
 fonts/     vendored woff2 + aggregator     tools/    .bat/.sh launchers
 scripts/   python/node tooling             docs/     README, CHANGELOG, LICENSE
-prism-shoutout/  the shoutout service package     branding/  banners
+branding/  banners
 ```
+
+> The shoutout **service** (the Python half) now lives in
+> [stream-manager](https://github.com/CarlFox98/stream-manager) as
+> `stream_manager/shoutout.py`. This repo keeps the **overlay**
+> (`widgets/prism-shoutout.html`) and its headless test
+> (`scripts/test-shoutout-overlay.mjs`).
 
 Scenes reference shared assets as `../core/…`, so they open correctly straight
 from disk. The two deploy steps (`scripts/build-obs-set.py` and
@@ -74,28 +80,32 @@ PNG exports for Twitch upload live in `twitch-panels/`.
 - **`prism-nowplaying.html`** — standalone Spotify now-playing card. Self-hosted
   OAuth; see `PRISM-NOWPLAYING-README.md`. Its Spotify client id must match
   `spotifyClientId` in `prism-config.js`.
-- **`prism-shoutout.html` + the `prism-shoutout/` package** — a mod types
-  `!so @user` in chat and a PRISM card slides in with the streamer's avatar,
-  last category, and an autoplaying recent clip. The service is the modular
-  [`prism-shoutout/`](prism-shoutout/README.md) Python package;
-  `prism_shoutout_service.py` at the repo root is a thin launcher shim for it.
-  See `PRISM-SHOUTOUT-README.md`; launch with `tools\Start-PRISM-Shoutout.bat`.
+- **`prism-shoutout.html`** — a mod types `!so @user` in chat and a PRISM card
+  slides in with the streamer's avatar, last category, and an autoplaying recent
+  clip. Gold "Raid · N viewers" variant for raids; falls back to the streamer's
+  offline banner when there's no clip. It connects to the driving service over
+  `ws://127.0.0.1:8777` and is driven by Stream Manager's `shoutout` module —
+  see [Shoutout service](#shoutout-service) below. Test it headlessly with
+  `node scripts/test-shoutout-overlay.mjs`, or open it with `?demo`.
 
-## Local setup (shoutout service)
+## Shoutout service
 
-The service code lives in the `prism-shoutout/` package (versioned here). Its
-virtual environment (`prismenv/`) is **not** in the repo — recreate it once:
+The Python service that watches chat, resolves clips and drives the card was
+**merged into [stream-manager](https://github.com/CarlFox98/stream-manager)**
+(Sept 2026) and now ships as `stream_manager/shoutout.py`, started with the rest
+of Stream Manager. Its credentials, config and log live there too
+(`data/shoutout-log.jsonl`).
 
-```
-py -m venv prismenv
-prismenv\Scripts\python.exe -m pip install -r prism-shoutout\requirements.txt
-```
+What stays in this repo is the presentation half:
 
-Then copy `prism-secrets.example.json` to `prismenv\prism-secrets.json`, fill in
-your Twitch app credentials, and run `tools\Start-PRISM-Shoutout.bat`. The launchers
-set `PRISM_SECRETS` to that file, so the service finds it no matter where it's
-started from. **Secrets stay local and are gitignored** — nothing is ever
-committed. Verify them any time with `prismenv\PRISM-Check.bat`.
+| Here | There |
+|------|-------|
+| `widgets/prism-shoutout.html` — the card | chat reader, `!so` and mod controls |
+| `scripts/test-shoutout-overlay.mjs` — 33 headless checks | Twitch lookups, clip selection, OBS audio ducking |
+
+The two halves talk over a local WebSocket (`ws://127.0.0.1:8777`): the service
+pushes a card payload, the overlay reports `clipstart` / `clipend` so ducking
+follows real playback. Keep that contract in step when changing either side.
 
 ## Hosting
 
@@ -143,11 +153,11 @@ The engine also caches last-good avatar / follower count / latest follower in
 
 Versioning follows [SemVer](https://semver.org); see [CHANGELOG.md](CHANGELOG.md).
 
-The shoutout **service** is the modular `prism-shoutout/` package (its own
-[README](prism-shoutout/README.md) and `docs/`). Both `prism_shoutout_service.py`
-(repo root) and `prismenv/prism_shoutout_service.py` are thin shims that import
-this one package, so there's a single source of truth. `run.bat` inside the
-package runs it directly via `python -m prism_shoutout`.
+The shoutout **service** lives in stream-manager (see
+[Shoutout service](#shoutout-service)); only the overlay is versioned here. Run
+`node scripts/test-shoutout-overlay.mjs` after touching
+`widgets/prism-shoutout.html` — it drives the card through a stubbed DOM on a
+controlled clock and covers the queue rules and every way a clip can die.
 
 ## Maintenance service
 

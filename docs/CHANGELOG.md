@@ -3,6 +3,21 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.7.2] — 2026-09-14
+
+### Changed
+- **The shoutout service has moved out of this repo.** It was merged into
+  [stream-manager](https://github.com/CarlFox98/stream-manager) as
+  `stream_manager/shoutout.py` at the start of September; the working copy here
+  was moved out then, but the deletion was never committed, so the repo still
+  carried a stale second copy. Removed `prism-shoutout/` and
+  `prism_shoutout_service.py`, and rewrote the README around the split.
+
+  PRISM keeps the presentation half — `widgets/prism-shoutout.html` and
+  `scripts/test-shoutout-overlay.mjs`. The WebSocket contract between them
+  (`ws://127.0.0.1:8777`, card payload out, `clipstart`/`clipend` back) is
+  unchanged and is what has to stay in step across the two repos.
+
 ## [1.7.1] — 2026-09-13
 
 ### Fixed
