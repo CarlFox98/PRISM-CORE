@@ -1,5 +1,12 @@
 /**
- * Headless test for the PRISM shoutout overlay.
+ * Headless conformance test for the shoutout overlay.
+ *
+ * Two implementations exist — this repo's hosted card and the copy Stream
+ * Manager serves — and they must behave identically. Run the same spec against
+ * both:
+ *
+ *   node scripts/test-shoutout-overlay.mjs
+ *   node scripts/test-shoutout-overlay.mjs <path-to-other-overlay.html>
  *
  * Runs widgets/prism-shoutout.html's script in a stubbed DOM with a CONTROLLED
  * clock, and drives it through window.PRISM_SHOUTOUT.
@@ -14,11 +21,18 @@
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import vm from 'node:vm';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const html = readFileSync(join(here, '..', 'widgets', 'prism-shoutout.html'), 'utf8');
+// Default: this repo's overlay. Pass a path to run the same spec against another
+// implementation — Stream Manager serves its own copy of this card, and the two
+// have to behave identically or the split silently drifts.
+const target = process.argv[2]
+  ? resolve(process.argv[2])
+  : join(here, '..', 'widgets', 'prism-shoutout.html');
+const html = readFileSync(target, 'utf8');
+console.log('target: ' + target + '\n');
 const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
 
 /* ---------- a controllable clock (timeouts AND intervals) ---------- */
@@ -93,13 +107,21 @@ const getElementById = (id) => {
   return byId.get(id);
 };
 
-/* the service sees clipstart/clipend over the socket — that is what drives ducking */
+/* The service has to learn when a clip actually starts and stops. The two
+   overlays report it differently — one over the WebSocket, one by POSTing to
+   /api/shoutout/clip — so record either. The spec cares that the report
+   happens, not how it travels. */
 const sent = [];
+const record = (raw) => { try { sent.push(JSON.parse(raw)); } catch { sent.push(raw); } };
 class FakeSocket {
   constructor() { this.readyState = 1; }
-  send(m) { try { sent.push(JSON.parse(m)); } catch { sent.push(m); } }
+  send(m) { record(m); }
   close() {}
 }
+const fakeFetch = (url, opts) => {
+  if (String(url).includes('/api/shoutout/clip') && opts && opts.body) record(opts.body);
+  return Promise.resolve({ json: () => ({ last_id: 0, events: [] }) });
+};
 
 const sandbox = {
   console,
@@ -111,6 +133,7 @@ const sandbox = {
   location: { hostname: 'test', search: '' },
   URLSearchParams, JSON, Math,
   WebSocket: FakeSocket,
+  fetch: fakeFetch,
 };
 sandbox.window = sandbox;
 vm.createContext(sandbox);
@@ -121,7 +144,8 @@ if (!api) { console.error('FAIL: overlay exposed no test hook'); process.exit(1)
 
 const clipEl = getElementById('clip');
 const video = () => clipEl.querySelector('video');
-const ducking = () => {
+// true while the overlay has told the service a clip is playing
+const clipReportedPlaying = () => {
   let on = false;
   for (const m of sent) { if (m.type === 'clipstart') on = true; if (m.type === 'clipend') on = false; }
   return on;
@@ -213,7 +237,7 @@ api.enqueue(withClip('frozen', 30000));
 const v1 = video();
 check('a card with a clip creates a video element', !!v1);
 v1.dispatch('playing');
-check('playback start engages the duck', ducking() === true);
+check('playback start is reported to the service', clipReportedPlaying() === true);
 
 // play normally for a few seconds, then stop advancing currentTime
 for (let i = 1; i <= 4; i++) { v1.currentTime = i; advance(1000); }
@@ -224,7 +248,7 @@ check('healthy playback is not mistaken for a stall',
 // within ~3.5s of the freeze
 advance(4500);                // currentTime frozen past CFG.stallMs
 check('a stalled clip is detected', !video());
-check('the duck is released on a stall', ducking() === false);
+check('a stall is reported as clip-end', clipReportedPlaying() === false);
 advance(3000 + 700);
 check('the card ends early instead of holding the frozen frame',
       api.state().busy === false);
@@ -242,10 +266,10 @@ api.enqueue(withClip('healthy', 12000));
 const v3 = video();
 v3.dispatch('playing');
 for (let i = 1; i <= 10; i++) { advance(1000); v3.currentTime = i; }
-check('a clip that plays through is left alone', !!video() && ducking() === true);
+check('a clip that plays through is left alone', !!video() && clipReportedPlaying() === true);
 v3.ended = true;
 v3.dispatch('ended');
-check('ending normally releases the duck', ducking() === false);
+check('ending normally is reported as clip-end', clipReportedPlaying() === false);
 advance(2000 + 700);
 check('the card then retires on its own schedule', api.state().busy === false);
 
@@ -255,7 +279,7 @@ const v4 = video();
 v4.dispatch('playing');
 advance(1000);
 v4.onerror();                 // the path that already worked, still works
-check('an outright error still recovers', !video() && ducking() === false);
+check('an outright error still recovers', !video() && clipReportedPlaying() === false);
 advance(3000 + 700);
 check('and shortens the card', api.state().busy === false);
 

@@ -101,11 +101,26 @@ What stays in this repo is the presentation half:
 | Here | There |
 |------|-------|
 | `widgets/prism-shoutout.html` — the card | chat reader, `!so` and mod controls |
-| `scripts/test-shoutout-overlay.mjs` — 32 headless checks | Twitch lookups, clip selection, OBS audio ducking |
+| `scripts/test-shoutout-overlay.mjs` — 32 headless checks | Twitch lookups, clip selection, chat commands |
 
-The two halves talk over a local WebSocket (`ws://127.0.0.1:8777`): the service
-pushes a card payload, the overlay reports `clipstart` / `clipend` so ducking
-follows real playback. Keep that contract in step when changing either side.
+**There are two cards, not one, and OBS loads the other one.** Stream Manager
+ships its own copy at `static/interactive/shoutout.html`, served over HTTP and
+fed by a long-poll on `/api/effects/shoutout`; that is what the OBS scenes
+actually load. The card here is the WebSocket build (`ws://127.0.0.1:8777`),
+which nothing currently serves — it is kept as the reference implementation and
+as the thing the harness is written against.
+
+So a change to the card has to be made **in both files**, and the harness is
+transport-agnostic so it can prove it:
+
+```bash
+node scripts/test-shoutout-overlay.mjs            # this repo's copy
+node scripts/test-shoutout-overlay.mjs "<stream-manager>/static/interactive/shoutout.html"
+```
+
+Both must pass the same 32 checks. Audio ducking is **not** implemented on
+either side — Stream Manager dropped it deliberately; see the note above
+`set_clip_playing()` there before reaching for it again.
 
 ## Hosting
 
@@ -157,7 +172,9 @@ The shoutout **service** lives in stream-manager (see
 [Shoutout service](#shoutout-service)); only the overlay is versioned here. Run
 `node scripts/test-shoutout-overlay.mjs` after touching
 `widgets/prism-shoutout.html` — it drives the card through a stubbed DOM on a
-controlled clock and covers the queue rules and every way a clip can die.
+controlled clock and covers the queue rules and every way a clip can die. Pass a
+path to run it against Stream Manager's copy of the card, which is the one OBS
+loads; both are expected to pass.
 
 ## Maintenance service
 

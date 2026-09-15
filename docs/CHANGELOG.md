@@ -3,6 +3,29 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.7.4] — 2026-09-15
+
+### Changed
+- **The overlay harness takes a path and no longer assumes a transport.**
+  `scripts/test-shoutout-overlay.mjs` defaulted to `widgets/prism-shoutout.html`
+  and only understood a WebSocket, so it could only ever test this repo's card.
+  It now accepts a target path and records the overlay's clip reports from
+  either a WebSocket `send` or a `POST /api/shoutout/clip`, which means the same
+  32 checks run against Stream Manager's `static/interactive/shoutout.html` too.
+
+      node scripts/test-shoutout-overlay.mjs "<stream-manager>/static/interactive/shoutout.html"
+
+### Fixed
+- **The README described the wrong card as the one in use.** 1.7.2 said the
+  WebSocket contract on `ws://127.0.0.1:8777` "has to stay in step across the
+  two repos". It does not: nothing serves that port any more. OBS loads Stream
+  Manager's HTTP/long-poll copy of the card, and the 1.7.1 stall fix was
+  deployed here while the overlay actually on screen still had the bug. The
+  README now says plainly that there are two cards, which one OBS loads, and
+  that a change has to land in both.
+- The comparison table no longer lists "OBS audio ducking" as something the
+  service does. It does not; Stream Manager dropped ducking deliberately.
+
 ## [1.7.3] — 2026-09-15
 
 ### Changed
