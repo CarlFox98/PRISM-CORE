@@ -101,7 +101,7 @@ What stays in this repo is the presentation half:
 | Here | There |
 |------|-------|
 | `widgets/prism-shoutout.html` — the card | chat reader, `!so` and mod controls |
-| `scripts/test-shoutout-overlay.mjs` — 33 headless checks | Twitch lookups, clip selection, OBS audio ducking |
+| `scripts/test-shoutout-overlay.mjs` — 32 headless checks | Twitch lookups, clip selection, OBS audio ducking |
 
 The two halves talk over a local WebSocket (`ws://127.0.0.1:8777`): the service
 pushes a card payload, the overlay reports `clipstart` / `clipend` so ducking

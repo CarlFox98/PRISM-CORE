@@ -3,6 +3,25 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [1.7.3] — 2026-09-15
+
+### Changed
+- **The maintenance script now checks what this repo actually owns.** With the
+  service gone it was warning about things that are no longer PRISM's business:
+  it looked for `requests`/`websockets` and for `prismenv/prism-secrets.json`,
+  both of which moved to stream-manager with the service. Those two checks are
+  replaced by one that runs `scripts/test-shoutout-overlay.mjs` and reports how
+  many checks passed — the overlay is this repo's half of the feature, so that
+  is the thing worth guarding.
+- The **Launchers** check understands the `set "PY=python"` fallback every
+  `tools/*.bat` carries, so a missing `prismenv/` is no longer reported as six
+  broken launchers. It counts them separately instead.
+- Removed `tools/Start-PRISM-Shoutout.bat` — it started a service that is not
+  here any more. Start the shoutout service with the rest of Stream Manager.
+
+### Fixed
+- The overlay harness has **32** checks, not 33 as 1.7.1 and the README claimed.
+
 ## [1.7.2] — 2026-09-14
 
 ### Changed
@@ -45,7 +64,7 @@ and [Semantic Versioning](https://semver.org).
   away: a controlled clock that drives intervals as well as timeouts, a DOM with
   working `appendChild`/`remove`/`querySelector` and captured event listeners,
   and a socket that records the `clipstart`/`clipend` traffic ducking depends on.
-  33 checks, including a stalled clip, a clip that never starts, a clip that
+  32 checks, including a stalled clip, a clip that never starts, a clip that
   plays through untouched, and an outright error.
 
 ## [1.7.0] — 2026-08-31

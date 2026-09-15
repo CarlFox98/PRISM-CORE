@@ -11,7 +11,6 @@ Exit code is always 0 (a failed CHECK is logged, not raised) unless --strict.
 """
 import datetime as _dt
 import glob
-import json
 import os
 import re
 import shutil
@@ -54,33 +53,24 @@ def check_python():
     add("OK", "Python", sys.version.split()[0])
 
 
-def check_deps():
-    missing = []
-    for m in ("requests", "websockets"):
-        try:
-            __import__(m)
-        except Exception:  # noqa: BLE001
-            missing.append(m)
-    if missing:
-        add("WARN", "Shoutout deps", "missing: %s (pip install -r prism-shoutout/requirements.txt)"
-            % ", ".join(missing))
+def check_overlay_tests():
+    """Drive the shoutout overlay through its headless harness.
+
+    The Python service moved to stream-manager in 1.7.2, so this repo's share of
+    the feature is the card itself. This is the check that it still behaves:
+    queue rules, and every way a clip can die without stranding the overlay.
+    """
+    test = os.path.join(REPO, "scripts", "test-shoutout-overlay.mjs")
+    if not os.path.isfile(test):
+        add("WARN", "Overlay tests", "scripts/test-shoutout-overlay.mjs not found")
+        return
+    code, out = run(["node", test])
+    if code == 0:
+        n_ok = sum(1 for line in out.splitlines() if line.strip().startswith("ok"))
+        add("OK", "Overlay tests", "%d checks passed" % n_ok)
     else:
-        add("OK", "Shoutout deps", "requests, websockets present")
-
-
-def check_secrets():
-    p = os.path.join(REPO, "prismenv", "prism-secrets.json")
-    if not os.path.isfile(p):
-        add("WARN", "Secrets file", "prismenv/prism-secrets.json not found")
-        return
-    try:
-        d = json.load(open(p, encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
-        add("FAIL", "Secrets file", "invalid JSON: %s" % e)
-        return
-    empty = [k for k in ("CLIENT_ID", "CLIENT_SECRET") if not d.get(k)]
-    add("WARN" if empty else "OK", "Secrets file",
-        ("missing/empty: " + ", ".join(empty)) if empty else "present & valid")
+        bad = [line.strip() for line in out.splitlines() if "FAIL" in line]
+        add("FAIL", "Overlay tests", "; ".join(bad[:3]) or "node exited %d" % code)
 
 
 def check_secret_not_tracked():
@@ -219,18 +209,34 @@ def check_launchers():
     if not os.path.isdir(tools):
         add("WARN", "Launchers", "tools/ not found")
         return
-    broken, checked = [], 0
+    broken, checked, fallback = [], 0, 0
     for name in sorted(os.listdir(tools)):
         if not name.lower().endswith(".bat"):
             continue
         body = open(os.path.join(tools, name), encoding="utf-8", errors="ignore").read()
+        # These launchers prefer a venv interpreter but fall back to PATH:
+        #     set "PY=...\prismenv\Scripts\python.exe"
+        #     if not exist "%PY%" set "PY=python"
+        # (and the scheduled-task one does the same with PYW/pythonw), so a
+        # missing prismenv is not a broken launcher. Since 1.7.2 the venv lives
+        # with the service in stream-manager and is absent here by design.
+        guarded = {m.group(1).lower() for m in
+                   re.finditer(r'if\s+not\s+exist\s+"%(\w+)%"\s+set\s+"\1=', body, re.I)}
+        venv_vars = {m.group(1).lower() for m in
+                     re.finditer(r'set\s+"(\w+)=[^"]*prismenv[^"]*"', body, re.I)}
+        has_fallback = bool(guarded & venv_vars)
         for ref in set(re.findall(r"%~dp0\.\.\\([A-Za-z0-9_\\.-]+)", body)):
+            if has_fallback and ref.lower().startswith("prismenv"):
+                fallback += 1
+                continue
             checked += 1
             if not os.path.exists(os.path.join(REPO, ref.replace("\\", os.sep))):
                 broken.append("%s -> %s" % (name, ref))
+    note = "%d referenced path(s) all exist" % checked
+    if fallback:
+        note += " (+%d venv path(s) with a PATH fallback)" % fallback
     add("WARN" if broken else "OK", "Launchers",
-        ("broken: " + "; ".join(broken)) if broken
-        else "%d referenced path(s) all exist" % checked)
+        ("broken: " + "; ".join(broken)) if broken else note)
 
 
 def check_obs_set():
@@ -266,7 +272,7 @@ def check_obs_set():
 def cleanup():
     targets = (glob.glob(os.path.join(REPO, "__pycache__"))
                + glob.glob(os.path.join(REPO, "scripts", "__pycache__"))
-               + glob.glob(os.path.join(REPO, "prism-shoutout", "**", "__pycache__"), recursive=True))
+               + glob.glob(os.path.join(REPO, "scripts", "**", "__pycache__"), recursive=True))
     removed = 0
     for t in targets:
         shutil.rmtree(t, ignore_errors=True)
@@ -282,8 +288,8 @@ def cleanup():
     add("OK", "Cleanup", "removed %d __pycache__ dir(s); pruned %d old log(s)" % (removed, pruned))
 
 
-CHECKS = [check_python, check_deps, check_secrets, check_secret_not_tracked,
-          check_git, check_integrity, check_version, check_fonts,
+CHECKS = [check_python, check_secret_not_tracked,
+          check_git, check_integrity, check_overlay_tests, check_version, check_fonts,
           check_pages_sync, check_obs_set, check_launchers,
           check_reachability, cleanup]
 
