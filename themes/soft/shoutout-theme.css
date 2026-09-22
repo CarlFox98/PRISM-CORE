@@ -4,7 +4,9 @@
    the active set (see the Signal copy for how). Only restyles; the
    show/hide transitions on .so stay the card's own.
    ============================================================ */
-@import url('fonts/prism-fonts.css');
+/* Fonts come from the card page itself (it imports /overlays/PRISM/fonts/prism-fonts.css,
+   which carries every PRISM family) — importing them here too would re-download
+   them each time the card re-reads this file. */
 
 :root{
   --ink:#1A1030; --ink-soft:#5B4A7E;

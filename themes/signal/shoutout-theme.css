@@ -7,7 +7,9 @@
    Only restyles: the card's markup, timing and show/hide
    transitions (.so / .so.show) are untouched.
    ============================================================ */
-@import url('fonts/prism-fonts.css');
+/* Fonts come from the card page itself (it imports /overlays/PRISM/fonts/prism-fonts.css,
+   which carries every PRISM family) — importing them here too would re-download
+   them each time the card re-reads this file. */
 
 :root{
   --ink:#DDF7F4; --ink-soft:#A9D8D3;
