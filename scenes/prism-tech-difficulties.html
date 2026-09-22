@@ -231,10 +231,10 @@ async function connectOBS() {
         if (CONFIG.obs.password && msg.d.authentication) {
           const { challenge, salt } = msg.d.authentication;
           const enc = new TextEncoder();
-          const h1 = await crypto.subtle.digest('SHA-256', enc.encode(CONFIG.obs.password + salt));
-          const h1hex = Array.from(new Uint8Array(h1)).map(b => b.toString(16).padStart(2, '0')).join('');
-          const h2 = await crypto.subtle.digest('SHA-256', enc.encode(h1hex + challenge));
-          id.d.authentication = Array.from(new Uint8Array(h2)).map(b => b.toString(16).padStart(2, '0')).join('');
+          // OBS websocket v5: base64(sha256(base64(sha256(password + salt)) + challenge))
+          const b64 = (buf) => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)));
+          const secret = b64(await crypto.subtle.digest('SHA-256', enc.encode(CONFIG.obs.password + salt)));
+          id.d.authentication = b64(await crypto.subtle.digest('SHA-256', enc.encode(secret + challenge)));
         }
         obsWs.send(JSON.stringify(id));
       }

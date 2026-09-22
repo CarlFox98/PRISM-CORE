@@ -2,17 +2,26 @@
 
 [![PRISM CI](https://github.com/CarlFox98/PRISM-CORE/actions/workflows/ci.yml/badge.svg)](https://github.com/CarlFox98/PRISM-CORE/actions/workflows/ci.yml)
 
-A cohesive **holo-glass / iridescent** overlay system for the Twitch channel
-[**NeoTheFox98**](https://twitch.tv/NeoTheFox98). Every scene, panel, and widget
-shares one design language — a five-colour prism palette, animated gradient
-borders, drifting light motes, and live Twitch data — all rendered at
-**1920×1080** and ready to drop into OBS as Browser Sources.
+The overlay system for the Twitch channel
+[**NeoTheFox98**](https://twitch.tv/NeoTheFox98): full-screen scenes, an in-game
+layout, chat styling and widgets, all rendered at **1920×1080**, fed by live
+Twitch data, and ready to drop into OBS as Browser Sources.
+
+PRISM 2.0 ships **three switchable scene sets**. Pick one from the Stream
+Manager dashboard (Overview → Overlay Scene Set):
+
+| Set | Look | Source |
+|-----|------|--------|
+| **PRISM Signal** (`prism-signal`) | Sci-fi HUD: grid, scanlines, notched panels, terminal readouts. Cyan + magenta. | `themes/signal/` |
+| **PRISM Soft Holo** (`prism-soft`) | Pastel iridescence, sticker cards, paw marks. Sora + Nunito. | `themes/soft/` |
+| **PRISM Holo** (`prism-holo`) | The 1.x holo-glass look, unchanged. | `scenes/` |
 
 ## Repository layout
 
 ```
-core/      shared theme, panels css, chat css, prism-config.js, prism-engine.js
-scenes/    full-screen OBS scenes          panels/   standalone Twitch info panels
+core/      prism-config.js, prism-engine.js, shared scene modules, holo css
+themes/    2.0 sets: signal/ and soft/ (scenes + theme css + chat css)
+scenes/    the 1.x holo scenes             panels/   standalone Twitch info panels
 widgets/   now-playing + shoutout overlays data/     follower list, secrets example
 fonts/     vendored woff2 + aggregator     tools/    .bat/.sh launchers
 scripts/   python/node tooling             docs/     README, CHANGELOG, LICENSE
@@ -29,36 +38,90 @@ Scenes reference shared assets as `../core/…`, so they open correctly straight
 from disk. The two deploy steps (`scripts/build-obs-set.py` and
 `scripts/deploy-pages.py`) flatten those paths when they emit a deployed copy.
 
-## OBS scene set
+## OBS scene sets
 
-PRISM is a switchable set for the local stream-manager. Build it with:
+Each PRISM set is a folder next to Stream Manager's `modern/` and `retro/`.
+Build them with:
 
 ```
-python scripts/build-obs-set.py        # writes <OBS Assets>/overlays/prism-holo/
+python scripts/build-obs-set.py                     # all three
+python scripts/build-obs-set.py --set prism-signal  # just one
 ```
 
-Then pick **prism-holo** in the stream-manager dashboard; it copies the set into
-`overlays/active/`, which OBS serves. The set folder is deliberately *not* named
-`prism` — Windows paths are case-insensitive, so `overlays/prism` would collide
-with the `overlays/PRISM` source repo.
+Then pick a set in the Stream Manager dashboard. It copies that folder into
+`overlays/active/`, which OBS serves as `http://localhost:5000/overlays/active/<scene>.html`.
+Your OBS sources never change; after switching, refresh the browser sources.
+
+For the dashboard to offer a set, its name must be in stream-manager's
+`config.json` → `"scene_sets"` (restart Stream Manager after editing it):
+
+```json
+"scene_sets": ["modern", "retro", "prism-holo", "prism-signal", "prism-soft"]
+```
+
+Every set provides the same scene names: `starting-soon`, `be-right-back`,
+`stream-ending`, `tech-difficulties`, `webcam-frame`, `wallpaper`,
+`chat-preview`, `thank-you`. The 2.0 sets add **`gameplay`**, which the other
+sets don't have, so a `gameplay.html` source shows nothing while `modern`,
+`retro` or `prism-holo` is active.
+
+No set folder is named plain `prism`: Windows paths are case-insensitive, so
+`overlays/prism` would collide with the `overlays/PRISM` source repo.
+
+### Scenes in the 2.0 sets
+
+| Scene | What it shows | Options |
+|-------|---------------|---------|
+| `starting-soon` | Countdown, today's category (from Twitch), socials, follower goal | `?timer=10`, or the ⚙ button (OBS: Interact) |
+| `be-right-back` | Paused state, current category, latest follower | |
+| `stream-ending` | Follower total, newest follower, socials | |
+| `tech-difficulties` | Status tiles (OBS link, desktop audio), stream status. Shows "We're back" and switches OBS to *Starting Soon* once the channel is live again | `window.PRISM_TECHCHECK` in the page to change port/password/scene |
+| `webcam-frame` | Frame that follows the browser source's size (size the source to the camera) | `?demo` |
+| `wallpaper` | Idle background: Stream Manager wins and quotes, reacts to events | |
+| `gameplay` | Frame layer over the game: webcam window (560×315 at 40,725), latest follower, goal, slots for now-playing + shoutout | `?demo` shows the slots |
+| `thank-you` | Thank-a-follower card | Space / `?auto` / `?hidebar` / `?demo` |
+| `chat-preview` | Preview of the set's chat CSS | |
+
+The chat itself is styled by pasting `prism-chat-signal.css` or
+`prism-chat-soft.css` (in the set folder) into SoundAlerts or the chat
+source's Custom CSS. Switching sets doesn't change pasted CSS.
+
+The shoutout card and the now-playing widget are separate sources (Stream
+Manager and GitHub Pages), but they still follow the set: each set ships
+`shoutout-theme.css` and `nowplaying-theme.css`, which both widgets load from
+`/overlays/active/` and re-read every minute. The holo set's copies are empty,
+so the widgets show their built-in look there. After changing the now-playing
+widget, run `tools\deploy-to-pages.bat` and push the `streaming` repo.
 
 ## Design system
 
-Two shared cores drive everything, so retheming or re-pointing identity happens
-in one place instead of every file:
+Identity and live data are shared by every set; each set's look lives in its
+own theme css (`themes/signal/signal.css`, `themes/soft/soft.css`, or
+`core/prism-theme.css` for holo). The 2.0 sets follow two rules: nothing on
+stream below 22px (labels) or 24px (content), and one thing moves continuously
+per scene.
 
 | File | Role |
 |------|------|
-| `prism-config.js` | **Single source of truth** — channel name, socials, follower goal, Spotify client id, avatar fallback. Change identity here and every scene follows. |
+| `prism-config.js` | **Single source of truth** — channel name, socials, follower goal (`goal` + `goalStep`), Spotify client id, avatar fallback. Change identity here and every scene in every set follows. |
 | `prism-theme.css` | Shared look for the full-screen scenes (palette `--c1`…`--c5`, backdrop, motes, holo components). |
 | `prism-engine.js` | Particle motes + live Twitch data via DecAPI (no secrets), and renders socials from config. Degrades gracefully offline; respects `prefers-reduced-motion`. |
 | `prism-panels.css` | Shared look for the standalone Twitch info panels. |
 
 Live-data hooks: add `class="js-avatar"`, `js-followcount`, `js-goal-fill`,
-`js-goal-now`, `js-goal-target`, or `js-latest` to any element and the engine
-fills it. Socials render into any `<div class="socials" data-prism-socials></div>`.
+`js-goal-now`, `js-goal-target`, `js-goal-left`, `js-goal-segments`,
+`js-latest`, `js-game`, `js-title` or `js-name` to any element and the engine
+fills it. Socials render into any `<div class="socials" data-prism-socials></div>`
+(`data-prism-socials="named"` adds each network's name).
 
-## Scenes — `scenes/` (load `../core/prism-theme.css` + `prism-config.js` + `prism-engine.js`)
+**Goal stepping:** with `goalStep: 25`, once the follower goal is reached the
+next multiple of 25 is shown, so the bar never sits pinned at 100%.
+
+Shared scene modules in `core/` (used by the 2.0 sets): `prism-countdown.js`,
+`prism-techcheck.js`, `prism-thankyou.js`, `prism-wallpaper.js`,
+`prism-chat-demo.js`. Each documents its markup hooks at the top.
+
+## Holo scenes (1.x) — `scenes/` (load `../core/prism-theme.css` + `prism-config.js` + `prism-engine.js`)
 
 - `prism-starting-soon.html` — countdown (configurable via `?timer=` or the gear)
 - `prism-be-right-back.html`
@@ -132,8 +195,9 @@ fine as local `file://` Browser Sources.
 
 ## Retheming
 
-Edit the palette variables `--c1`…`--c5` at the top of `prism-theme.css` and
-`prism-panels.css` to retune the entire set at once. Edit `prism-config.js` to
+2.0 sets: edit the `:root` tokens at the top of `themes/signal/signal.css` or
+`themes/soft/soft.css`, then rebuild the sets. Holo: edit the palette variables
+`--c1`…`--c5` at the top of `prism-theme.css` and `prism-panels.css`. Edit `prism-config.js` to
 change identity (channel, socials, goal).
 
 ## Development
@@ -147,7 +211,7 @@ git config core.hooksPath .githooks     # blocks secrets from being committed
 Checks (also run in CI on every push via `.github/workflows/ci.yml`):
 
 ```
-node scripts/test-socials.mjs      # config + scene load-order integrity
+node scripts/test-socials.mjs      # config, scene load order, and every 2.0 set's files
 bash scripts/scan-secrets.sh       # credential scan
 node --check core/prism-config.js core/prism-engine.js
 ```
@@ -186,9 +250,11 @@ tools\prism-maintenance.bat            # run it now, in a window, to see the rep
 tools\uninstall-maintenance-task.bat   # remove the scheduled task
 ```
 
-It verifies the venv/deps, that `prism-secrets.json` is valid and *not* tracked
-by git, whether the repo is behind `origin`, the config/scene integrity test, and
-DecAPI reachability — then clears stray `__pycache__` and prunes old logs. Every
+It checks Python, that no secret file is tracked by git, whether the repo is
+behind `origin`, the config/scene integrity test, the 32 shoutout overlay
+checks, that VERSION matches the changelog, the local fonts, whether the hosted
+overlays and every built scene set match their source, the launchers, and
+DecAPI reachability. Then it clears stray `__pycache__` and prunes old logs. Every
 run writes a timestamped report to `maintenance-logs/` (gitignored). It's
 read-only apart from that housekeeping — it never pulls, pushes, or edits code.
 

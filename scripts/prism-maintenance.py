@@ -240,33 +240,46 @@ def check_launchers():
 
 
 def check_obs_set():
-    """The built OBS scene set should match the current source."""
+    """Each built OBS scene set should match the current source."""
     parent = os.path.abspath(os.path.join(REPO, ".."))
-    out = os.path.join(parent, "prism-holo")
-    if not os.path.isdir(out):
-        add("OK", "OBS scene set", "not built here — run scripts/build-obs-set.py")
+    flat = (("../../core/", ""), ("../../data/", ""), ("../../fonts/", "fonts/"),
+            ("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/"))
+    sets = {
+        "prism-holo": [(os.path.join(REPO, "scenes", s), d) for s, d in (
+            ("prism-starting-soon.html", "starting-soon.html"),
+            ("prism-be-right-back.html", "be-right-back.html"),
+            ("prism-stream-ending.html", "stream-ending.html"),
+            ("prism-tech-difficulties.html", "tech-difficulties.html"))],
+    }
+    for name, theme in (("prism-signal", "signal"), ("prism-soft", "soft")):
+        tdir = os.path.join(REPO, "themes", theme)
+        if os.path.isdir(tdir):
+            sets[name] = [(os.path.join(tdir, f), f) for f in sorted(os.listdir(tdir))
+                          if f.endswith((".html", ".css"))]
+    built, stale = [], []
+    for name, pairs in sets.items():
+        out = os.path.join(parent, name)
+        if not os.path.isdir(out):
+            continue
+        built.append(name)
+        for s, dst in pairs:
+            if not os.path.isfile(s):
+                continue
+            d = os.path.join(out, dst)
+            if not os.path.isfile(d):
+                stale.append("%s/%s (missing)" % (name, dst))
+                continue
+            txt = open(s, encoding="utf-8").read()
+            for a, b in flat:
+                txt = txt.replace(a, b)
+            if txt != open(d, encoding="utf-8").read():
+                stale.append("%s/%s" % (name, dst))
+    if not built:
+        add("OK", "OBS scene sets", "not built here — run scripts/build-obs-set.py")
         return
-    pairs = {"prism-starting-soon.html": "starting-soon.html",
-             "prism-be-right-back.html": "be-right-back.html",
-             "prism-stream-ending.html": "stream-ending.html",
-             "prism-tech-difficulties.html": "tech-difficulties.html"}
-    stale = []
-    for src, dst in pairs.items():
-        s = os.path.join(REPO, "scenes", src)
-        d = os.path.join(out, dst)
-        if not os.path.isfile(s):
-            continue
-        if not os.path.isfile(d):
-            stale.append(dst + " (missing)")
-            continue
-        txt = open(s, encoding="utf-8").read()
-        for a, b in (("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/")):
-            txt = txt.replace(a, b)
-        if txt != open(d, encoding="utf-8").read():
-            stale.append(dst)
-    add("WARN" if stale else "OK", "OBS scene set",
+    add("WARN" if stale else "OK", "OBS scene sets",
         ("stale: %s — run scripts/build-obs-set.py" % ", ".join(stale)) if stale
-        else "in sync with source")
+        else "%s in sync with source" % ", ".join(built))
 
 
 def cleanup():

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Signal — In-game Layout</title>
+<link rel="stylesheet" href="signal.css">
+<style>
+/* In-game frame layer. Put it ABOVE your game capture in OBS; the middle is
+   transparent. The webcam goes behind the cam window (560x315 at 40,725),
+   and the now-playing + shoutout browser sources sit in the marked slots.
+   Add ?demo to the URL to see the slots filled with placeholders. */
+html,body{ background:transparent; }
+.stage{ background:transparent; }
+.stage::before,.stage::after{ display:none; }
+.chip{ display:flex; align-items:center; gap:14px; padding:12px 20px; background:rgba(4,12,16,0.9);
+  font-family:var(--mono); font-size:22px; letter-spacing:2px; color:var(--ink); }
+.follow{ left:40px; top:36px; border-left:3px solid var(--mg); }
+.follow .k{ color:var(--dim); }
+.follow .v{ color:var(--mg); font-weight:600; }
+.goal{ left:40px; top:100px; width:420px; flex-direction:column; align-items:stretch; gap:10px; border-left:3px solid var(--cy); }
+.goal .row{ display:flex; justify-content:space-between; }
+.goal .seg i{ height:10px; }
+/* webcam window */
+.cam{ left:40px; bottom:40px; width:560px; }
+.cam .tab{ display:inline-flex; align-items:center; gap:12px; padding:8px 30px 8px 14px; background:var(--cy); color:#04090D;
+  font-family:var(--mono); font-size:22px; font-weight:600; letter-spacing:3px; clip-path:polygon(0 0,calc(100% - 18px) 0,100% 100%,0 100%); }
+.cam .tab i{ width:12px; height:12px; background:var(--mg); animation:blink 1.4s steps(1) infinite; }
+.cam .win{ height:315px; border:3px solid var(--cy);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%); }
+/* slots — invisible on stream, outlined in ?demo */
+.slot{ display:none; align-items:center; justify-content:center; font-family:var(--mono); font-size:22px; letter-spacing:4px;
+  color:rgba(221,247,244,0.45); border:2px dashed rgba(92,242,227,0.4); background:rgba(4,12,16,0.55); }
+.slot.np{ right:40px; top:36px; width:520px; height:104px; }
+.slot.so{ right:40px; bottom:40px; width:900px; height:300px; }
+body.demo{ background:linear-gradient(160deg,#2b3140,#1b1f2a 55%,#12141b); }
+body.demo .slot{ display:flex; }
+body.demo .cam .win{ background:rgba(10,18,22,0.7); }
+.game{ inset:0; display:none; align-items:center; justify-content:center; font-family:var(--mono); font-size:28px; letter-spacing:8px; color:rgba(255,255,255,0.16); }
+body.demo .game{ display:flex; }
+@media (prefers-reduced-motion: reduce){ .cam .tab i{ animation:none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="game">GAME CAPTURE</div>
+  <div class="chip follow js-latest-wrap" hidden><span class="k">NEW FOLLOW ▸</span><span class="v js-latest"></span></div>
+  <div class="chip goal"><div class="row"><span style="color:var(--dim)">FOLLOWERS</span><span><span class="js-goal-now">—</span> / <span class="js-goal-target">—</span></span></div>
+    <div class="seg js-goal-segments"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <div class="cam"><div class="tab"><i></i>CAM_01 · <span class="js-name">NeoTheFox98</span></div><div class="win"></div></div>
+  <div class="slot np">NOW PLAYING · widget</div>
+  <div class="slot so">SHOUTOUT · widget</div>
+</div>
+<script>if(new URLSearchParams(location.search).has('demo')) document.body.classList.add('demo');</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body>
+</html>

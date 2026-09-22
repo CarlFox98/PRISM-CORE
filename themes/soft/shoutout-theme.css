@@ -1,0 +1,48 @@
+/* ============================================================
+   PRISM 2.0 — SOFT HOLO · shoutout card theme
+   Loaded by the shoutout card from /overlays/active/ so it follows
+   the active set (see the Signal copy for how). Only restyles; the
+   show/hide transitions on .so stay the card's own.
+   ============================================================ */
+@import url('fonts/prism-fonts.css');
+
+:root{
+  --ink:#1A1030; --ink-soft:#5B4A7E;
+  --c1:#9FF3D6; --c2:#9CC9FF; --c3:#C8B6FF; --c4:#FFB5CF; --c5:#FFD9A0;
+  --cream:#FFF7F0; --shadow:rgba(10,4,24,0.6);
+}
+html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
+
+/* a cream sticker card with an offset shadow */
+.so{ --hex:circle(50% at 50% 50%);
+  width:1100px; padding:0; border:0; border-radius:36px; background:var(--cream); overflow:visible;
+  -webkit-backdrop-filter:none; backdrop-filter:none; animation:none;
+  box-shadow:14px 14px 0 var(--shadow); }
+.so-inner{ background:transparent; border-radius:36px; padding:30px 32px; }
+
+.so-id{ width:390px; gap:8px; }
+.so-ava{ width:140px; height:140px; filter:none; }
+.so-ava::before{ background:conic-gradient(from 200deg,#9FF3D6,#9CC9FF,#C8B6FF,#FFB5CF,#FFD9A0,#9FF3D6); animation:none; }
+.so.raid .so-ava{ filter:none; }
+.so-ava img, .so-ava-letter{ inset:7px; width:calc(100% - 14px); height:calc(100% - 14px); background:#2a1d48; }
+.so-ava-letter{ font-family:'Sora',sans-serif; color:var(--cream); }
+
+/* eyebrow becomes a pastel pill */
+.so-eyebrow{ padding:6px 18px; border-radius:999px; background:var(--c4); color:var(--ink);
+  font-size:20px; font-weight:800; letter-spacing:0.5px; text-transform:lowercase; text-shadow:none; }
+.so-eyebrow .dot{ display:none; }
+.so.live .so-eyebrow{ background:var(--c1); color:var(--ink); text-shadow:none; }
+.so.raid .so-eyebrow{ background:var(--c5); color:var(--ink); text-shadow:none; }
+
+.so-name{ font-family:'Sora',sans-serif; font-size:62px; font-weight:800; line-height:1.02; letter-spacing:-2px;
+  background:none; -webkit-text-fill-color:var(--ink); color:var(--ink); filter:none; animation:none; }
+.so-handle{ font-family:'Nunito',sans-serif; font-size:22px; font-weight:800; color:var(--ink-soft); letter-spacing:0; }
+.so-cat{ font-size:24px; font-weight:700; letter-spacing:0; color:var(--ink-soft); }
+.so-cat b{ color:var(--ink); font-weight:800; }
+
+.so-clip{ border-radius:24px; background:#2a1d48; box-shadow:0 0 0 4px #C8B6FF; }
+.so-clip .noclip{ font-family:'Sora',sans-serif; font-size:22px; letter-spacing:1px; text-transform:lowercase; color:#E6DDF7;
+  background:radial-gradient(600px 400px at 50% 40%,rgba(200,182,255,0.18),transparent 70%); }
+
+.so-rail{ left:32px; right:32px; bottom:12px; height:8px; border-radius:999px; background:rgba(26,16,48,0.1); }
+.so-rail i{ border-radius:999px; background:linear-gradient(90deg,#9FF3D6,#9CC9FF,#C8B6FF,#FFB5CF); }

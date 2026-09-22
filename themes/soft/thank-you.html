@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Soft Holo — Thank You</title>
+<link rel="stylesheet" href="soft.css">
+<style>
+html,body{ background:transparent; }
+.ty{ position:absolute; left:50%; top:50%; width:900px; margin-left:-450px; margin-top:-150px; opacity:0;
+  transform:rotate(-2deg) scale(.85); transition:opacity .35s, transform .6s cubic-bezier(.34,1.56,.64,1); }
+.ty.show{ opacity:1; transform:rotate(-2deg) scale(1); }
+.ty .card{ background:var(--ink); color:var(--bg); border:0; border-radius:34px; padding:34px 40px 38px 170px; box-shadow:12px 12px 0 var(--shadow); position:relative; transform:none; }
+.ty .emb{ position:absolute; left:34px; top:34px; width:108px; height:108px; border-radius:50%; background:var(--iris); display:flex; align-items:center; justify-content:center; color:var(--ink); }
+.ty .emb svg{ fill:currentColor; }
+.ty .k{ display:inline-block; padding:6px 18px; border-radius:999px; background:var(--pink); font-size:22px; font-weight:800; }
+.ty .name{ font-family:var(--display); font-size:92px; font-weight:800; line-height:1.05; letter-spacing:-2px; margin-top:8px; overflow-wrap:anywhere; }
+.ty .msg{ font-size:28px; color:#5B4A7E; margin-top:6px; }
+#bar{ position:fixed; left:50%; bottom:40px; transform:translateX(-50%); display:flex; align-items:center; gap:16px; padding:10px 14px 10px 10px;
+  border-radius:999px; background:var(--ink); color:var(--bg); font-size:18px; box-shadow:5px 5px 0 var(--shadow); }
+#bar button{ cursor:pointer; padding:10px 20px; border-radius:999px; border:0; background:var(--lilac); color:var(--bg); font-weight:800; }
+#note{ position:fixed; left:50%; top:30px; transform:translateX(-50%); padding:8px 18px; border-radius:999px; background:var(--butter); color:var(--bg); font-size:18px; }
+.hidden{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="ty" id="card" role="status">
+  <div class="card">
+    <div class="emb"><svg width="58" height="58" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div>
+    <span class="k">thank you for the follow!</span>
+    <div class="name" id="name">Follower</div>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+<div id="note" class="hidden"></div>
+<div id="bar" class="hidden"><button id="pick">Thank a follower</button><span>or Space · ?hidebar hides this · ?auto picks on load</span></div>
+<script>window.PRISM_THANKYOU = { messages:[
+  "Welcome to the pack — glad you're here!",
+  "Thanks for the follow. Enjoy the stream!",
+  "You just made the stream a little brighter.",
+  "Big thanks for following — see you in chat!"
+]};</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-thankyou.js"></script>
+</body>
+</html>

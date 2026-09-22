@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Soft Holo — In-game Layout</title>
+<link rel="stylesheet" href="soft.css">
+<style>
+/* In-game frame layer. Put it ABOVE your game capture in OBS; the middle is
+   transparent. The webcam goes behind the cam window (560x315 at 40,721),
+   and the now-playing + shoutout browser sources sit in the marked slots.
+   Add ?demo to the URL to see the slots filled with placeholders. */
+html,body{ background:transparent; }
+.stage{ background:transparent; }
+.follow{ left:40px; top:36px; font-size:24px; }
+.follow svg{ fill:#FF8FB0; }
+.follow .k{ font-family:var(--body); font-weight:800; font-size:22px; }
+.goal{ left:40px; top:108px; width:400px; padding:14px 20px; border-radius:22px; background:rgba(26,16,48,0.88); box-shadow:5px 5px 0 var(--shadow); }
+.goal .top{ font-size:22px; } .goal .track{ height:20px; }
+.cam{ left:40px; bottom:44px; width:560px; height:315px; border-radius:30px; padding:6px; background:var(--iris); box-shadow:10px 10px 0 var(--shadow);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; }
+.name{ left:70px; bottom:22px; z-index:3; }
+.slot{ display:none; align-items:center; justify-content:center; font-family:var(--display); font-size:22px; letter-spacing:4px; color:rgba(255,255,255,0.5);
+  border:3px dashed rgba(200,182,255,0.5); border-radius:28px; background:rgba(26,16,48,0.5); }
+.slot.np{ right:40px; top:36px; width:520px; height:92px; border-radius:999px; }
+.slot.so{ right:40px; bottom:44px; width:900px; height:280px; }
+.game{ inset:0; display:none; align-items:center; justify-content:center; font-family:var(--display); font-size:28px; letter-spacing:8px; color:rgba(255,255,255,0.16); }
+body.demo{ background:linear-gradient(160deg,#2b3140,#1b1f2a 55%,#12141b); }
+body.demo .slot, body.demo .game{ display:flex; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="game">GAME CAPTURE</div>
+  <div class="follow sticker js-latest-wrap" hidden><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg><span class="k">new follow:</span><span class="js-latest"></span></div>
+  <div class="goal"><div class="top"><span class="k">followers</span><span><span class="js-goal-now">—</span> / <span class="js-goal-target">—</span></span></div><div class="track"><div class="fill js-goal-fill"></div></div></div>
+  <div class="cam"></div>
+  <div class="name sticker tilt-l"><span class="js-name">NeoTheFox98</span></div>
+  <div class="slot np">now playing · widget</div>
+  <div class="slot so">shoutout · widget</div>
+</div>
+<script>if(new URLSearchParams(location.search).has('demo')) document.body.classList.add('demo');</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body>
+</html>

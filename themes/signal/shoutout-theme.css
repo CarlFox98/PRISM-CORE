@@ -1,0 +1,61 @@
+/* ============================================================
+   PRISM 2.0 — SIGNAL · shoutout card theme
+   Loaded by the shoutout card (Stream Manager's
+   static/interactive/shoutout.html) from /overlays/active/, so the
+   card follows whichever set the dashboard has active. Holo has no
+   theme file, so the card keeps its built-in look there.
+   Only restyles: the card's markup, timing and show/hide
+   transitions (.so / .so.show) are untouched.
+   ============================================================ */
+@import url('fonts/prism-fonts.css');
+
+:root{
+  --ink:#DDF7F4; --ink-soft:#A9D8D3;
+  --c1:#5CF2E3; --c2:#5CF2E3; --c3:#6FA7A2; --c4:#FF5FA2; --c5:#FFC857;
+  --sg-panel:rgba(6,20,24,0.95);
+}
+html,body{ font-family:'Chakra Petch','Segoe UI',sans-serif; }
+
+/* notched panel instead of the rainbow glass rim */
+.so{ --hex:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+  width:1120px; padding:0; border-radius:0; border:0; background:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none; animation:none;
+  box-shadow:none; filter:drop-shadow(0 18px 40px rgba(0,0,0,0.6)); }
+.so-inner{ border-radius:0; padding:58px 30px 30px; background:var(--sg-panel);
+  border:1px solid rgba(255,95,162,0.55);
+  clip-path:polygon(26px 0,100% 0,100% calc(100% - 26px),calc(100% - 26px) 100%,0 100%,0 26px); }
+/* header strip */
+.so-inner::before{ content:"INCOMING TRANSMISSION // SHOUTOUT"; position:absolute; left:0; right:0; top:0; height:44px;
+  display:flex; align-items:center; padding:0 34px; background:rgba(255,95,162,0.14);
+  font-family:'JetBrains Mono',monospace; font-size:20px; letter-spacing:4px; color:var(--c4); }
+.so.raid .so-inner::before{ content:"INCOMING RAID // SIGNAL BOOST"; color:var(--c5); background:rgba(255,200,87,0.12); }
+.so.live .so-inner::before{ content:"LIVE SIGNAL // SHOUTOUT"; }
+
+/* identity column: left-aligned readout */
+.so-id{ align-items:flex-start; text-align:left; width:400px; gap:8px; }
+.so-ava{ width:128px; height:128px; filter:none; }
+.so-ava::before{ background:var(--c1); animation:none; }
+.so.raid .so-ava::before{ background:var(--c5); }
+.so.raid .so-ava{ filter:none; }
+.so-ava-letter{ font-family:'Chakra Petch',sans-serif; color:var(--c1); }
+.so-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:20px; letter-spacing:3px; text-shadow:none; color:var(--c1); }
+.so-eyebrow .dot{ width:12px; height:12px; border-radius:0; box-shadow:0 0 10px currentColor; background:currentColor; }
+.so.live .so-eyebrow{ text-shadow:none; }
+.so.raid .so-eyebrow{ text-shadow:none; }
+.so-name{ font-size:60px; font-weight:700; line-height:1; letter-spacing:2px; text-transform:uppercase;
+  background:none; -webkit-text-fill-color:var(--ink); color:var(--ink); filter:none; animation:none; }
+.so-handle{ font-family:'JetBrains Mono',monospace; font-size:22px; color:var(--c3); }
+.so-cat{ font-family:'JetBrains Mono',monospace; font-size:22px; letter-spacing:0; color:var(--ink-soft); }
+.so-cat b{ color:var(--ink); }
+
+/* clip window: square, cyan edge, scanlines */
+.so-clip{ border-radius:0; box-shadow:0 0 0 1px rgba(92,242,227,0.45); background:#0a1418; }
+.so-clip::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18) 0,rgba(0,0,0,0.18) 1px,transparent 1px,transparent 4px); }
+.so-clip .noclip{ font-family:'JetBrains Mono',monospace; font-size:22px; letter-spacing:3px;
+  background:radial-gradient(600px 400px at 50% 40%,rgba(92,242,227,0.10),transparent 70%); }
+
+/* time rail: solid cyan along the bottom edge */
+.so-rail{ height:4px; border-radius:0; background:rgba(92,242,227,0.12); }
+.so-rail i{ background:var(--c1); box-shadow:0 0 10px var(--c1); }
+.so.raid .so-rail i{ background:var(--c5); box-shadow:0 0 10px var(--c5); }

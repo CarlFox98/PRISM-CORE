@@ -1,0 +1,41 @@
+/* ============================================================
+   PRISM 2.0 — SOFT HOLO chat
+   Paste into the SoundAlerts chat CSS editor, or an OBS Browser
+   Source's Custom CSS. Transparent, so the scene shows through.
+   Rename the header in ".chat::before { content }".
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Nunito:wght@700;800&display=swap');
+
+:root{
+  --sf-bg:#1A1030; --sf-ink:#FFF7F0; --sf-soft:#E6DDF7; --sf-lilac:#C8B6FF; --sf-pink:#FFB5CF;
+  --sf-shadow:rgba(10,4,24,0.55);
+}
+html, body, #app{ background:transparent !important; margin:0 !important; overflow:hidden;
+  font-family:'Nunito','Segoe UI',sans-serif !important; font-weight:700; -webkit-font-smoothing:antialiased; }
+.chat, .chat--list{ background:transparent !important; border:none !important; padding:6px 12px 12px 4px !important;
+  width:100% !important; height:100% !important; overflow-y:auto !important; overflow-x:hidden !important; }
+.chat::-webkit-scrollbar{ width:0; }
+
+.chat::before{
+  content:"chat ♥"; display:inline-block; position:sticky; top:0; z-index:5; margin:0 0 14px;
+  padding:8px 22px; border-radius:999px; background:var(--sf-ink); color:var(--sf-bg);
+  font-family:'Sora',sans-serif; font-size:24px; font-weight:800; box-shadow:5px 5px 0 var(--sf-shadow); transform:rotate(-2deg);
+}
+.chat__item, .chat__item-transform-wrapper{ margin:0 0 12px; }
+.chat__item-inner{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; padding:12px 18px 14px;
+  background:rgba(26,16,48,0.9); border:3px solid var(--user-color, var(--sf-lilac)); border-radius:22px;
+  box-shadow:5px 5px 0 var(--sf-shadow); animation:sf-pop .45s cubic-bezier(.34,1.56,.64,1) both;
+}
+.chat__metadata{ display:flex; align-items:center; order:-1; }
+.chat__metadata-inner{ display:inline-flex; align-items:center; gap:6px; }
+.chat__avatar{ width:32px; height:32px; border-radius:50%; flex-shrink:0; }
+.chat__badges{ display:inline-flex; gap:4px; }
+.chat__badge{ width:20px; height:20px; border-radius:50%; }
+.chat__user{ display:inline-block; padding:3px 14px; border-radius:999px; background:var(--user-color, var(--sf-lilac));
+  color:var(--sf-bg); font-weight:800; font-size:22px; white-space:nowrap; }
+.chat__message{ flex:1 1 100%; color:var(--sf-ink); font-size:24px; line-height:1.4; word-break:break-word; }
+.chat__emote{ vertical-align:middle; }
+.chat__cheermote--amount{ font-weight:800; color:var(--sf-pink); }
+@keyframes sf-pop{ from{ opacity:0; transform:scale(.9) translateY(10px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .chat__item-inner{ animation:none; } }

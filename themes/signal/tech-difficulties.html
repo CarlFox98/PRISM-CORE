@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Signal — Technical Difficulties</title>
+<link rel="stylesheet" href="signal.css">
+<style>
+.hero{ left:132px; top:250px; display:flex; flex-direction:column; gap:22px; }
+.hero .title{ font-size:156px; color:var(--ink); animation:glitch 6s steps(1) infinite; }
+@keyframes glitch{
+  0%,92%,100%{ transform:none; text-shadow:none; }
+  93%{ transform:translateX(-6px); text-shadow:4px 0 var(--mg),-4px 0 var(--cy); }
+  95%{ transform:translateX(5px);  text-shadow:-5px 0 var(--mg),5px 0 var(--cy); }
+  97%{ transform:translateX(-2px); text-shadow:2px 0 var(--mg); }
+}
+.tiles{ left:140px; bottom:160px; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; width:1060px; }
+.icon-item{ background:var(--panel); border:1px solid var(--line); padding:20px 18px; display:flex; flex-direction:column; gap:12px; align-items:flex-start;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%); }
+.icon-item svg{ width:44px; height:44px; fill:none; stroke:var(--dim); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+.icon-label{ font-family:var(--mono); font-size:22px; letter-spacing:3px; color:var(--soft); }
+.icon-check{ font-family:var(--mono); font-size:22px; letter-spacing:0; color:var(--dim); min-height:28px; }
+.icon-check:empty::before{ content:"—"; }
+.icon-item.state-ok{ border-color:var(--cy); } .icon-item.state-ok svg{ stroke:var(--cy); } .icon-item.state-ok .icon-check{ color:var(--cy); }
+.icon-item.state-warn{ border-color:var(--am); } .icon-item.state-warn svg{ stroke:var(--am); } .icon-item.state-warn .icon-check{ color:var(--am); }
+.icon-item.state-error{ border-color:var(--mg); } .icon-item.state-error svg{ stroke:var(--mg); } .icon-item.state-error .icon-check{ color:var(--mg); }
+.status{ right:140px; bottom:160px; width:540px; }
+.status-dot{ width:14px; height:14px; background:var(--dim); display:inline-block; margin-right:14px; }
+.status-dot.live{ background:var(--cy); box-shadow:0 0 12px var(--cy); }
+.status-dot.offline{ background:var(--mg); box-shadow:0 0 12px var(--mg); }
+.status-dot.error{ background:var(--am); }
+.side{ right:140px; top:250px; }
+#backAnnouncement{ inset:0; z-index:6; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+  background:rgba(4,9,13,0.92); opacity:0; pointer-events:none; transition:opacity .5s; }
+#backAnnouncement.visible{ opacity:1; }
+#backAnnouncement .title{ font-size:180px; color:var(--cy); text-shadow:0 0 50px rgba(92,242,227,0.5); }
+@media (prefers-reduced-motion: reduce){ .hero .title{ animation:none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+  <div class="bar-top"><span>PRISM//SIGNAL · <span class="js-name">NeoTheFox98</span></span><span class="state mg">Signal lost</span></div>
+  <div class="hero in">
+    <div class="label" style="color:var(--mg)">&gt; err: feed interrupted · re-establishing link</div>
+    <div class="title">Technical<br>difficulties</div>
+    <div class="lede">Hang tight — back with you in a moment.</div>
+  </div>
+  <div class="side avatar in d1"><img class="js-avatar" alt="NeoTheFox98"></div>
+  <div class="tiles in d2">
+    <div class="icon-item" id="itemPc"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="26" rx="2"/><path d="M18 40h12M24 34v6"/></svg><span class="icon-label">PC LINK</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemOverlay"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="32" rx="2"/><path d="M5 17h38M11 12.5h.01M16 12.5h.01"/></svg><span class="icon-label">OVERLAY</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemGame"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="15" width="40" height="20" rx="8"/><path d="M13 21v8M9 25h8M31 23h.01M36 27h.01"/></svg><span class="icon-label">GAME</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemAudio"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="18" y="5" width="12" height="22" rx="6"/><path d="M11 22a13 13 0 0 0 26 0M24 35v8M17 43h14"/></svg><span class="icon-label">AUDIO</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemPower"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6v16"/><path d="M14 12a14 14 0 1 0 20 0"/></svg><span class="icon-label">POWER</span><span class="icon-check"></span></div>
+  </div>
+  <div class="status panel in d3">
+    <div class="label">Stream status</div>
+    <div class="row"><span><span class="status-dot" id="statusDot"></span><span id="statusText">CHECKING…</span></span></div>
+  </div>
+  <div id="backAnnouncement" role="status">
+    <div class="label" style="color:var(--cy)">&gt; link restored</div>
+    <div class="title">We're back</div>
+    <div class="lede">Resuming the stream…</div>
+  </div>
+  <div class="bar-bot"><span>twitch.tv/<span class="js-name">NeoTheFox98</span></span><span>Auto-resume armed</span></div>
+</div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-techcheck.js"></script>
+</body></html>

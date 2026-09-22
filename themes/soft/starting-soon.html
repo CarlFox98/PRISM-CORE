@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Soft Holo — Starting Soon</title>
+<link rel="stylesheet" href="soft.css">
+<style>
+.who{ left:150px; top:240px; display:flex; flex-direction:column; align-items:center; }
+.who .sticker{ margin-top:-34px; }
+.main{ left:600px; top:230px; right:150px; display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
+.clock{ display:flex; align-items:center; gap:16px; margin-top:10px; }
+.clock .n{ padding:14px 30px; border-radius:26px; background:rgba(255,255,255,0.1); border:3px solid var(--lilac);
+  font-family:var(--display); font-size:92px; font-weight:800; line-height:1; box-shadow:8px 8px 0 var(--shadow); font-variant-numeric:tabular-nums; }
+.clock .n + .c + .n{ border-color:var(--pink); }
+.clock .c{ font-family:var(--display); font-size:80px; font-weight:800; color:var(--lilac); }
+[data-prism-countdown].done .n{ background:var(--mint); color:var(--bg); border-color:var(--mint); }
+.gear{ cursor:pointer; background:none; border:0; font-size:22px; color:var(--dim); margin-left:14px; }
+.foot{ left:150px; right:150px; bottom:90px; display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
+.foot .goal{ width:420px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="paw" style="left:150px;top:120px;transform:rotate(-14deg)"><svg width="120" height="120" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div>
+  <div class="paw" style="right:170px;top:600px;transform:rotate(18deg);opacity:.1"><svg width="90" height="90" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div>
+  <div class="who pop">
+    <div class="avatar"><img class="js-avatar" alt="NeoTheFox98"></div>
+    <div class="sticker tilt-l"><span class="js-name">NeoTheFox98</span></div>
+  </div>
+  <div class="main" data-prism-countdown>
+    <div class="tag tilt-l pop d1">hi hi! grab a snack</div>
+    <div class="title pop d2">Starting soon!</div>
+    <div class="lede pop d3 js-game-wrap" hidden>Today we're playing <b class="js-game"></b></div>
+    <div class="clock pop d4"><span class="n js-cd-min">05</span><span class="c">:</span><span class="n js-cd-sec">00</span><button class="gear js-cd-settings" title="Set countdown length">⚙</button></div>
+  </div>
+  <div class="foot pop d5">
+    <div class="socials" data-prism-socials></div>
+    <div class="goal"><div class="top"><span class="k">followers</span><span><span class="js-goal-now">—</span> / <span class="js-goal-target">—</span></span></div><div class="track"><div class="fill js-goal-fill"></div></div></div>
+  </div>
+</div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-countdown.js"></script>
+</body></html>

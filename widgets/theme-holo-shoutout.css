@@ -1,0 +1,4 @@
+/* PRISM Holo · shoutout card theme — intentionally empty.
+   The card's built-in look IS the holo look. This file exists so that
+   switching back to the holo set clears a Signal/Soft theme (the card
+   re-reads /overlays/active/shoutout-theme.css every minute). */

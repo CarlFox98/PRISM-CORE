@@ -2,8 +2,8 @@
 """
 Download the PRISM fonts locally so overlays work fully offline.
 
-Fetches the Google Fonts CSS for Space Grotesk (400/500/600/700) and JetBrains
-Mono (500/600/700), downloads every woff2 it references into ../fonts/, and
+Fetches the Google Fonts CSS for every family the PRISM sets use (see CSS_URL),
+downloads every woff2 it references into ../fonts/, and
 rewrites ../fonts/prism-fonts.css with local @font-face rules (preserving each
 weight and unicode-range exactly as Google serves them).
 
@@ -15,8 +15,14 @@ import re
 import sys
 import urllib.request
 
+# Holo (1.x): Space Grotesk + JetBrains Mono.  Signal: Chakra Petch (+ JetBrains
+# Mono).  Soft Holo: Sora + Nunito.  One file serves every set; browsers only
+# download the faces a scene actually uses.
 CSS_URL = ("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700"
-           "&family=JetBrains+Mono:wght@500;600;700&display=swap")
+           "&family=JetBrains+Mono:wght@400;500;600;700"
+           "&family=Chakra+Petch:wght@500;600;700"
+           "&family=Sora:wght@400;600;800"
+           "&family=Nunito:wght@600;700;800&display=swap")
 # a modern browser UA so Google returns woff2 (not ttf)
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0 Safari/537.36")

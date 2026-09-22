@@ -1,0 +1,88 @@
+/* ============================================================
+   PRISM 2.0 — SOFT HOLO
+   Warm and playful: pastel iridescence, sticker cards with offset
+   shadows, rounded type (Sora + Nunito), paw marks.
+
+   Rules this set keeps:
+   • Nothing on stream below 22px (labels) / 24px (content).
+   • One thing moves continuously per scene (the background blobs,
+     very slowly); everything else animates in once and stays still.
+   ============================================================ */
+@import url('../../fonts/prism-fonts.css');
+
+:root{
+  --bg:#1A1030; --ink:#FFF7F0; --soft:#E6DDF7; --dim:#B7A8D6;
+  --mint:#9FF3D6; --sky:#9CC9FF; --lilac:#C8B6FF; --pink:#FFB5CF; --peach:#FFB5A7; --butter:#FFD9A0;
+  --shadow:rgba(10,4,24,0.55); --card:rgba(255,255,255,0.08);
+  --iris:conic-gradient(from 200deg,#9FF3D6,#9CC9FF,#C8B6FF,#FFB5CF,#FFD9A0,#9FF3D6);
+  --display:'Sora','Segoe UI',sans-serif; --body:'Nunito','Segoe UI',sans-serif;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:1920px; height:1080px; overflow:hidden; background:var(--bg); color:var(--ink);
+  font-family:var(--body); font-weight:700; -webkit-font-smoothing:antialiased; }
+[hidden]{ display:none !important; }
+button{ font:inherit; color:inherit; }
+
+/* ---------- stage + blobs ---------- */
+.stage{ position:relative; width:1920px; height:1080px; overflow:hidden; background:var(--bg); }
+.stage > *{ position:absolute; z-index:2; }
+.blob{ z-index:0; border-radius:50%; filter:blur(120px); pointer-events:none; animation:drift 38s ease-in-out infinite alternate; }
+.blob.b1{ left:-200px; top:-240px; width:900px; height:900px; background:var(--mint); opacity:.26; }
+.blob.b2{ right:-180px; top:-120px; width:800px; height:800px; background:var(--lilac); opacity:.34; animation-duration:46s; animation-direction:alternate-reverse; }
+.blob.b3{ right:200px; bottom:-380px; width:900px; height:900px; background:var(--peach); opacity:.26; animation-duration:52s; }
+@keyframes drift{ from{ transform:translate(0,0) scale(1); } to{ transform:translate(90px,60px) scale(1.12); } }
+.paw{ z-index:1; color:var(--ink); opacity:.14; }
+.paw svg{ display:block; fill:currentColor; }
+
+/* ---------- type ---------- */
+.title{ font-family:var(--display); font-size:150px; font-weight:800; line-height:1; letter-spacing:-4px; }
+.lede{ font-size:38px; color:var(--soft); }
+.lede b{ color:var(--ink); font-weight:800; }
+.label{ font-size:22px; font-weight:800; letter-spacing:1px; color:var(--dim); text-transform:lowercase; }
+
+/* ---------- stickers + cards ---------- */
+.sticker{ display:inline-flex; align-items:center; gap:12px; padding:12px 26px; border-radius:999px;
+  background:var(--ink); color:var(--bg); font-family:var(--display); font-weight:800; font-size:28px;
+  box-shadow:6px 6px 0 var(--shadow); }
+/* tilt via --r so the pop-in animation keeps it */
+.tilt-l{ --r:-4deg; } .tilt-r{ --r:3deg; } .tilt-s{ --r:-1.5deg; }
+.sticker,.tag,.card,.tilt-l,.tilt-r,.tilt-s{ transform:rotate(var(--r,0deg)); }
+.tag{ display:inline-flex; align-items:center; padding:10px 24px; border-radius:16px; font-size:26px; font-weight:800;
+  color:var(--bg); background:var(--mint); box-shadow:5px 5px 0 var(--shadow); }
+.tag.pink{ background:var(--pink); } .tag.lilac{ background:var(--lilac); } .tag.sky{ background:var(--sky); } .tag.butter{ background:var(--butter); }
+.card{ background:var(--card); border:3px solid var(--lilac); border-radius:28px; padding:24px 28px;
+  box-shadow:8px 8px 0 var(--shadow); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+.card.cream{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+
+/* avatar in an iridescent ring */
+.avatar{ width:340px; height:340px; border-radius:50%; padding:10px; background:var(--iris); box-shadow:10px 12px 0 var(--shadow); }
+.avatar img{ width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; border:6px solid var(--bg); background:#2a1d48; }
+
+/* socials as pastel chips */
+.socials{ display:flex; gap:18px; flex-wrap:wrap; }
+.social-item{ display:inline-flex; align-items:center; gap:10px; padding:14px 26px; border-radius:999px;
+  color:var(--bg); font-weight:800; font-size:24px; box-shadow:5px 5px 0 var(--shadow); background:var(--sky); }
+.social-item:nth-child(4n+2){ background:var(--peach); }
+.social-item:nth-child(4n+3){ background:var(--mint); }
+.social-item:nth-child(4n+4){ background:var(--lilac); }
+.social-item .ico{ width:22px; height:22px; fill:currentColor; }
+.social-item .net{ display:none; }
+.social-item .label{ color:inherit; text-transform:none; letter-spacing:0; font-size:24px; font-weight:800; }
+
+/* chunky goal bar */
+.goal{ display:flex; flex-direction:column; gap:10px; }
+.goal .top{ display:flex; justify-content:space-between; font-size:24px; font-weight:800; }
+.goal .top .k{ color:var(--soft); }
+.goal .track{ height:28px; border-radius:999px; background:rgba(255,255,255,0.12); border:3px solid var(--ink); overflow:hidden; }
+.goal .fill{ height:100%; width:0; border-radius:999px; background:linear-gradient(90deg,var(--mint),var(--sky),var(--lilac),var(--pink));
+  transition:width 1.2s cubic-bezier(.16,1,.3,1); }
+
+/* ---------- entrances (once) ---------- */
+.pop{ opacity:0; animation:pop .6s cubic-bezier(.34,1.56,.64,1) forwards; }
+.pop.d1{ animation-delay:.12s; } .pop.d2{ animation-delay:.24s; } .pop.d3{ animation-delay:.36s; } .pop.d4{ animation-delay:.48s; } .pop.d5{ animation-delay:.6s; }
+@keyframes pop{ from{ opacity:0; transform:rotate(var(--r,0deg)) scale(.85); } to{ opacity:1; transform:rotate(var(--r,0deg)) scale(1); } }
+
+@media (prefers-reduced-motion: reduce){
+  .blob{ animation:none; }
+  .pop{ animation:none; opacity:1; }
+}

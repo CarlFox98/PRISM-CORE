@@ -72,6 +72,28 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
 @keyframes scan{ 0%,100%{background-position:130% 0; opacity:0.5} 50%{background-position:-30% 0; opacity:0.9} }
 @keyframes eq{ 0%,100%{height:5px} 50%{height:20px} }
 </style>
+<!-- Set theme: follows the set chosen in the Stream Manager dashboard. Every set
+     ships this file (the holo set's is empty, which leaves the built-in look), and
+     it is re-read every 60s so switching sets restyles this source without a refresh.
+     A failed load keeps whatever theme is already applied. -->
+<link rel="stylesheet" id="prism-theme" href="http://localhost:5000/overlays/active/nowplaying-theme.css">
+<script data-prism-theme>
+(function(){
+  var q = new URLSearchParams(location.search).get('theme');
+  var BASE = q || 'http://localhost:5000/overlays/active/nowplaying-theme.css';
+  var cur = document.getElementById('prism-theme');
+  function fresh(){ return BASE + (BASE.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(); }
+  cur.href = fresh();   /* never trust a cached copy from before a set switch */
+  function swap(){
+    var n = document.createElement('link');
+    n.rel = 'stylesheet'; n.href = fresh();
+    n.onload = function(){ if (cur && cur.parentNode) cur.parentNode.removeChild(cur); cur = n; };
+    n.onerror = function(){ if (n.parentNode) n.parentNode.removeChild(n); };
+    document.head.appendChild(n);
+  }
+  setInterval(swap, 60000);
+})();
+</script>
 </head>
 <body>
 <div class="wrap">

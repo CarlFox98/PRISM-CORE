@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Signal — Webcam Frame</title>
+<link rel="stylesheet" href="signal.css">
+<style>
+/* Size the OBS browser source to your camera; the frame follows it. */
+html,body{ width:100%; height:100%; background:transparent; }
+.cam{ position:fixed; inset:0; }
+.cam .edge{ position:absolute; inset:18px 6px 6px 6px; border:3px solid var(--cy);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 34px),calc(100% - 34px) 100%,0 100%);
+  box-shadow:inset 0 0 30px rgba(92,242,227,0.25); }
+.cam .cut{ position:absolute; right:6px; bottom:6px; width:48px; height:48px;
+  background:linear-gradient(135deg,transparent calc(50% - 2px),var(--cy) calc(50% - 2px),var(--cy) calc(50% + 1px),transparent calc(50% + 1px)); }
+.cam .tab{ position:absolute; left:6px; top:0; display:flex; align-items:center; gap:14px; padding:8px 30px 8px 16px;
+  background:var(--cy); color:var(--bg); font-family:var(--mono); font-size:22px; font-weight:600; letter-spacing:3px;
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 100%,0 100%); }
+.cam .tab .rec{ width:12px; height:12px; background:var(--mg); animation:blink 1.4s steps(1) infinite; }
+.cam .sweep{ position:absolute; left:9px; right:9px; top:21px; }
+body.demo .cam .edge{ background:linear-gradient(160deg,#243040,#121820); }
+@media (prefers-reduced-motion: reduce){ .cam .tab .rec{ animation:none; } }
+</style>
+</head>
+<body>
+<div class="cam">
+  <div class="edge"></div>
+  <div class="cut"></div>
+  <div class="tab"><span class="rec"></span><span>CAM_01 · <span class="js-name">NeoTheFox98</span></span></div>
+</div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script>if(new URLSearchParams(location.search).has('demo')) document.body.classList.add('demo');</script>
+</body>
+</html>

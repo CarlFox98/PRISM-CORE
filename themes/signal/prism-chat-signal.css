@@ -1,0 +1,45 @@
+/* ============================================================
+   PRISM 2.0 — SIGNAL chat
+   Paste into the SoundAlerts chat CSS editor, or an OBS Browser
+   Source's Custom CSS. Transparent, so the scene shows through.
+   Rename the header in ".chat::before { content }".
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --sg-ink:#DDF7F4; --sg-dim:#6FA7A2; --sg-cy:#5CF2E3; --sg-mg:#FF5FA2;
+  --sg-panel:rgba(6,20,24,0.88); --sg-line:rgba(92,242,227,0.35);
+}
+html, body, #app{ background:transparent !important; margin:0 !important; overflow:hidden;
+  font-family:'JetBrains Mono',Consolas,monospace !important; -webkit-font-smoothing:antialiased; }
+.chat, .chat--list{ background:transparent !important; border:none !important; padding:4px !important;
+  width:100% !important; height:100% !important; overflow-y:auto !important; overflow-x:hidden !important; }
+.chat::-webkit-scrollbar{ width:0; }
+
+.chat::before{
+  content:"COMMS // LIVE"; display:block; position:sticky; top:0; z-index:5;
+  margin:0 0 12px; padding:10px 16px; font-family:'Chakra Petch',sans-serif; font-size:22px; font-weight:700;
+  letter-spacing:5px; color:#04090D; background:var(--sg-cy);
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 100%,0 100%);
+}
+.chat__item, .chat__item-transform-wrapper{ margin:0 0 10px; }
+.chat__item-inner{
+  position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px;
+  padding:12px 16px 14px; background:var(--sg-panel); border-left:3px solid var(--user-color, var(--sg-cy));
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);
+  animation:sg-in .35s cubic-bezier(.16,1,.3,1) both;
+}
+.chat__metadata{ display:flex; align-items:center; order:-1; }
+.chat__metadata-inner{ display:inline-flex; align-items:center; gap:6px; }
+.chat__avatar{ width:32px; height:32px; border-radius:0; flex-shrink:0; }
+.chat__badges{ display:inline-flex; gap:4px; }
+.chat__badge{ width:20px; height:20px; border-radius:2px; }
+.chat__user{ font-family:'Chakra Petch',sans-serif; font-weight:700; font-size:24px; letter-spacing:1px;
+  color:var(--user-color, var(--sg-cy)); white-space:nowrap; }
+.chat__user::after{ content:" ▸"; color:var(--sg-dim); font-weight:400; }
+.chat__message{ flex:1 1 100%; color:var(--sg-ink); font-size:24px; line-height:1.45; word-break:break-word; }
+.chat__emote{ vertical-align:middle; }
+.chat__cheermote--amount{ font-weight:600; color:var(--sg-mg); }
+.chat__item:first-child .chat__item-inner{ background:rgba(8,30,34,0.94); }
+@keyframes sg-in{ from{ opacity:0; transform:translateX(-18px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .chat__item-inner{ animation:none; } }

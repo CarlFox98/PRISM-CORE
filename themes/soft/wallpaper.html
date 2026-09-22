@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Soft Holo — Wallpaper</title>
+<link rel="stylesheet" href="soft.css">
+<style>
+.mark{ left:0; right:0; top:330px; text-align:center; font-family:var(--display); font-size:150px; font-weight:800; letter-spacing:-4px; color:rgba(255,247,240,0.13); }
+.blob.surge{ opacity:.5; transition:opacity .4s; }
+#season{ inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+#season .p{ position:absolute; top:-30px; border-radius:50%; opacity:var(--o); animation:fall linear infinite; }
+#season .p.winter{ background:#fff; }
+#season .p.spring{ background:var(--pink); border-radius:60% 0 60% 0; }
+#season .p.summer{ background:var(--butter); box-shadow:0 0 12px var(--butter); }
+#season .p.autumn{ background:var(--peach); border-radius:0 60% 0 60%; }
+@keyframes fall{ to{ transform:translate(var(--drift),1140px) rotate(240deg); } }
+#wp-wins{ left:150px; bottom:90px; display:flex; flex-direction:column-reverse; gap:14px; align-items:flex-start; }
+#wp-wins .w{ padding:12px 24px; border-radius:18px; background:var(--ink); color:var(--bg); font-size:24px; box-shadow:5px 5px 0 var(--shadow);
+  opacity:0; transform:translateY(12px) rotate(-1deg); transition:all .5s cubic-bezier(.34,1.56,.64,1); }
+#wp-wins .w.on{ opacity:1; transform:rotate(-1deg); }
+#wp-quote{ right:150px; bottom:90px; width:640px; opacity:0; transition:opacity .8s; }
+#wp-quote.on{ opacity:1; }
+#wp-quote .q{ display:block; font-family:var(--display); font-size:34px; font-weight:600; line-height:1.3; }
+#wp-quote .by{ display:block; margin-top:10px; font-size:24px; color:var(--dim); }
+#fx{ inset:0; pointer-events:none; z-index:4; }
+.ripple{ position:absolute; left:50%; top:50%; width:40px; height:40px; margin:-20px 0 0 -20px; border:4px solid; border-radius:50%; animation:ripple 1.8s ease-out forwards; }
+@keyframes ripple{ to{ transform:scale(24); opacity:0; } }
+.spark{ position:absolute; left:50%; top:50%; width:12px; height:12px; border-radius:50%; background:currentColor; animation:spark 1.2s ease-out forwards; }
+@keyframes spark{ to{ transform:translate(var(--dx),var(--dy)) scale(.4); opacity:0; } }
+.tint{ inset:0; z-index:1; pointer-events:none; transition:background 3s; }
+body[data-tod="dawn"] .tint{ background:rgba(255,217,160,0.07); }
+body[data-tod="dusk"] .tint{ background:rgba(255,181,167,0.08); }
+body[data-tod="night"] .tint,body[data-tod="evening"] .tint{ background:rgba(8,2,20,0.22); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="blob b1 js-surge"></div><div class="blob b2"></div><div class="blob b3 js-surge"></div>
+  <div class="tint"></div>
+  <div id="season"></div>
+  <div class="paw" style="left:260px;top:820px;transform:rotate(-20deg);opacity:0.05"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:420px;top:700px;transform:rotate(10deg);opacity:0.07"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:600px;top:760px;transform:rotate(-15deg);opacity:0.09"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:780px;top:630px;transform:rotate(12deg);opacity:0.11"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:960px;top:690px;transform:rotate(-10deg);opacity:0.13"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:1140px;top:560px;transform:rotate(14deg);opacity:0.15"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:1320px;top:620px;transform:rotate(-8deg);opacity:0.17"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:1500px;top:490px;transform:rotate(16deg);opacity:0.19"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div><div class="paw" style="left:1680px;top:550px;transform:rotate(-6deg);opacity:0.21"><svg width="70" height="70" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div>
+  <div class="mark js-name">NeoTheFox98</div>
+  <div id="wp-wins"></div>
+  <div id="wp-quote" class="card"></div>
+  <div id="fx"></div>
+</div>
+<script>window.PRISM_WALLPAPER = { tint:{ wheel:'#C8B6FF', coinflip:'#9FF3D6', slots:'#FFD9A0', hype:'#FFB5CF' }, fallbackTint:'#9CC9FF' };</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-wallpaper.js"></script>
+</body>
+</html>

@@ -3,6 +3,112 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.0.2] — 2026-09-21
+
+### Added
+- **The shoutout card and the now-playing widget follow the active set.**
+  Each set now ships `shoutout-theme.css` and `nowplaying-theme.css`. Both
+  widgets load theirs from `/overlays/active/` and re-read it every minute, so
+  switching sets in the Stream Manager dashboard restyles them without
+  refreshing the OBS source.
+  - **Signal:** a notched "INCOMING TRANSMISSION" panel, a notched avatar, a
+    scanlined clip window and a cyan rail; now-playing becomes a HUD strip.
+  - **Soft Holo:** a cream sticker card with an offset shadow, a round avatar
+    in the iridescent ring and pastel pills; now-playing becomes a rounded pill.
+  - **Holo:** its two theme files are empty on purpose, so switching back to
+    holo clears a 2.0 theme and leaves the widgets' built-in look.
+- The theme files only restyle. The shoutout card's markup, queue, timers and
+  show/hide transitions are unchanged, and the 32-check harness passes against
+  both copies of the card.
+- The now-playing widget is hosted on GitHub Pages, so it reads its theme from
+  `http://localhost:5000/overlays/active/`. `?theme=<url>` overrides that. If
+  Stream Manager isn't reachable, the widget keeps its last theme, or the holo
+  look on a cold start.
+
+## [2.0.1] — 2026-09-21
+
+### Fixed
+- **Tech Difficulties never authenticated with OBS.** The websocket login
+  sent hex digests; OBS websocket v5 expects base64
+  (`base64(sha256(base64(sha256(password + salt)) + challenge))`). With OBS's
+  authentication on, the scene could never connect: PC LINK read
+  DISCONNECTED and the automatic switch back to *Starting Soon* never
+  happened. Fixed in `core/prism-techcheck.js` (2.0 sets) and in the holo
+  scene's inline copy.
+- **The OBS tiles no longer depend on that websocket.** The 2.0 scene now
+  reads OBS state from Stream Manager's `/api/status`. Stream Manager
+  already polls OBS with the password from its `.env`, so no secret has to
+  live in a browser source. PC LINK and OVERLAY light up from that. The
+  websocket is still used, when it can connect, for the desktop-audio tile
+  and the scene switch.
+
+## [2.0.0] — 2026-09-18
+
+PRISM 2.0: two new scene sets, switchable from the Stream Manager dashboard.
+The 1.x holo-glass set stays as a third option, unchanged.
+
+### Added
+- **Two new scene sets**, each with the full set of scenes Stream Manager
+  expects plus a new in-game layout:
+  - **PRISM Signal** (`themes/signal/`, builds to `prism-signal`): sci-fi HUD
+    with a grid, scanlines, notched panels, corner brackets and terminal
+    readouts, in cyan and magenta with amber for warnings. Chakra Petch +
+    JetBrains Mono.
+  - **PRISM Soft Holo** (`themes/soft/`, builds to `prism-soft`): pastel
+    iridescence, sticker cards with offset shadows, paw marks. Sora + Nunito.
+
+  Scenes in each: starting-soon, be-right-back, stream-ending,
+  tech-difficulties, webcam-frame, wallpaper, chat-preview, thank-you, and
+  **gameplay** (new: a frame layer that goes over the game capture, with a
+  webcam window, latest follower, follower goal, and marked slots for the
+  now-playing and shoutout sources; `?demo` shows the slots).
+- **Chat CSS for each set**: `prism-chat-signal.css` and `prism-chat-soft.css`,
+  ready for SoundAlerts / OBS Custom CSS. They use the chatter's own colour.
+- **Scene logic in shared modules** so the two sets don't each carry a copy:
+  `core/prism-countdown.js`, `prism-techcheck.js`, `prism-thankyou.js`,
+  `prism-wallpaper.js`, `prism-chat-demo.js`. Behaviour matches the 1.x
+  scenes (the holo set keeps its inline copies, untouched). The countdown is
+  now based on the wall clock, so a throttled source can't drift.
+- **Engine hooks**: `.js-name` (display name from config), `.js-game` /
+  `.js-title` (current Twitch category / title via DecAPI, cached like the
+  rest), `.js-goal-left`, and `.js-goal-segments` for segmented meters.
+  `data-prism-socials="named"` also renders each network's name.
+- **Goal stepping**: `goalStep` in `prism-config.js` (set to 25). Once the goal
+  has been reached, the next multiple of `goalStep` is shown instead: 119
+  followers with a goal of 100 now reads 119 / 125. Before this, the bar sat
+  full at 119 / 100. This also applies to the holo set.
+- Socials in the config carry a `name` ("YouTube", "Telegram", …).
+
+### Changed
+- **Design rules for 2.0 sets**: nothing on stream below 22px (labels) or 24px
+  (content), and one thing moves continuously per scene. Scenes carry
+  their real state (Pre-show / Paused / Offline / Signal lost) instead of a
+  "LIVE" pill on scenes shown before or between live segments.
+- `scripts/build-obs-set.py` builds all three sets (`prism-holo`,
+  `prism-signal`, `prism-soft`), or one with `--set`. Theme paths
+  (`../../core/` etc.) are flattened like the holo ones.
+- `scripts/fetch-fonts.py` also vendors Chakra Petch, Sora and Nunito (and
+  JetBrains Mono 400). `fonts/` now holds 69 files, and a scene only
+  downloads the faces it uses.
+- The maintenance check compares every built set with its source, not just
+  `prism-holo`.
+- `scripts/test-socials.mjs` also checks every 2.0 set: all nine scenes
+  present, config loaded before any core module, and every local file a scene
+  links to exists.
+
+### Fixed
+- **CI was red since 1.7.2**: `.github/workflows/ci.yml` still compiled and
+  tested `prism_shoutout_service.py` and `prism-shoutout/`, which moved to
+  stream-manager. Those steps are gone. CI now compiles `scripts/*.py`,
+  syntax-checks every `core/*.js`, and dry-runs the set build.
+- README: the maintenance section described checks (venv, secrets file) that
+  1.7.3 removed.
+
+### Stream Manager (separate repo)
+- `config.json` `scene_sets` gains `prism-signal` and `prism-soft`, and
+  `static/dashboard.js` gives all three PRISM sets proper labels. Restart
+  Stream Manager to pick up the config (it reads `scene_sets` at startup).
+
 ## [1.7.4] — 2026-09-15
 
 ### Changed

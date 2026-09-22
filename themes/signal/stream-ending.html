@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Signal — Stream Ending</title>
+<link rel="stylesheet" href="signal.css">
+<style>
+.hero{ left:132px; top:260px; display:flex; flex-direction:column; gap:22px; }
+.hero .title{ font-size:150px; }
+.stats{ left:140px; bottom:170px; display:flex; gap:26px; }
+.stats .panel{ min-width:360px; }
+.stats .num{ font-size:88px; font-weight:700; color:var(--cy); line-height:1; font-variant-numeric:tabular-nums; }
+.stats .who{ font-size:48px; font-weight:700; color:var(--mg); line-height:1.1; }
+.side{ right:140px; top:250px; width:540px; display:flex; flex-direction:column; gap:26px; }
+.side .avatar{ align-self:flex-end; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+  <div class="sweep"></div>
+  <div class="bar-top"><span>PRISM//SIGNAL · <span class="js-name">NeoTheFox98</span></span><span class="state mg">Offline</span></div>
+  <div class="hero in">
+    <div class="label">&gt; closing feed · end of transmission</div>
+    <div class="title">Thanks for<br>watching</div>
+    <div class="lede">See you next stream.</div>
+  </div>
+  <div class="stats">
+    <div class="panel in d2"><div class="label">Followers</div><div class="num js-followcount">—</div></div>
+    <div class="panel mg in d3 js-latest-wrap" hidden><div class="label">Newest in the pack</div><div class="who js-latest"></div></div>
+  </div>
+  <div class="side">
+    <div class="avatar in d1"><img class="js-avatar" alt="NeoTheFox98"></div>
+    <div class="panel in d2">
+      <div class="label">Stay in the loop</div>
+      <div class="socials" data-prism-socials="named"></div>
+    </div>
+  </div>
+  <div class="bar-bot"><span>twitch.tv/<span class="js-name">NeoTheFox98</span></span><span>EOT</span></div>
+</div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body></html>

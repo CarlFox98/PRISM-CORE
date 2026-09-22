@@ -1,0 +1,30 @@
+/* ============================================================
+   PRISM 2.0 — SOFT HOLO · now-playing widget theme
+   Loaded by the hosted now-playing widget from Stream Manager
+   (http://localhost:5000/overlays/active/). No fonts imported here —
+   the widget page carries its own fonts/.
+   ============================================================ */
+:root{
+  --ink:#FFF7F0; --ink-soft:#E6DDF7;
+  --c1:#9FF3D6; --c2:#9CC9FF; --c3:#C8B6FF; --c4:#FFB5CF; --c5:#FFD9A0;
+}
+html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
+.wrap{ top:10px; left:10px; }
+.card{ width:500px; padding:0; border:3px solid #C8B6FF; border-radius:999px; background:rgba(26,16,48,0.92);
+  -webkit-backdrop-filter:none; backdrop-filter:none; animation:rise .5s cubic-bezier(.34,1.56,.64,1) both;
+  box-shadow:6px 6px 0 rgba(10,4,24,0.55); overflow:hidden; }
+.inner{ background:transparent; border-radius:999px; padding:10px 28px 10px 10px; gap:16px; }
+.inner::after{ display:none; }
+.spark{ display:none; }
+/* album art as a spinning-free "record" */
+.art{ width:72px; height:72px; border-radius:50%; box-shadow:0 0 0 4px #FFF7F0; }
+.title{ font-family:'Sora',sans-serif; font-size:24px; font-weight:800; letter-spacing:-0.5px; text-shadow:none; }
+.artist{ font-size:20px; font-weight:700; color:var(--ink-soft); }
+.bar{ height:8px; border-radius:999px; background:rgba(255,255,255,0.14); }
+.fill{ border-radius:999px; background:linear-gradient(90deg,#9FF3D6,#9CC9FF,#C8B6FF,#FFB5CF); }
+.times{ font-family:'Nunito',sans-serif; font-weight:700; font-size:16px; color:#B7A8D6; }
+.eq span{ width:5px; border-radius:999px; background:#FFB5CF; }
+.connect{ border-radius:24px; }
+.connect .cta{ font-family:'Sora',sans-serif; font-size:22px; }
+.connect .hint{ font-size:18px; }
+.btn{ background:#C8B6FF; color:#1A1030; font-size:18px; font-weight:800; }

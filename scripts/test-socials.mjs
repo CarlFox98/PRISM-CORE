@@ -45,7 +45,36 @@ for (const f of scenes) {
   else if (c > e) fail(`${f}: loads engine before config`);
 }
 
+// 4) 2.0 sets (themes/<name>/): every canonical scene exists, anything that
+//    uses a core module loads the config first, and every local file a scene
+//    links to exists — a wrong ../../ path would 404 inside OBS silently.
+const THEME_SCENES = ['starting-soon', 'be-right-back', 'stream-ending', 'tech-difficulties',
+  'webcam-frame', 'wallpaper', 'chat-preview', 'thank-you', 'gameplay'];
+const themesDir = url('../themes/');
+const themes = fs.existsSync(themesDir)
+  ? fs.readdirSync(themesDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name) : [];
+let themeScenes = 0;
+for (const t of themes) {
+  for (const w of ['shoutout-theme.css', 'nowplaying-theme.css']) {
+    if (!fs.existsSync(url(`../themes/${t}/${w}`))) fail(`themes/${t}/${w}: missing (the shoutout card / now-playing widget read it from the active set)`);
+  }
+  for (const sc of THEME_SCENES) {
+    const rel = `themes/${t}/${sc}.html`;
+    if (!fs.existsSync(url('../' + rel))) { fail(`${rel}: missing (every set needs all ${THEME_SCENES.length} scenes)`); continue; }
+    themeScenes++;
+    const h = fs.readFileSync(url('../' + rel), 'utf8');
+    const c = h.indexOf('prism-config.js');
+    for (const mod of ['prism-engine.js', 'prism-countdown.js', 'prism-techcheck.js', 'prism-wallpaper.js', 'prism-thankyou.js']) {
+      const m = h.indexOf(mod);
+      if (m >= 0 && (c < 0 || c > m)) fail(`${rel}: loads ${mod} without prism-config.js before it`);
+    }
+    for (const [, ref] of h.matchAll(/(?:src|href)="([^"#?:]+\.(?:js|css|json))"/g)) {
+      if (!fs.existsSync(new URL(ref, url('../' + rel)))) fail(`${rel}: links to missing file ${ref}`);
+    }
+  }
+}
+
 console.log(ok
-  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order)`
+  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified`
   : '✗ integrity checks failed');
 process.exit(ok ? 0 : 1);

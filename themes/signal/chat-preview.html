@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Signal — Chat Preview</title>
+<link rel="stylesheet" href="signal.css">
+<link rel="stylesheet" href="prism-chat-signal.css">
+<style>
+/* preview stage only — the overlay itself is prism-chat-signal.css */
+html,body{ background:#04090D !important; }
+.shell{ position:absolute; right:60px; top:60px; bottom:60px; width:520px; display:flex; flex-direction:column; }
+.shell .chat{ flex:1; }
+.cap{ left:60px; top:60px; width:900px; }
+.cap .lede{ font-family:var(--display) !important; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="cap"><div class="label">Chat preview · Signal</div><div class="lede" style="margin-top:12px">Paste <b>prism-chat-signal.css</b> into SoundAlerts (or the OBS source's Custom CSS). New lines drop in every few seconds.</div></div>
+  <div class="shell"><div class="chat"><div class="chat--list" id="feed"></div></div></div>
+</div>
+<script>window.PRISM_CHATDEMO = { colors:['#5CF2E3','#FF5FA2','#FFC857','#7FB8FF','#B7F26B'] };</script>
+<script src="../../core/prism-chat-demo.js"></script>
+</body>
+</html>

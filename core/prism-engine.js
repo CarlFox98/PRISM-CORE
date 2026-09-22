@@ -15,6 +15,20 @@
      .js-goal-target      -> textContent set to goal
      .js-latest           -> textContent set to newest follower name
      .js-latest-wrap[hidden] -> unhidden when a latest follower loads
+     .js-goal-left        -> textContent set to followers still needed
+     .js-name             -> displayName from prism-config.js (static)
+     .js-game             -> current Twitch category (set in your dashboard)
+     .js-title            -> current stream title
+     .js-game-wrap[hidden] / .js-title-wrap[hidden] -> unhidden once loaded
+     .js-goal-segments    -> its children get class "on" up to count/goal
+                             (segmented meters; any number of children)
+
+   Goal stepping: when PRISM_CONFIG.goalStep is set and the count has
+   reached the goal, the goal moves up to the next multiple of goalStep
+   (119 followers, goal 100, step 25 -> 125) instead of pinning at 100%.
+
+   Socials: <div class="socials" data-prism-socials="named"> also renders
+   each network's name (config `name`, else `alt`) in a span.net.
    Everything degrades gracefully if the network/endpoint fails.
    ============================================================ */
 (function(){
@@ -25,6 +39,7 @@
      per-scene fallback/override so nothing breaks if config is absent. */
   var CH    = (CFG.channel || body.dataset.channel || '').trim();
   var GOAL  = parseInt(body.dataset.goal || CFG.goal || '0', 10) || 0;
+  var STEP  = parseInt(CFG.goalStep || '0', 10) || 0;
   var MOTES = parseInt(body.dataset.motes || '72', 10);
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -69,9 +84,16 @@
     if(!list || !list.length) return;
     Array.prototype.forEach.call(document.querySelectorAll('.socials[data-prism-socials]'), function(wrap){
       wrap.innerHTML = '';
+      var named = wrap.getAttribute('data-prism-socials') === 'named';
       list.forEach(function(s){
         var item = document.createElement('div');
         item.className = 'social-item';
+        if(named){
+          var net = document.createElement('span');
+          net.className = 'net';
+          net.textContent = s.name || s.alt || '';
+          item.appendChild(net);
+        }
         var lab = document.createElement('span');
         lab.className = 'label';
         lab.textContent = s.label || '';
@@ -81,6 +103,13 @@
       });
     });
   })();
+
+  /* identity text from config */
+  if(CFG.displayName || CFG.channel){
+    Array.prototype.forEach.call(document.querySelectorAll('.js-name'), function(el){
+      el.textContent = CFG.displayName || CFG.channel;
+    });
+  }
 
   /* avatar fallback from config (live data overwrites it moments later) */
   if(CFG.avatarFallback){
@@ -131,14 +160,26 @@
     if(!/^https?:\/\//.test(url)) return;
     each('img.js-avatar', function(img){ img.src = url; });
   }
+  /* the goal to show for count n: the configured one, or — once it has been
+     reached and goalStep is set — the next multiple of goalStep above n */
+  function effectiveGoal(n){
+    if(GOAL > 0 && STEP > 0 && n >= GOAL) return (Math.floor(n / STEP) + 1) * STEP;
+    return GOAL;
+  }
   function applyFollows(n){
     if(isNaN(n)) return;
     each('.js-followcount', function(el){ el.textContent = fmt(n); });
     each('.js-goal-now', function(el){ el.textContent = fmt(n); });
-    if(GOAL > 0){
-      each('.js-goal-target', function(el){ el.textContent = fmt(GOAL); });
-      var pct = Math.max(0, Math.min(100, (n / GOAL) * 100));
+    var goal = effectiveGoal(n);
+    if(goal > 0){
+      each('.js-goal-target', function(el){ el.textContent = fmt(goal); });
+      each('.js-goal-left', function(el){ el.textContent = fmt(Math.max(0, goal - n)); });
+      var pct = Math.max(0, Math.min(100, (n / goal) * 100));
       each('.js-goal-fill', function(el){ el.style.width = pct.toFixed(1) + '%'; });
+      each('.js-goal-segments', function(el){
+        var kids = el.children, on = Math.round(kids.length * pct / 100);
+        for(var i=0;i<kids.length;i++){ kids[i].classList.toggle('on', i < on); }
+      });
     }
   }
   function applyLatest(name){
@@ -147,6 +188,17 @@
     each('.js-latest-wrap', function(el){ el.hidden = false; });
   }
 
+  function applyText(kind, v){
+    if(!v) return;
+    each('.js-' + kind, function(el){ el.textContent = v; });
+    each('.js-' + kind + '-wrap', function(el){ el.hidden = false; });
+  }
+  /* category + title: only fetched when a scene asks for them */
+  function loadMeta(kind){
+    if(!document.querySelector('.js-' + kind)) return;
+    get(kind).then(function(v){ applyText(kind, v); cacheSet(kind, v); })
+      .catch(function(){ applyText(kind, cacheGet(kind)); });
+  }
   function loadAvatar(){
     get('avatar').then(function(url){
       applyAvatar(url); cacheSet('avatar', url);
@@ -171,9 +223,11 @@
     applyAvatar(cacheGet('avatar'));
     applyFollows(parseInt(cacheGet('follows'), 10));
     applyLatest(cacheGet('latest'));
+    if(document.querySelector('.js-game')) applyText('game', cacheGet('game'));
+    if(document.querySelector('.js-title')) applyText('title', cacheGet('title'));
   })();
 
-  function refresh(){ loadAvatar(); loadFollows(); loadLatest(); }
+  function refresh(){ loadAvatar(); loadFollows(); loadLatest(); loadMeta('game'); loadMeta('title'); }
   refresh();
   setInterval(refresh, 60000);
 })();

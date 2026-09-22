@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Signal — Be Right Back</title>
+<link rel="stylesheet" href="signal.css">
+<style>
+.hero{ left:132px; top:300px; display:flex; flex-direction:column; gap:22px; }
+.hero .title{ font-size:168px; }
+.hold{ width:900px; height:10px; background:rgba(92,242,227,0.12); position:relative; overflow:hidden; margin-top:18px; }
+.hold::after{ content:""; position:absolute; top:0; bottom:0; width:220px; background:var(--cy); box-shadow:0 0 18px var(--cy);
+  animation:hold 2.6s cubic-bezier(.65,0,.35,1) infinite alternate; }
+@keyframes hold{ from{ left:0; } to{ left:calc(100% - 220px); } }
+.side{ right:140px; top:250px; width:540px; display:flex; flex-direction:column; gap:26px; }
+.side .avatar{ align-self:flex-end; }
+@media (prefers-reduced-motion: reduce){ .hold::after{ animation:none; } }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+  <div class="bar-top"><span>PRISM//SIGNAL · <span class="js-name">NeoTheFox98</span></span><span class="state am">Paused</span></div>
+  <div class="hero in">
+    <div class="label">&gt; signal held · away from keyboard</div>
+    <div class="title">Be right<br>back</div>
+    <div class="hold" aria-hidden="true"></div>
+    <div class="lede js-game-wrap" hidden>Still on · <b class="js-game"></b></div>
+  </div>
+  <div class="side">
+    <div class="avatar in d1"><img class="js-avatar" alt="NeoTheFox98"></div>
+    <div class="panel in d2 js-latest-wrap" hidden>
+      <div class="row"><span class="k">Latest follow</span><span class="js-latest" style="color:var(--cy)"></span></div>
+    </div>
+    <div class="panel in d3">
+      <div class="label">Channels</div>
+      <div class="socials" data-prism-socials="named"></div>
+    </div>
+  </div>
+  <div class="bar-bot"><span>twitch.tv/<span class="js-name">NeoTheFox98</span></span><span>Holding pattern</span></div>
+</div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body></html>

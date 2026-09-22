@@ -1,0 +1,121 @@
+/* ============================================================
+   PRISM 2.0 — SIGNAL
+   Sci-fi HUD: grid, scanlines, notched panels, corner brackets,
+   terminal readouts. Two accents (cyan + magenta), amber for warnings.
+
+   Rules this set keeps:
+   • Nothing on stream below 22px (labels) / 24px (content).
+   • One thing moves continuously per scene; everything else
+     animates in once and stays still.
+   ============================================================ */
+@import url('../../fonts/prism-fonts.css');
+
+:root{
+  --bg:#04090D; --ink:#DDF7F4; --soft:#A9D8D3; --dim:#6FA7A2;
+  --cy:#5CF2E3; --mg:#FF5FA2; --am:#FFC857;
+  --panel:rgba(6,20,24,0.86); --line:rgba(92,242,227,0.35);
+  --display:'Chakra Petch','Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --notch:22px;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ width:1920px; height:1080px; overflow:hidden; background:var(--bg); color:var(--ink);
+  font-family:var(--display); -webkit-font-smoothing:antialiased; }
+body.clear{ background:transparent; }
+[hidden]{ display:none !important; }
+button{ font:inherit; text-transform:inherit; letter-spacing:inherit; color:inherit; }
+
+/* ---------- stage ---------- */
+.stage{ position:relative; width:1920px; height:1080px; overflow:hidden;
+  background-color:var(--bg);
+  background-image:linear-gradient(rgba(92,242,227,0.06) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(92,242,227,0.06) 1px,transparent 1px);
+  background-size:48px 48px; }
+.stage::before{ content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(900px 600px at 30% 40%,rgba(92,242,227,0.10),transparent 70%),
+             radial-gradient(760px 520px at 85% 78%,rgba(255,95,162,0.08),transparent 70%); }
+.stage::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.22) 0,rgba(0,0,0,0.22) 1px,transparent 1px,transparent 4px); }
+.stage > *{ position:absolute; z-index:2; }
+
+/* corner brackets */
+.corner{ width:70px; height:70px; border:0 solid var(--cy); z-index:3; }
+.corner.tl{ left:40px; top:40px; border-left-width:3px; border-top-width:3px; }
+.corner.tr{ right:40px; top:40px; border-right-width:3px; border-top-width:3px; }
+.corner.bl{ left:40px; bottom:40px; border-left-width:3px; border-bottom-width:3px; }
+.corner.br{ right:40px; bottom:40px; border-right-width:3px; border-bottom-width:3px; }
+
+/* meta bars */
+.bar-top,.bar-bot{ left:140px; right:140px; display:flex; justify-content:space-between; align-items:center;
+  font-family:var(--mono); font-size:22px; letter-spacing:3px; color:var(--dim); text-transform:uppercase; }
+.bar-top{ top:74px; } .bar-bot{ bottom:74px; }
+.state{ display:inline-flex; align-items:center; gap:12px; }
+.state::before{ content:""; width:12px; height:12px; background:currentColor; box-shadow:0 0 12px currentColor; }
+.state.mg{ color:var(--mg); } .state.cy{ color:var(--cy); } .state.am{ color:var(--am); }
+
+/* ---------- type ---------- */
+.label{ font-family:var(--mono); font-size:22px; letter-spacing:4px; color:var(--dim); text-transform:uppercase; }
+.title{ font-size:132px; font-weight:700; letter-spacing:4px; line-height:1; text-transform:uppercase; }
+.big{ font-size:250px; font-weight:700; line-height:0.95; letter-spacing:6px; color:var(--cy);
+  text-shadow:0 0 40px rgba(92,242,227,0.45); font-variant-numeric:tabular-nums; }
+.lede{ font-size:36px; font-weight:500; color:var(--soft); letter-spacing:1px; }
+.lede b{ color:var(--ink); font-weight:700; }
+
+/* terminal log */
+.log{ display:flex; flex-direction:column; gap:12px; font-family:var(--mono); font-size:24px; color:#7FC9C2; }
+.log div{ white-space:pre; overflow:hidden; width:0; animation:type 0.9s steps(40,end) forwards; }
+.log div:nth-child(2){ animation-delay:0.9s; } .log div:nth-child(3){ animation-delay:1.8s; }
+.log .ok{ color:var(--cy); } .log .hold{ color:var(--am); } .log .bad{ color:var(--mg); }
+@keyframes type{ to{ width:100%; } }
+.cursor{ display:inline-block; width:14px; height:26px; background:var(--cy); vertical-align:-4px; margin-left:6px;
+  animation:blink 1s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+
+/* ---------- panels ---------- */
+.panel{ background:var(--panel); border:1px solid var(--line); padding:24px 28px;
+  clip-path:polygon(0 0,calc(100% - var(--notch)) 0,100% var(--notch),100% 100%,0 100%);
+  display:flex; flex-direction:column; gap:16px; }
+.panel.mg{ border-color:rgba(255,95,162,0.55); }
+.panel .row{ display:flex; justify-content:space-between; align-items:baseline; gap:24px;
+  font-family:var(--mono); font-size:24px; }
+.panel .row .k{ color:var(--dim); letter-spacing:2px; text-transform:uppercase; font-size:22px; }
+
+/* notched avatar */
+.avatar{ width:240px; height:240px; padding:4px; background:var(--cy);
+  clip-path:polygon(24px 0,100% 0,100% calc(100% - 24px),calc(100% - 24px) 100%,0 100%,0 24px); }
+.avatar img{ width:100%; height:100%; object-fit:cover; display:block; background:#0a1216;
+  clip-path:polygon(22px 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%,0 22px); }
+
+/* socials as rows (data-prism-socials="named") */
+.socials{ display:flex; flex-direction:column; gap:14px; }
+.social-item{ display:grid; grid-template-columns:26px 1fr auto; align-items:center; gap:14px;
+  font-family:var(--mono); font-size:24px; color:var(--ink); }
+.social-item .net{ order:2; color:var(--dim); font-size:22px; letter-spacing:2px; text-transform:uppercase; }
+.social-item .ico{ order:1; width:24px; height:24px; color:var(--cy); fill:currentColor; }
+.social-item .label{ order:3; font-family:var(--mono); font-size:24px; letter-spacing:0; text-transform:none; color:var(--ink); }
+/* inline variant: one line of handles */
+.socials.inline{ flex-direction:row; gap:40px; }
+.socials.inline .social-item{ grid-template-columns:24px auto; gap:12px; }
+.socials.inline .net{ display:none; }
+
+/* segmented goal meter */
+.seg{ display:grid; grid-template-columns:repeat(20,minmax(0,1fr)); gap:4px; }
+.seg i{ height:18px; background:rgba(92,242,227,0.15); transition:background .4s; }
+.seg i.on{ background:var(--cy); box-shadow:0 0 8px rgba(92,242,227,0.5); }
+
+/* slow scan sweep — the one moving thing on most scenes */
+.sweep{ left:0; right:0; top:0; height:180px; z-index:4; pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(92,242,227,0.07) 60%,rgba(92,242,227,0.16) 98%,transparent);
+  animation:sweep 9s linear infinite; }
+@keyframes sweep{ from{ transform:translateY(-200px); } to{ transform:translateY(1100px); } }
+
+/* ---------- entrances (once) ---------- */
+.in{ opacity:0; animation:inUp .55s cubic-bezier(.16,1,.3,1) forwards; }
+.in.d1{ animation-delay:.15s; } .in.d2{ animation-delay:.3s; } .in.d3{ animation-delay:.45s; } .in.d4{ animation-delay:.6s; }
+@keyframes inUp{ from{ opacity:0; transform:translateY(18px); } to{ opacity:1; transform:none; } }
+
+@media (prefers-reduced-motion: reduce){
+  .sweep,.cursor{ animation:none; }
+  .log div{ animation:none; width:auto; }
+  .in{ animation:none; opacity:1; }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Soft Holo — Technical Difficulties</title>
+<link rel="stylesheet" href="soft.css">
+<style>
+.main{ left:150px; top:200px; right:620px; display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
+.main .title{ font-size:140px; }
+.who{ right:170px; top:200px; }
+.who .avatar{ width:320px; height:320px; }
+.who .sticker{ position:absolute; left:-40px; bottom:10px; }
+.tiles{ left:150px; bottom:90px; display:flex; gap:18px; }
+.icon-item{ display:flex; flex-direction:column; align-items:center; gap:8px; width:170px; padding:18px 12px 16px; border-radius:24px;
+  background:rgba(255,255,255,0.08); border:3px solid rgba(255,255,255,0.18); box-shadow:6px 6px 0 var(--shadow); }
+.icon-item svg{ width:46px; height:46px; fill:none; stroke:var(--soft); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; }
+.icon-label{ font-size:22px; font-weight:800; }
+.icon-check{ font-size:22px; font-weight:800; color:var(--dim); min-height:30px; text-transform:lowercase; }
+.icon-check:empty::before{ content:"…"; }
+.icon-item.state-ok{ border-color:var(--mint); } .icon-item.state-ok svg{ stroke:var(--mint); } .icon-item.state-ok .icon-check{ color:var(--mint); }
+.icon-item.state-warn{ border-color:var(--butter); } .icon-item.state-warn svg{ stroke:var(--butter); } .icon-item.state-warn .icon-check{ color:var(--butter); }
+.icon-item.state-error{ border-color:var(--pink); } .icon-item.state-error svg{ stroke:var(--pink); } .icon-item.state-error .icon-check{ color:var(--pink); }
+.status{ right:150px; bottom:90px; display:flex; align-items:center; gap:14px; }
+#statusText{ text-transform:lowercase; }
+.status-dot{ width:18px; height:18px; border-radius:50%; background:var(--dim); }
+.status-dot.live{ background:var(--mint); } .status-dot.offline{ background:var(--pink); } .status-dot.error{ background:var(--butter); }
+#backAnnouncement{ inset:0; z-index:6; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;
+  background:rgba(26,16,48,0.9); opacity:0; pointer-events:none; transition:opacity .5s; }
+#backAnnouncement.visible{ opacity:1; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="paw" style="left:150px;top:120px;transform:rotate(-14deg)"><svg width="120" height="120" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div>
+  <div class="main">
+    <div class="tag pink tilt-l pop">uh oh!</div>
+    <div class="title pop d1">Technical difficulties</div>
+    <div class="lede pop d2">Something went wobbly — fixing it now. Hang tight!</div>
+  </div>
+  <div class="who pop d1"><div class="avatar"><img class="js-avatar" alt="NeoTheFox98"></div><div class="sticker tilt-l">be right there</div></div>
+  <div class="tiles pop d3">
+    <div class="icon-item" id="itemPc"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="26" rx="5"/><path d="M18 40h12M24 34v6"/></svg><span class="icon-label">pc link</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemOverlay"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="32" rx="6"/><path d="M5 17h38M11 12.5h.01M16 12.5h.01"/></svg><span class="icon-label">overlay</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemGame"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="15" width="40" height="20" rx="10"/><path d="M13 21v8M9 25h8M31 23h.01M36 27h.01"/></svg><span class="icon-label">game</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemAudio"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="18" y="5" width="12" height="22" rx="6"/><path d="M11 22a13 13 0 0 0 26 0M24 35v8M17 43h14"/></svg><span class="icon-label">audio</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemPower"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6v16"/><path d="M14 12a14 14 0 1 0 20 0"/></svg><span class="icon-label">power</span><span class="icon-check"></span></div>
+  </div>
+  <div class="status sticker tilt-r pop d4"><span class="status-dot" id="statusDot"></span><span id="statusText">checking…</span></div>
+  <div id="backAnnouncement" role="status">
+    <div class="tag tilt-l">yay!</div>
+    <div class="title">We're back!</div>
+    <div class="lede">Resuming the stream…</div>
+  </div>
+</div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-techcheck.js"></script>
+</body></html>
