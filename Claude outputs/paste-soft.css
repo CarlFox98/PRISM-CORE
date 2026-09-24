@@ -3,23 +3,24 @@
    widget controls; this sheet must not compete with them.
    List is flex column + justify-content:flex-end => NEWEST IS :last-child. */
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@800&display=swap');
-:root{ --sf-ink:#FFF7F0; --sf-lilac:#C8B6FF; --sf-pink:#FFB5CF; --sf-panel:rgba(26,16,48,0.90); --sf-shadow:rgba(10,4,24,0.55) }
+:root{ --sg-ink:#FFF7F0; --sg-dim:#C8B6FF; --sg-cy:#C8B6FF; --sg-mg:#FFB5CF; --sg-panel:rgba(26,16,48,0.90); --sg-shadow:rgba(10,4,24,0.55) }
 html, body, #app{ background:transparent !important; margin:0 !important }
 .chat, .chat--list{ background:transparent !important; border:none !important; padding:4px !important }
 .chat::-webkit-scrollbar{ width:0 }
-.chat::before{ content:"chat \2665"; flex:0 0 auto; align-self:flex-start; width:fit-content; margin:0 0 10px; padding:8px 20px; font-family:'Sora',sans-serif; font-size:24px; font-weight:800; color:#1A1030; background:var(--sf-ink); border-radius:999px; box-shadow:5px 5px 0 var(--sf-shadow); transform:rotate(-2deg) }
+.chat::before{ content:"chat \2665"; display:block; flex:0 0 auto; margin:0 0 10px; padding:10px 16px; display:inline-block; font-family:'Sora',sans-serif; font-size:24px; font-weight:800; letter-spacing:0; color:#1A1030; background:var(--sg-ink); border-radius:999px; box-shadow:5px 5px 0 var(--sg-shadow); transform:rotate(-2deg) }
 .chat__item, .chat__item-transform-wrapper{ margin:0 }
 .chat__item:nth-last-child(n+7){ display:none }
 .chat__item:nth-last-child(6){ opacity:.30 }
 .chat__item:nth-last-child(5){ opacity:.50 }
 .chat__item:nth-last-child(4){ opacity:.72 }
-.chat__item-inner{ position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; width:fit-content; max-width:100%; padding:10px 16px 12px; background:var(--sf-panel); border:3px solid var(--user-color, var(--sf-lilac)); border-radius:22px; box-shadow:5px 5px 0 var(--sf-shadow) }
+.chat__item-inner{ position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; width:fit-content; max-width:100%; padding:10px 16px 12px; background:var(--sg-panel); border:3px solid var(--user-color, var(--sg-cy)); border-radius:22px; box-shadow:5px 5px 0 var(--sg-shadow) }
 .chat__metadata{ display:flex; align-items:center; order:-1 }
 .chat__metadata-inner{ display:inline-flex; align-items:center; gap:6px }
 .chat__avatar{ width:36px; height:36px; border-radius:50%; flex-shrink:0 }
 .chat__badges{ display:inline-flex; gap:4px }
 .chat__badge{ width:24px; height:24px; border-radius:50% }
+
 .chat__message{ flex:1 1 100% }
 .chat__emote{ height:1.4em; width:auto; vertical-align:middle }
-.chat__cheermote--amount{ color:var(--sf-pink) }
-.chat__item:last-child .chat__item-inner{ background:rgba(40,24,72,0.94) }
+.chat__cheermote--amount{ color:var(--sg-mg) }
+.chat__item:last-child .chat__item-inner{ background:rgba(8,30,34,0.94) }
