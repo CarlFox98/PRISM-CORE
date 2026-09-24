@@ -3,6 +3,35 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.0.3] — 2026-09-23
+
+### Fixed
+- **The chat sheets hid the six newest messages.** `.chat--list` is a flex
+  column with `justify-content:flex-end` and `overflow:hidden`, so SoundAlerts
+  appends new messages at the bottom and clips old ones off the top — the
+  newest message is `:last-child`, not `:first-child`. Both 2.0 sheets (and the
+  1.x holo sheet they inherited it from) counted from the wrong end, so the
+  message cap and the fade ramp applied to the newest messages instead of the
+  oldest. Now `:nth-last-child` throughout.
+- **`overflow-y:auto` fought the widget's own bottom anchoring.** Removed; the
+  native `overflow:hidden` is what makes messages stack upward from the bottom.
+- **Soft Holo's header stretched the full column width.** A duplicate `display`
+  declaration left it blockified as a flex item. Now `align-self:flex-start`
+  with `width:fit-content`, so the pill hugs its text.
+- Soft Holo's newest-message highlight was Signal's dark teal; it is now a
+  lighter purple that belongs to the set.
+
+### Changed
+- **The chat sheets are structure only.** SoundAlerts' own widget controls win
+  over pasted CSS, so font family, size, colour, outline and shadow now live in
+  the widget UI (32px messages, 28px names) and the sheets keep only what the
+  controls can't do: panels, the accent bar, the header, avatar and badge
+  sizing, emote sizing, the message cap and the fade ramp. This removes a class
+  of conflict rather than trying to win it.
+- Message cap is the newest six, with the oldest three stepping down to 72% /
+  50% / 30% opacity.
+- Emotes render at `1.4em` instead of Twitch's 28px default.
+
 ## [2.0.2] — 2026-09-21
 
 ### Added

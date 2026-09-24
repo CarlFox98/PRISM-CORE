@@ -33,3 +33,7 @@ push-to-github.bat
 
 # maintenance service logs (local, per-machine)
 maintenance-logs/
+
+# Claude's delivered copies — duplicates of files that live elsewhere in
+# the repo. Kept locally for convenience; the tracked originals are canonical.
+Claude outputs/
