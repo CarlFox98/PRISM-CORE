@@ -85,10 +85,15 @@ ASSET_DIRS = ["fonts"]
 HOLO_THEMES = {
     "theme-holo-shoutout.css":   "shoutout-theme.css",
     "theme-holo-nowplaying.css": "nowplaying-theme.css",
+    # Unlike the two above, holo's chat skin is NOT empty: the chat overlay is
+    # PRISM's own markup, so holo gets a proper look rather than the 1.x sheet's
+    # guesses about SoundAlerts' DOM.
+    "theme-holo-chat.css":       "chat-theme.css",
 }
 
 # 2.0 sets: every file in themes/<name>/ is copied (scenes are already named
-# canonically, plus the theme's css), together with these shared files.
+# canonically, plus the theme's css and chat-theme.css), together with these
+# shared files. Nothing to add here for chat: the whole theme folder ships.
 THEME_SCENES = ["starting-soon.html", "be-right-back.html", "stream-ending.html",
                 "tech-difficulties.html", "webcam-frame.html", "wallpaper.html",
                 "chat-preview.html", "thank-you.html", "gameplay.html"]

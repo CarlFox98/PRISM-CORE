@@ -3,6 +3,61 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.1.0] — 2026-09-23
+
+PRISM renders chat itself. The overlay reads Stream Manager's chat feed
+(stream-manager v0.11.0) instead of restyling somebody else's widget, so
+message lifecycle, mentions, moderation and event cards all become possible —
+and chat finally follows the active set like every other surface.
+
+### Added
+- **`chat/prism-chat.html` + `core/prism-chat.js` + `core/prism-chat-base.css`** —
+  the chat overlay. Backfills the newest 25 messages on load, then long-polls
+  `/api/effects/chat`. No framework, no build step, no dependency.
+- **`scripts/deploy-chat.py`** flattens the three sources into stream-manager's
+  `static/chat/`. One OBS URL that never changes and is not tied to a set:
+  `http://localhost:5000/static/chat/chat.html`
+- **Three chat skins** — `themes/signal/chat-theme.css`,
+  `themes/soft/chat-theme.css` and `widgets/theme-holo-chat.css` (built to
+  `chat-theme.css` for `prism-holo`). Unlike the shoutout and now-playing holo
+  themes, holo's chat skin is a real look, not an empty file: we own this
+  markup now.
+- **Placement is a feature, not a constant.** The page fills whatever box OBS
+  gives the source, so geometry is the OBS transform — per scene, for free.
+  `?anchor=top|bottom` and `?align=left|right` set orientation; `?max`,
+  `?ageout`, `?backfill` and `?theme` tune the rest.
+
+### Fixed
+- **A `since=0` poll would have spun at full speed.** `/api/effects/<channel>`
+  answers a first poll immediately rather than long-polling, so a renderer that
+  re-polls on response burns a core until the first event ever fires. The loop
+  paces itself to one request every 2s until it has a real id. Measured: 3
+  requests in 5 seconds against an empty bus.
+- **Chat is untrusted input.** Nothing in the message path touches `innerHTML`;
+  a message whose text is `<img src=x onerror=...>` renders as literal
+  characters. This page shares an origin with the Stream Manager dashboard.
+- **The fade ramp keyed off the wrong end**, so any `?max` other than 6 dimmed
+  the middle of the column and left the oldest messages bright. It now indexes
+  from the oldest end and only applies once the column is full.
+- **An empty message id swallowed every later id-less message**, because the
+  dedupe selector `[data-id=""]` matches them all.
+- **Usernames were ellipsised at five characters.** `max-width:60%` on a
+  `width:fit-content` panel is a circular constraint; the name now shrinks only
+  when the panel reaches the column edge.
+- **A theme's entry animation would have killed the fade ramp.** CSS animations
+  outrank inline style, so `fill-mode:both` pins every message at opacity 1.
+  All three skins use `backwards`, and the test suite asserts it.
+- Age-out timers no longer fire on messages already trimmed away; `?max=0` is
+  clamped to 1 instead of dropping everything; a message that somehow arrives
+  without fragments falls back to its raw text.
+
+### Notes
+- Nothing renders on stream until the overlay is added to OBS. The old
+  SoundAlerts chat source is untouched and stays the rollback.
+- Themes must never `@import` fonts: the page re-reads the active theme every
+  60s, so an import re-downloads the whole set each time (the 2.0.2 shoutout
+  bug). `scripts/test-socials.mjs` now fails the build if one appears.
+
 ## [2.0.3] — 2026-09-23
 
 ### Fixed

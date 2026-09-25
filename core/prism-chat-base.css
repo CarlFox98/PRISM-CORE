@@ -1,0 +1,141 @@
+/* ============================================================
+   PRISM 2.0 — chat, base layer
+   Structure, sizing and lifecycle transitions. A theme
+   (/overlays/active/chat-theme.css) owns colour, shape and its own
+   entry animation; everything here must stay readable with no theme
+   loaded at all, because a theme failing to load is exactly the
+   failure mode this project has already hit once.
+
+   Sizes are the audit's conclusion, set here so a theme can't undo
+   them by accident: 30px message, 26px name. At 720p — the most
+   common Twitch quality — that reads as 20px and 17px.
+   ============================================================ */
+
+:root{
+  --pc-gap: 10px;
+  --pc-pad: 8px;
+  --pc-exit: 220ms;
+
+  --pc-msg-size: 30px;
+  --pc-name-size: 26px;
+  --pc-line: 1.4;
+
+  /* Neutral fallback palette — themes override all of these. */
+  --pc-ink: #F2F5F7;
+  --pc-dim: #9FB0B8;
+  --pc-panel: rgba(10,12,18,0.82);
+  --pc-accent: #7FD4E8;
+}
+
+html, body{
+  margin:0; padding:0; height:100%;
+  background:transparent;
+  overflow:hidden;
+  font-family:'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* The column fills whatever box OBS gives the source — placement is the
+   OBS transform, per scene, not a constant in here. */
+#pc-feed{
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  padding:var(--pc-pad);
+  gap:var(--pc-gap);
+}
+html[data-anchor="bottom"] #pc-feed{ justify-content:flex-end }
+html[data-anchor="top"]    #pc-feed{ justify-content:flex-start }
+html[data-align="left"]    #pc-feed{ align-items:flex-start }
+html[data-align="right"]   #pc-feed{ align-items:flex-end }
+
+.pc-item{
+  flex:0 0 auto;
+  max-width:100%;
+  transition:opacity 180ms linear;
+}
+/* Messages leave, they don't vanish. */
+.pc-item.pc-leaving{
+  opacity:0 !important;
+  transform:translateY(6px);
+  transition:opacity var(--pc-exit) ease, transform var(--pc-exit) ease;
+}
+
+.pc-inner{
+  box-sizing:border-box;
+  width:fit-content;
+  max-width:100%;
+  padding:10px 16px 12px;
+  background:var(--pc-panel);
+  border-left:3px solid var(--user-color, var(--pc-accent));
+}
+html[data-align="right"] .pc-inner{
+  border-left:0;
+  border-right:3px solid var(--user-color, var(--pc-accent));
+  margin-left:auto;
+}
+
+.pc-meta{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:2px;
+}
+html[data-align="right"] .pc-meta{ flex-direction:row-reverse }
+/* Right-hand column: the whole card reads right-to-left, not just the name. */
+html[data-align="right"] .pc-body,
+html[data-align="right"] .pc-reply{ text-align:right }
+
+.pc-badge{
+  width:24px; height:24px;
+  flex-shrink:0;
+  vertical-align:middle;
+}
+
+.pc-name{
+  font-size:var(--pc-name-size);
+  font-weight:700;
+  line-height:1.15;
+  color:var(--pc-ink);
+  /* No percentage max-width here. The panel is width:fit-content, so a
+     percentage would resolve against a width derived from this very element
+     and ellipsise even a five-character name. min-width:0 lets the flex item
+     shrink ONLY once the panel has hit its own max-width at the column edge,
+     which is exactly when a long name should start truncating. */
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.pc-reply{
+  font-size:calc(var(--pc-msg-size) * 0.62);
+  color:var(--pc-dim);
+  margin:0 0 2px;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.pc-body{
+  font-size:var(--pc-msg-size);
+  line-height:var(--pc-line);
+  color:var(--pc-ink);
+  word-break:break-word;
+}
+
+.pc-emote{
+  height:1.4em;
+  width:auto;
+  vertical-align:middle;
+}
+
+.pc-at{ font-weight:700; color:var(--pc-accent) }
+.pc-at-self{ color:var(--user-color, var(--pc-accent)) }
+.pc-mention .pc-inner{ box-shadow:inset 0 0 0 1px var(--pc-accent) }
+
+@media (prefers-reduced-motion: reduce){
+  .pc-item, .pc-item.pc-leaving{ transition:none }
+}

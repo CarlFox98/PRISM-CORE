@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" data-anchor="bottom" data-align="left">
+<head>
+<meta charset="utf-8">
+<title>PRISM Chat</title>
+<!-- Vendored PRISM families, loaded ONCE here. Themes must never @import
+     them: this page re-reads the theme every 60s and each import would
+     re-download the whole set (the 2.0.2 shoutout bug). -->
+<link rel="stylesheet" href="/overlays/PRISM/fonts/prism-fonts.css">
+<!-- Base layer: structure + sizing, readable with no theme at all. -->
+<link rel="stylesheet" href="prism-chat-base.css">
+<!-- Skin: follows the active set, re-read on a timer by prism-chat.js.
+     Missing on a non-PRISM set, which is why the base layer stands alone. -->
+<link rel="stylesheet" id="pc-theme" href="/overlays/active/chat-theme.css">
+</head>
+<body>
+<div id="pc-feed" role="log" aria-live="polite" aria-label="Twitch chat"></div>
+<script src="prism-chat.js"></script>
+</body>
+</html>

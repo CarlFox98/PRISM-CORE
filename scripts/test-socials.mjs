@@ -55,8 +55,8 @@ const themes = fs.existsSync(themesDir)
   ? fs.readdirSync(themesDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name) : [];
 let themeScenes = 0;
 for (const t of themes) {
-  for (const w of ['shoutout-theme.css', 'nowplaying-theme.css']) {
-    if (!fs.existsSync(url(`../themes/${t}/${w}`))) fail(`themes/${t}/${w}: missing (the shoutout card / now-playing widget read it from the active set)`);
+  for (const w of ['shoutout-theme.css', 'nowplaying-theme.css', 'chat-theme.css']) {
+    if (!fs.existsSync(url(`../themes/${t}/${w}`))) fail(`themes/${t}/${w}: missing (a widget reads it from the active set, so the set must ship one)`);
   }
   for (const sc of THEME_SCENES) {
     const rel = `themes/${t}/${sc}.html`;
@@ -74,7 +74,40 @@ for (const t of themes) {
   }
 }
 
+// 5) chat overlay: the three deploy sources exist, holo has a real skin, and
+//    every relative reference in the page resolves once deploy-chat.py has
+//    flattened chat/ and core/ into one folder.
+const CHAT_SRC = {
+  'chat/prism-chat.html': 'chat.html',
+  'core/prism-chat.js': 'prism-chat.js',
+  'core/prism-chat-base.css': 'prism-chat-base.css',
+};
+for (const src of Object.keys(CHAT_SRC)) {
+  if (!fs.existsSync(url('../' + src))) fail(`${src}: missing (deploy-chat.py copies it into stream-manager's static/chat/)`);
+}
+if (!fs.existsSync(url('../widgets/theme-holo-chat.css'))) fail('widgets/theme-holo-chat.css: missing (holo\'s chat skin)');
+const chatPage = url('../chat/prism-chat.html');
+let chatRefs = 0;
+if (fs.existsSync(chatPage)) {
+  const h = fs.readFileSync(chatPage, 'utf8');
+  for (const [, ref] of h.matchAll(/(?:src|href)="([^"#?:]+\.(?:js|css))"/g)) {
+    if (ref.startsWith('/')) continue;           // served by stream-manager, not from the repo
+    chatRefs++;
+    // The page sits beside its assets only AFTER the deploy flattens them.
+    const flat = ['chat/', 'core/'].some(d => fs.existsSync(url('../' + d + ref)));
+    if (!flat) fail(`chat/prism-chat.html: links to ${ref}, which is in neither chat/ nor core/`);
+  }
+  if (!h.includes('/overlays/PRISM/fonts/prism-fonts.css')) fail('chat/prism-chat.html: does not load the vendored fonts');
+}
+// A theme re-read every 60s must never @import fonts (the 2.0.2 bug).
+for (const f of [...themes.map(t => `themes/${t}/chat-theme.css`), 'widgets/theme-holo-chat.css']) {
+  const p = url('../' + f);
+  if (fs.existsSync(p) && /^\s*@import/m.test(fs.readFileSync(p, 'utf8'))) {
+    fail(`${f}: @import in a theme re-read every 60s re-downloads on every poll`);
+  }
+}
+
 console.log(ok
-  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified`
+  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified, chat overlay + ${chatRefs} refs OK`
   : '✗ integrity checks failed');
 process.exit(ok ? 0 : 1);

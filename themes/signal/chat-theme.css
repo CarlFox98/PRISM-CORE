@@ -1,0 +1,55 @@
+/* ============================================================
+   PRISM 2.0 — SIGNAL chat skin
+   Colour, shape and entry motion only. Structure and sizing belong to
+   prism-chat-base.css; fonts are loaded once by the page from
+   /overlays/PRISM/fonts/prism-fonts.css — never @import them here, because
+   this file is re-read every 60s and each import re-downloads the lot.
+   ============================================================ */
+:root{
+  --pc-ink:#DDF7F4;
+  --pc-dim:#6FA7A2;
+  --pc-panel:rgba(6,20,24,0.88);
+  --pc-accent:#5CF2E3;
+  --pc-hot:#FF5FA2;
+}
+html, body{ font-family:'JetBrains Mono', Consolas, monospace }
+
+.pc-inner{
+  clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  border-left-width:3px;
+}
+html[data-align="right"] .pc-inner{
+  clip-path:polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px);
+}
+
+.pc-name{
+  font-family:'Chakra Petch', sans-serif;
+  font-weight:700;
+  letter-spacing:1px;
+}
+.pc-name::after{ content:" \25B8"; color:var(--pc-dim); font-weight:400 }
+html[data-align="right"] .pc-name::after{ content:none }
+html[data-align="right"] .pc-name::before{ content:"\25C2 "; color:var(--pc-dim); font-weight:400 }
+
+.pc-badge{ border-radius:2px }
+.pc-body{ text-shadow:0 1px 6px rgba(0,0,0,.55), 0 0 2px rgba(0,0,0,.45) }
+.pc-reply{ font-family:'JetBrains Mono', monospace }
+
+.pc-newest .pc-inner{ background:rgba(8,30,34,0.94) }
+.pc-mention .pc-inner{ box-shadow:inset 0 0 0 1px var(--pc-accent), 0 0 18px rgba(92,242,227,.18) }
+.pc-first .pc-inner{ border-left-color:var(--pc-hot) }
+.pc-cheer .pc-body{ color:var(--pc-hot) }
+
+/* fill-mode BACKWARDS, not both: a finished animation outranks inline style,
+   so `both` would pin every message at opacity 1 and kill the fade ramp. */
+.pc-item{ animation:pc-sg-in .35s cubic-bezier(.16,1,.3,1) backwards }
+@keyframes pc-sg-in{
+  from{ opacity:0; transform:translateX(-18px) }
+  to  { opacity:1; transform:none }
+}
+html[data-align="right"] .pc-item{ animation-name:pc-sg-in-r }
+@keyframes pc-sg-in-r{
+  from{ opacity:0; transform:translateX(18px) }
+  to  { opacity:1; transform:none }
+}
+@media (prefers-reduced-motion: reduce){ .pc-item{ animation:none } }

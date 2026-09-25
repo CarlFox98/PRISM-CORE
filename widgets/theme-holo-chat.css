@@ -1,0 +1,56 @@
+/* ============================================================
+   PRISM — HOLO chat skin (the 1.x iridescent look, rebuilt)
+   The 1.x sheet guessed at SoundAlerts' DOM and used !important on every
+   line to win. We own this markup now, so it needs neither.
+   Colour and shape only; fonts come from the page.
+   ============================================================ */
+:root{
+  --pc-ink:#EAF0FF;
+  --pc-dim:#A9B4D6;
+  --pc-panel:rgba(14,16,28,0.62);
+  --pc-accent:#7FB0FF;
+  --pc-hot:#FF7ACB;
+  --pc-c1:#57F2E4; --pc-c2:#6C8BFF; --pc-c3:#B983FF; --pc-c4:#FF7ACB;
+}
+html, body{ font-family:'Space Grotesk', 'Segoe UI', system-ui, sans-serif }
+
+/* Frosted pane with an iridescent rim: the panel colour paints the
+   padding box, the gradient the border box. */
+.pc-inner{
+  border:1px solid transparent;
+  border-left:0;
+  border-radius:12px;
+  background:
+    linear-gradient(var(--pc-panel), var(--pc-panel)) padding-box,
+    linear-gradient(120deg, var(--pc-c1), var(--pc-c2), var(--pc-c3), var(--pc-c4)) border-box;
+  backdrop-filter:blur(7px);
+  box-shadow:0 10px 30px rgba(0,0,0,.42);
+}
+html[data-align="right"] .pc-inner{ border-right:0 }
+
+.pc-name{
+  font-weight:700;
+  letter-spacing:.4px;
+  color:var(--user-color, var(--pc-ink));
+  text-shadow:0 0 12px rgba(120,150,255,.35);
+}
+.pc-badge{ border-radius:50% }
+.pc-body{ text-shadow:0 1px 7px rgba(0,0,0,.6) }
+.pc-reply{ color:var(--pc-dim) }
+
+.pc-newest .pc-inner{
+  background:
+    linear-gradient(rgba(18,22,38,0.74), rgba(18,22,38,0.74)) padding-box,
+    linear-gradient(120deg, var(--pc-c1), var(--pc-c2), var(--pc-c3), var(--pc-c4)) border-box;
+  box-shadow:0 12px 34px rgba(0,0,0,.5), 0 0 26px rgba(120,150,255,.28);
+}
+.pc-mention .pc-inner{ box-shadow:0 0 0 1px var(--pc-c1), 0 0 22px rgba(87,242,228,.3) }
+.pc-first .pc-name{ color:var(--pc-c1) }
+.pc-cheer .pc-body{ color:var(--pc-hot) }
+
+.pc-item{ animation:pc-holo-in .4s ease-out backwards }
+@keyframes pc-holo-in{
+  from{ opacity:0; transform:translateY(8px) }
+  to  { opacity:1; transform:none }
+}
+@media (prefers-reduced-motion: reduce){ .pc-item{ animation:none } }
