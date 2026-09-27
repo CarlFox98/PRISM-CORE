@@ -1,0 +1,15 @@
+{
+  "name": "prism-core",
+  "version": "2.2.0",
+  "private": true,
+  "description": "PRISM - OBS overlays for NeoTheFox's Twitch streams. Not published; package.json exists for the test tooling.",
+  "scripts": {
+    "test": "node scripts/test-socials.mjs && node scripts/test-chat-overlay.mjs",
+    "test:config": "node scripts/test-socials.mjs",
+    "test:chat": "node scripts/test-chat-overlay.mjs",
+    "deploy:chat": "python scripts/deploy-chat.py"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

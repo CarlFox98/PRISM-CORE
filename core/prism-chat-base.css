@@ -132,6 +132,9 @@ html[data-align="right"] .pc-reply{ text-align:right }
   vertical-align:middle;
 }
 
+/* /me — Twitch renders an action in the chatter's own colour, italic. */
+.pc-action .pc-body{ font-style:italic; color:var(--user-color, var(--pc-ink)) }
+
 .pc-at{ font-weight:700; color:var(--pc-accent) }
 .pc-at-self{ color:var(--user-color, var(--pc-accent)) }
 .pc-mention .pc-inner{ box-shadow:inset 0 0 0 1px var(--pc-accent) }

@@ -21,7 +21,6 @@ OBS points at one URL that never changes and is not tied to a set:
 """
 import argparse
 import os
-import shutil
 import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,6 +51,13 @@ def default_target():
 
 
 def copy_one(src, dst, dry):
+    """Write dst atomically, then read it back.
+
+    Atomic because a half-written overlay file is a blank chat on stream, and
+    read-back because this repo lives under OneDrive: a write has reported
+    success here before while leaving the old bytes on disk. A deploy that
+    silently didn't deploy is the single most expensive failure this script has.
+    """
     with open(src, "rb") as f:
         raw = f.read()
     if src.lower().endswith(TEXT_EXT):
@@ -62,8 +68,25 @@ def copy_one(src, dst, dry):
     if dry:
         return len(raw)
     os.makedirs(os.path.dirname(dst), exist_ok=True)
-    with open(dst, "wb") as f:
-        f.write(raw)
+    tmp = dst + ".tmp"
+    try:
+        with open(tmp, "wb") as f:
+            f.write(raw)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, dst)             # atomic on Windows and POSIX alike
+    finally:
+        # Never leave a .tmp behind in a folder stream-manager serves.
+        if os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+    with open(dst, "rb") as f:
+        back = f.read()
+    if back != raw:
+        raise RuntimeError(
+            f"{dst} did not persist: wrote {len(raw)} bytes, read back {len(back)}")
     return len(raw)
 
 
@@ -87,14 +110,17 @@ def main():
         return 1
 
     for src_rel, dst_name in sorted(FILES.items()):
-        n = copy_one(os.path.join(REPO, src_rel), os.path.join(out, dst_name), args.dry_run)
+        try:
+            n = copy_one(os.path.join(REPO, src_rel),
+                         os.path.join(out, dst_name), args.dry_run)
+        except (OSError, RuntimeError) as e:
+            print(f"  FAILED  {src_rel} -> chat/{dst_name}: {e}")
+            return 1
         print(f"  {'would copy' if args.dry_run else 'copied'}  {src_rel:<28} -> chat/{dst_name}  ({n} bytes)")
 
     print("\nOBS browser source URL:")
     print("  http://localhost:5000/static/chat/chat.html")
     print("  optional: ?anchor=top  ?align=right  ?max=8  ?ageout=90")
-    if shutil.which("python") is None:
-        pass
     return 0
 
 

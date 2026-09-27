@@ -3,6 +3,120 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.2.0] — 2026-09-25
+
+A full audit-and-fix pass over the chat overlay, end to end, plus moderation
+sync pulled forward from Phase 4 because a message a mod deleted was staying on
+stream. Two of the findings were load-bearing enough to measure.
+
+### Added
+- **Moderation sync (was Phase 4).** `CLEARMSG` removes the one message it
+  targets; `CLEARCHAT` removes one chatter's messages, or clears the room when
+  Twitch sends no target. Both replay from the backfill, so a deleted message
+  does not come back when OBS refreshes the source. Pulled forward on purpose:
+  with the default `?ageout=0` a deleted line could sit on stream for the rest
+  of the broadcast.
+- **`/me` support.** Actions arrive CTCP-wrapped; the wrapper is stripped
+  server-side and the message renders italic in the chatter's colour
+  (`.pc-action`). Twitch does not document whether a `/me` line's emote offsets
+  are measured against the wrapped string or the body, so the feed *detects* it
+  per message rather than guessing — an emote code is always a whole
+  space-delimited word, so the origin whose spans land on whole words wins.
+- **`scripts/test-chat-overlay.mjs`** — 33 behaviour tests that drive the real
+  `prism-chat.js` in a real browser against a scriptable fake Stream Manager.
+  The greps in `test-socials.mjs` check that the guards are still *spelled*
+  right; this checks they still *work*. Skips cleanly when playwright is absent.
+- Nine new guards in `test-socials.mjs` and 29 new cases in stream-manager's
+  `tests/test_chatfeed.py`. Every one was verified by reverting the fix it
+  covers and confirming it fails.
+
+### Fixed
+- **The poll spun at 400 requests/second.** `/api/effects/<channel>` reports the
+  *global* effect id whenever a channel has no ring buffer yet, so once any
+  other overlay's effect pushed that id past the chat overlay's high-water mark,
+  every poll returned instantly with no events and was re-issued with zero
+  delay — from overlay load until the first chat message of the run. A shoutout
+  before anyone has chatted is enough to trigger it. The overlay now always
+  takes a higher reported id, events or not (effect ids are global and
+  monotonic, so this loses nothing), with a 1s floor behind it. Measured:
+  1209 requests in 3s before, 3 after.
+- **Badge lookups blocked the IRC thread, on every single message.** The badge
+  cache judged staleness on its `ok` flag, so a failed Helix read was never
+  considered fresh and the *next* message tried again — up to two 6-second
+  requests on the one thread that answers Twitch's PING and dispatches every
+  `!command`. A sustained Helix outage would have stalled chat and dropped the
+  connection. The fetch now happens on a background thread, one at a time, and
+  a failure backs off; the map is replaced rather than mutated so readers never
+  need the lock.
+- **`?max=1` rendered the only message on screen at 30% opacity**, and `?max=2`
+  and `?max=3` dimmed the newest. The fade ramp is now capped below the newest
+  message at every `max`.
+- **A hung poll froze chat silently.** `fetch` has no timeout of its own, so one
+  half-open request meant no messages and no console trace for the rest of the
+  stream. Polls now abort after 40s (the server's long poll answers in 25).
+- **Chat died for the rest of the stream if Stream Manager restarted.** Effect
+  ids restart at 1, so the overlay waited for a number the new process would not
+  reach for hours. It now notices the reported id going backwards, clears the
+  stale column and re-backfills.
+- **An out-of-range emote span ate the rest of the message.** A clamped span
+  left the cursor past the end, so the trailing text vanished; spans that do not
+  land wholly inside the text are dropped instead.
+- **`?backfill=25` restored fewer than 25 messages** in proportion to how busy
+  the mods had been, because moderation events share the ring buffer. It counts
+  messages now, and still replays the moderation events that follow them.
+- A malformed moderation payload could take the IRC connection down: the guard
+  wrapped the emit but not the payload build.
+- `deploy-chat.py` writes atomically and reads the file back, because a write
+  has silently not persisted in this repo before (OneDrive). A failed deploy now
+  exits non-zero instead of leaving a half-written overlay.
+- Fonts are served as `font/woff2` rather than `application/octet-stream`.
+- Removed a dead tag-unescape table from `chatfeed.py` and dead code from
+  `deploy-chat.py`.
+
+### Invariants these fixes depend on
+Each of these looks like an obvious simplification. It is not.
+
+- **Effect ids are monotonic within one server run.** Restart detection is
+  entirely built on a reported id going backwards. If effect ids are ever made
+  to persist across restarts, that detection silently stops working and needs a
+  per-run nonce instead.
+- **A badge map is replaced, never mutated in place.** `_badges()` iterates the
+  map it was handed without holding the lock. Mutating the cached dict in place
+  would be a data race on the IRC thread.
+- **The badge refresh flag is cleared on every exit path**, including
+  `BaseException` and a failure to start the thread. Latching it True freezes
+  badges for the rest of the session.
+- **Theme entry animations use `fill-mode: backwards`, never `both`.** A
+  finished animation outranks inline style, so `both` pins every message at
+  opacity 1 and kills the fade ramp.
+- **The backfill routes through `handle()`, not `add()`.** Skipping the
+  moderation kinds there brings deleted messages back on an OBS refresh.
+- **`chat.py` dispatches CLEARCHAT on param count**: one param is a room clear,
+  two is one user. Reading a timeout as a room clear wipes the overlay.
+
+### Decided against
+- **A `CONTRACT_VERSION` bump for the new `action` field.** The renderer refuses
+  any payload whose `v` it does not equal, so a bump would blank the overlay
+  until both halves redeploy. An additive field degrades to rendering `/me`
+  upright — the better failure mode.
+- **Falling back to a login when `CLEARMSG` carries no target id.** It would
+  remove every message from that chatter, which is `CLEARCHAT`'s job. A single
+  deletion must never wipe a visible history.
+- **Making `/me !command` dispatch a command.** `_handle_privmsg` still tests
+  the wrapped text for the prefix. Defensible either way and out of scope for a
+  chat-overlay pass; noted so it is not rediscovered as a bug.
+- **Hardening `chat.py`'s `_parse` against malformed IRC lines.** A line with no
+  space after the tags would raise and force a reconnect, but there is no
+  evidence in the logs that Twitch ever sends one, and touching the parser risks
+  the path every message takes.
+- **Priming badges synchronously at startup.** The first few messages of a
+  session render without badge images instead. Blocking the IRC thread is what
+  this release exists to stop doing.
+
+### Notes
+- Requires stream-manager v0.11.1. Run `python scripts/deploy-chat.py` after
+  pulling, then refresh the OBS browser source.
+
 ## [2.1.0] — 2026-09-23
 
 PRISM renders chat itself. The overlay reads Stream Manager's chat feed

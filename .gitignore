@@ -37,3 +37,9 @@ maintenance-logs/
 # Claude's delivered copies — duplicates of files that live elsewhere in
 # the repo. Kept locally for convenience; the tracked originals are canonical.
 Claude outputs/
+
+# Node dev dependencies. scripts/test-chat-overlay.mjs needs playwright to run
+# the overlay's behaviour tests; the browsers it downloads live outside the repo
+# (in %LOCALAPPDATA%\ms-playwright). package.json and the lockfile ARE tracked so
+# the test setup is reproducible — only the installed tree is ignored.
+node_modules/

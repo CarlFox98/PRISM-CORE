@@ -78,9 +78,13 @@
     var item = el("div", "pc-item");
     item.setAttribute("data-id", m.id || "");
     item.setAttribute("data-user", (m.user && m.user.id) || "");
+    // CLEARCHAT identifies its target by id, but falls back to the trailing
+    // login when Twitch omits target-user-id, so both are on the node.
+    item.setAttribute("data-login", (m.user && m.user.login) || "");
     item.style.setProperty("--user-color", (m.user && m.user.color) || "");
 
     var f = m.flags || {};
+    if (m.action) item.classList.add("pc-action");
     if (f.first) item.classList.add("pc-first");
     if (f.mod) item.classList.add("pc-mod");
     if (f.vip) item.classList.add("pc-vip");
@@ -151,12 +155,16 @@
     var kids = live();
     var n = kids.length;
     var full = n >= CFG.max;                      // only fade what's about to go
+    // How many of the OLDEST messages the ramp covers. Capped at n-1 so the
+    // newest is always at full opacity: at ?max=1 the old code handed the only
+    // message on screen the dimmest step and rendered chat at 30%.
+    var dim = Math.min(CFG.fade.length, n - 1);
     kids.forEach(function (k, i) {
       k.classList.toggle("pc-newest", i === n - 1);
-      // Indexed from the OLDEST end so the ramp still lands on the messages
-      // nearest the chop at any CFG.max, not just the default 6.
-      var f = full ? CFG.fade[CFG.fade.length - 1 - i] : null;
-      k.style.opacity = (i < CFG.fade.length && f != null) ? String(f) : "";
+      // Indexed from the OLDEST end so the ramp lands on the messages nearest
+      // the chop at any CFG.max, not just the default 6.
+      var f = (full && i < dim) ? CFG.fade[dim - 1 - i] : null;
+      k.style.opacity = (f != null) ? String(f) : "";
     });
   }
 
@@ -177,16 +185,50 @@
   }
 
   function add(m) {
-    if (m.v !== CONTRACT) return warnOnce("contract v" + m.v + " (this overlay renders v" + CONTRACT + ")");
-    if (m.kind !== "msg") return;                 // clearmsg/clearchat/event: later phases
     // Dedupe the backfill/poll overlap — but only on a real id. An empty id
     // would match every id-less message and silently swallow the lot.
-    if (m.id && feed.querySelector('[data-id="' + cssEscape(m.id) + '"]')) return;
+    if (m.id && feed.querySelector('[data-id="' + cssEscape(m.id) + '"]:not(.pc-leaving)')) return;
     var node = build(m);
     feed.appendChild(node);
     if (CFG.ageOut > 0) setTimeout(function () { drop(node); }, CFG.ageOut * 1000);
     trim();
     restyle();
+  }
+
+  // ------------------------------------------------------ moderation ----
+  function clearAll() {
+    live().forEach(function (k) { drop(k); });
+  }
+
+  function removeBy(userId, login) {
+    live().forEach(function (k) {
+      if (userId ? k.getAttribute("data-user") === userId
+                 : (login && k.getAttribute("data-login") === login)) drop(k);
+    });
+  }
+
+  // Every payload enters here. A message a mod deleted has to LEAVE the
+  // screen: before this, it sat there until it scrolled off, and with the
+  // default ?ageout=0 that could be the rest of the stream.
+  function handle(m) {
+    if (!m || m.v !== CONTRACT) {
+      return warnOnce("contract v" + (m && m.v) + " (this overlay renders v" + CONTRACT + ")");
+    }
+    if (m.kind === "msg") return add(m);
+    if (m.kind === "clearmsg") {
+      // Exactly one message. No login fallback: CLEARMSG without a target id
+      // is not licence to wipe a chatter's whole visible history.
+      var t = m.target_id && feed.querySelector('[data-id="' + cssEscape(m.target_id) + '"]');
+      if (t) drop(t);
+      return;
+    }
+    if (m.kind === "clearchat") {
+      if (m.user_id || m.login) removeBy(m.user_id, m.login);
+      else clearAll();                            // whole room cleared
+      return;
+    }
+    // Unknown kind: a later phase's event reaching an older overlay. Ignore it
+    // rather than warn — the version check above already gates real breakage.
   }
 
   function cssEscape(s) {
@@ -203,41 +245,85 @@
   // ------------------------------------------------------- transport ----
   var lastId = 0;
   var errDelay = 0;
+  // The server's long poll returns within 25s. This is the watchdog for the
+  // other case: a socket that went half-open (Stream Manager restarted, the
+  // loopback stack dropped it) and will never answer and never error, which
+  // would leave the overlay frozen with no console trace for the whole stream.
+  var POLL_TIMEOUT = 40000;
 
   function get(path) {
-    return fetch(API + path, { cache: "no-store" }).then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.json();
+    var ctl = ("AbortController" in window) ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, POLL_TIMEOUT) : 0;
+    function done(v) { if (timer) clearTimeout(timer); return v; }
+    return fetch(API + path, { cache: "no-store", signal: ctl ? ctl.signal : undefined })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(done, function (e) { done(); throw e; });
+  }
+
+  // Stream Manager numbers effects from 1 on every start, and within one run
+  // the id it reports is monotonic — so a last_id BELOW our high-water mark
+  // can only mean it restarted. Without this the overlay waits for an id the
+  // new process will not reach for hours: chat goes silently dead for the rest
+  // of the stream while the poll loop hammers a 25s long poll forever.
+  // INVARIANT: if effects ids are ever made persistent across restarts, this
+  // detection stops working and needs a per-run nonce instead.
+  function restarted(srvLast) {
+    return typeof srvLast === "number" && srvLast > 0 && srvLast < lastId;
+  }
+
+  function backfill() {
+    return get("/api/chat/backfill?n=" + CFG.backfill).then(function (d) {
+      // handle(), not add(): a CLEARMSG still in the ring buffer must delete
+      // its target again after an OBS source refresh, or a deleted message
+      // comes straight back onto the screen.
+      (d.messages || []).forEach(handle);         // already oldest-first
+      lastId = d.last_id || 0;
     });
   }
 
   function start() {
-    get("/api/chat/backfill?n=" + CFG.backfill).then(function (d) {
-      (d.messages || []).forEach(add);           // already oldest-first
-      lastId = d.last_id || 0;
-    }).catch(function () {
+    backfill().catch(function () {
       // Stream Manager down or still starting: show nothing, never an error
       // on stream, and let the poll loop's backoff handle the retry.
     }).then(poll);
   }
 
+  // Floor for a zero-event response that came back too fast to have been a
+  // real long poll. Belt and braces behind the lastId advance below.
+  var MIN_IDLE = 1000;
+
   function poll() {
     var idle = 0;
+    var t0 = Date.now();
     get("/api/effects/chat?since=" + lastId).then(function (d) {
       errDelay = 0;
+      if (restarted(d.last_id)) {
+        warnOnce("Stream Manager restarted — resyncing the chat feed");
+        lastId = 0;
+        clearAll();
+        return backfill().catch(function () { lastId = 0; });
+      }
       var evs = d.events || [];
       if (evs.length) {
-        evs.forEach(function (e) { if (e && e.data) add(e.data); });
-        lastId = d.last_id || lastId;
-      } else if (lastId === 0) {
-        // The shared endpoint answers a since=0 poll IMMEDIATELY instead of
-        // long-polling, so re-polling on response would spin at full speed
-        // until the first event ever fires. Pace it until we have a real id.
-        lastId = d.last_id || 0;
-        idle = 2000;
+        evs.forEach(function (e) { if (e && e.data) handle(e.data); });
       }
-      // A genuine long-poll timeout returns no events with lastId > 0:
-      // re-poll at once, which is the whole point of the long poll.
+      // ALWAYS take a higher last_id, events or not. Effect ids are global and
+      // monotonic, so anything the chat channel emits later is numbered above
+      // whatever the server reports now — advancing loses nothing.
+      //
+      // Not advancing is what made this loop spin. The endpoint reports the
+      // GLOBAL id whenever the chat channel has no ring buffer yet, so once any
+      // other overlay's effect pushed that id past ours, every poll returned
+      // instantly with no events and was re-issued with zero delay: measured at
+      // 400 requests/second on the streaming PC, from overlay load until the
+      // first chat message of the run.
+      if (typeof d.last_id === "number" && d.last_id > lastId) lastId = d.last_id;
+      if (!evs.length && Date.now() - t0 < MIN_IDLE) idle = MIN_IDLE;
+      // A genuine long-poll timeout takes ~25s and re-polls at once, which is
+      // the whole point of the long poll.
     }).catch(function () {
       errDelay = Math.min(errDelay ? errDelay * 2 : 1000, 15000);
     }).then(function () {
