@@ -20,7 +20,8 @@ Manager dashboard (Overview → Overlay Scene Set):
 
 ```
 core/      prism-config.js, prism-engine.js, shared scene modules, holo css
-themes/    2.0 sets: signal/ and soft/ (scenes + theme css + chat css)
+chat/      the chat overlay page (renderer + base css live in core/)
+themes/    2.0 sets: signal/ and soft/ (scenes + theme css + chat skin)
 scenes/    the 1.x holo scenes             panels/   standalone Twitch info panels
 widgets/   now-playing + shoutout overlays data/     follower list, secrets example
 fonts/     vendored woff2 + aggregator     tools/    .bat/.sh launchers
@@ -82,9 +83,9 @@ No set folder is named plain `prism`: Windows paths are case-insensitive, so
 | `thank-you` | Thank-a-follower card | Space / `?auto` / `?hidebar` / `?demo` |
 | `chat-preview` | Preview of the set's chat CSS | |
 
-The chat itself is styled by pasting `prism-chat-signal.css` or
-`prism-chat-soft.css` (in the set folder) into SoundAlerts or the chat
-source's Custom CSS. Switching sets doesn't change pasted CSS.
+Chat is a PRISM overlay of its own — see **[Chat](#chat)** below. The
+`prism-chat-signal.css` / `prism-chat-soft.css` files still in each set folder
+are the retired stopgap for styling SoundAlerts' widget, kept only for rollback.
 
 The shoutout card and the now-playing widget are separate sources (Stream
 Manager and GitHub Pages), but they still follow the set: each set ships
@@ -92,6 +93,55 @@ Manager and GitHub Pages), but they still follow the set: each set ships
 `/overlays/active/` and re-read every minute. The holo set's copies are empty,
 so the widgets show their built-in look there. After changing the now-playing
 widget, run `tools\deploy-to-pages.bat` and push the `streaming` repo.
+
+## Chat
+
+PRISM renders chat itself. It reads Stream Manager's chat feed rather than
+styling somebody else's widget, so message lifecycle, mentions, moderation and
+`/me` are ours to control, and chat follows the active set like every other
+surface. Requires **stream-manager v0.11.1 or newer**.
+
+| File | Role |
+| --- | --- |
+| `chat/prism-chat.html` | the page OBS loads |
+| `core/prism-chat.js` | the renderer — no framework, no build step, no dependency |
+| `core/prism-chat-base.css` | structure and sizing; readable with no theme at all |
+| `themes/<set>/chat-theme.css` | the skin, re-read every 60s so a set switch restyles chat live |
+| `widgets/theme-holo-chat.css` | holo's skin, built to `chat-theme.css` by the set build |
+
+Deploy it into Stream Manager's `static/` folder, which serves it:
+
+```
+python scripts/deploy-chat.py
+```
+
+Then point one OBS Browser Source at a URL that never changes and is not tied
+to a set:
+
+```
+http://localhost:5000/static/chat/chat.html
+```
+
+Placement is the OBS transform, per scene — the page fills whatever box the
+source is given. Only orientation and behaviour come from the URL:
+
+| Option | Default | Effect |
+| --- | --- | --- |
+| `?anchor=` | `bottom` | which edge messages grow from (`bottom` or `top`) |
+| `?align=` | `left` | which side the cards sit on (`left` or `right`) |
+| `?max=` | `6` | messages on screen |
+| `?ageout=` | `0` | seconds before a message expires; `0` never expires |
+| `?backfill=` | `25` | messages restored on load |
+
+What it renders: themed messages with badges, Twitch emotes, mentions
+(highlighted when they're you), replies, cheers, first-time chatters, and `/me`
+in italics. A message a mod deletes leaves the screen, and the delete survives
+an OBS source refresh. If Stream Manager restarts, chat notices and resyncs on
+its own rather than going silent.
+
+Because it is served from `localhost`, chat is blank when Stream Manager is not
+running — unlike a cloud-hosted widget. Keep the old chat source in OBS, hidden,
+as the rollback.
 
 ## Design system
 
@@ -211,10 +261,24 @@ git config core.hooksPath .githooks     # blocks secrets from being committed
 Checks (also run in CI on every push via `.github/workflows/ci.yml`):
 
 ```
-node scripts/test-socials.mjs      # config, scene load order, and every 2.0 set's files
+node scripts/test-socials.mjs      # config, scene load order, every 2.0 set's files, chat guards
 bash scripts/scan-secrets.sh       # credential scan
-node --check core/prism-config.js core/prism-engine.js
+node --check core/prism-config.js core/prism-engine.js core/prism-chat.js
 ```
+
+The chat overlay also has behaviour tests that drive the real renderer in a real
+browser against a scriptable fake Stream Manager. They need playwright, and skip
+cleanly without it, so they are optional:
+
+```
+npm install                        # playwright, the only dev dependency
+npx playwright install chromium
+npm test                           # both suites: config integrity + 33 chat checks
+```
+
+`test-socials.mjs` greps the chat sources for guards that each cover a defect
+that actually shipped; `test-chat-overlay.mjs` checks those guards still *work*.
+Treat the greps as a tripwire, not as coverage.
 
 To update the **hosted** overlays (now-playing, shoutout, thank-you), edit the
 source files here, run `tools\deploy-to-pages.bat` to copy them into `github-pages/`,

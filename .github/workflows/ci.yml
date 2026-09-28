@@ -35,5 +35,24 @@ jobs:
       - name: Shoutout overlay queue test
         run: node scripts/test-shoutout-overlay.mjs
 
+      # Drives the real chat renderer in a real browser against a scriptable
+      # fake Stream Manager. The script skips cleanly when playwright is absent,
+      # so chromium is installed here deliberately to make it actually run.
+      - name: Chat overlay behaviour test
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          node scripts/test-chat-overlay.mjs
+
+      # The README and CHANGELOG have drifted behind VERSION before. The
+      # maintenance service checks this weekly on the streaming PC; doing it
+      # here catches it at the commit that caused it.
+      - name: VERSION matches the changelog
+        run: |
+          v=$(tr -d ' \t\r\n' < VERSION)
+          echo "VERSION = $v"
+          grep -q "\[$v\]" docs/CHANGELOG.md \
+            || { echo "docs/CHANGELOG.md has no [$v] entry"; exit 1; }
+
       - name: Secret scan
         run: bash scripts/scan-secrets.sh

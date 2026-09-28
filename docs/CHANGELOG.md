@@ -3,6 +3,29 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.2.1] — 2026-09-27
+
+Documentation and CI. No change to any overlay.
+
+### Fixed
+- **The README documented the retired stopgap as the way to style chat.** It
+  told you to paste `prism-chat-signal.css` into SoundAlerts' Custom CSS, which
+  has been wrong since 2.1.0 — PRISM renders chat itself. There is now a **Chat**
+  section covering the four files, `scripts/deploy-chat.py`, the OBS URL, every
+  query option, and the fact that chat is blank when Stream Manager is not
+  running. The retired stopgap sheets are named as rollback-only.
+- `chat/` was missing from the repository layout despite being a tracked folder.
+- The Development section listed the checks to run and omitted the chat tests
+  and `npm test` entirely.
+
+### Added
+- CI runs `scripts/test-chat-overlay.mjs` against a real chromium, so the 33
+  behaviour checks are enforced on every push rather than only when someone
+  remembers to install playwright locally.
+- CI fails when `VERSION` has no matching entry in this changelog. The
+  maintenance service already checked that weekly on the streaming PC; doing it
+  at the commit is what catches the drift this release exists to fix.
+
 ## [2.2.0] — 2026-09-25
 
 A full audit-and-fix pass over the chat overlay, end to end, plus moderation
