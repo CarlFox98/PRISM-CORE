@@ -44,6 +44,13 @@ jobs:
           npx playwright install --with-deps chromium
           node scripts/test-chat-overlay.mjs
 
+      # Renders each built set's chat-preview and checks it is showing the real
+      # overlay. The source guards check the fix is still spelled right; this
+      # checks the page still works. Two releases shipped a preview whose files
+      # all existed and which had no DOM in common with the overlay.
+      - name: Chat preview render test
+        run: node scripts/test-chat-preview.mjs
+
       # The README and CHANGELOG have drifted behind VERSION before. The
       # maintenance service checks this weekly on the streaming PC; doing it
       # here catches it at the commit that caused it.

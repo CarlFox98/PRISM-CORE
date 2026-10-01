@@ -3,6 +3,81 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.2.2] — 2026-09-30
+
+A tree-wide audit of 2.0. Nothing here changes how a set looks; all of it is
+things that were quietly wrong, found by checking rather than by breaking.
+
+### Fixed
+- **The dashboard offered two scene sets that cannot work.** `modern` and
+  `retro` were still in stream-manager's `scene_sets`, so either was one click
+  away on the Overview tab. `modern` provides four of the eight canonical
+  scenes; `retro` provides *none* — it still carries its 1.x filenames
+  (`starting-soon-win9x-v3.html`, `be-right-back-win98.html` and friends), so
+  choosing it mid-stream 404s every OBS browser source at once. Both are relics
+  that `prism-holo` replaced. They are out of `scene_sets`, and
+  `scripts/test-socials.mjs` now fails if an offered set is missing any
+  canonical scene.
+- **Every set's `chat-preview` scene still advertised the retired third-party
+  widget.** It linked the stopgap sheet and its on-screen copy told you to
+  paste that file into someone else's Custom CSS — two releases after 2.1.0
+  made chat PRISM's own, and one release after 2.2.1 fixed exactly that claim
+  in the README without touching the page it described. Worse than stale: the
+  preview and the overlay had no DOM in common. `core/prism-chat-demo.js`
+  emitted the third-party markup while the sheet that actually ships,
+  `chat-theme.css`, styles `.pc-*` and was previewed by nothing.
+
+  `prism-chat-demo.js` now builds the same `.pc-item > .pc-inner > .pc-meta /
+  .pc-reply / .pc-body` DOM `core/prism-chat.js` builds, with the same max,
+  the same `[0.72, 0.50, 0.30]` fade ramp and the same `.pc-newest` rule, and
+  cycles the variants a theme has to style (first-chatter, mod, VIP,
+  broadcaster, cheer, mention, reply, `/me`). All three preview pages were
+  rewritten to load `prism-chat-base.css` plus their set's skin. The preview
+  now shows what ships.
+- **The retired stopgap sheets were shipping into the live overlay folder.** A
+  2.0 set copies its whole theme folder, so `prism-chat-soft.css` was sitting
+  in `overlays/active/` on a running stream, loaded by nothing.
+  `build-obs-set.py` gained `THEME_SKIP`, which names them rather than
+  pattern-matching, so putting one back has to be deliberate.
+- **`core/prism-chat-holo-iridescent.css` was dead and still built.** 15.5 KB,
+  listed in `build-obs-set.py`'s `ASSETS` and copied into every holo build,
+  loaded by absolutely nothing — the old preview had those styles pasted
+  inline. The README claimed the preview was styled by it. Out of the manifest;
+  `prism-chat-base.css` and `prism-chat-demo.js` take its place because the
+  preview now needs the real base layer.
+- README: the claim that "every set provides the same scene names" (false for
+  `modern` and `retro`), the `scene_sets` example listing both, and the holo
+  preview's styling.
+
+### Added
+- `scripts/test-socials.mjs` grew four guards, each one a defect above:
+  every set offered in `scene_sets` must provide all eight canonical scenes;
+  no page may link the retired sheet or point a viewer at the third-party
+  widget; each preview must load the base layer, its set's skin and `#pc-feed`;
+  and `prism-chat-demo.js` must build the real `.pc-*` classes and no others.
+  A fifth catches the general case behind the dead-CSS bug: anything
+  `build-obs-set.py` copies into every set that no page loads.
+- The set check reads stream-manager's `config.json`, overridable with
+  `SM_CONFIG` / `PRISM_OVERLAYS`. When it can't find it, it says so rather than
+  passing silently — a check that verifies nothing while the summary reports
+  success is worse than no check.
+
+### Notes
+- Rebuild the sets after pulling: `python scripts/build-obs-set.py`, then
+  switch sets once in the dashboard so `overlays/active/` is refreshed.
+- Three retired files are now shipped by nothing but are still on disk:
+  `themes/signal/prism-chat-signal.css`, `themes/soft/prism-chat-soft.css`,
+  `core/prism-chat-holo-iridescent.css`. The test suite reports them as safe to
+  delete rather than failing — a red suite for a pending tidy-up is one people
+  learn to ignore.
+- Checked and clean, so nobody re-audits them: all five vendored font families
+  are genuinely used (Chakra Petch + JetBrains Mono for Signal, Sora + Nunito
+  for Soft, Space Grotesk + JetBrains Mono for Holo and both widgets);
+  `prism-followers.json` is fetched at runtime by `prism-thankyou.js`; and
+  `theme-holo-nowplaying.css` / `theme-holo-shoutout.css` only look unreferenced
+  because the build renames them and the widgets load them from
+  `/overlays/active/`.
+
 ## [2.2.1] — 2026-09-27
 
 Documentation and CI. No change to any overlay.

@@ -75,7 +75,12 @@ const msg = (id, text, extra = {}) => ({
   text, fragments: [{ type: 'text', text }], mentions: [], ...extra,
 });
 
-const browser = await chromium.launch({ args: ['--no-sandbox'] });
+// CI images sometimes ship a chromium that doesn't match the pinned
+// playwright. PW_CHROMIUM points at one that does; unset, playwright finds its
+// own. Same escape hatch as stream-manager's tests/dashboard_layout.mjs.
+const LAUNCH = { args: ['--no-sandbox'] };
+if (process.env.PW_CHROMIUM) LAUNCH.executablePath = process.env.PW_CHROMIUM;
+const browser = await chromium.launch(LAUNCH);
 async function open(qs = '') {
   const page = await browser.newPage({ viewport: { width: 700, height: 800 } });
   const warns = [];

@@ -165,7 +165,156 @@ for (const f of [...themes.map(t => `themes/${t}/chat-theme.css`), 'widgets/them
   }
 }
 
+// 7) Every set the dashboard OFFERS must actually work.
+//    stream-manager's config.json lists the sets shown on the Overview tab.
+//    `retro` sat in that list for months carrying only 1.x filenames
+//    (starting-soon-win9x-v3.html and friends), so choosing it mid-stream
+//    404'd every OBS browser source at once; `modern` was missing four of the
+//    eight. A set you cannot pick safely has no business being offered.
+const CANON = ['starting-soon', 'be-right-back', 'stream-ending', 'tech-difficulties',
+  'webcam-frame', 'wallpaper', 'chat-preview', 'thank-you'];
+let setsChecked = 0;
+{
+  // The overlays root is this repo's parent (…/overlays/PRISM → …/overlays),
+  // and stream-manager lives outside it entirely. Both are overridable so the
+  // check is testable and so a different machine layout can still run it.
+  const overlays = process.env.PRISM_OVERLAYS
+    ? new URL('file://' + process.env.PRISM_OVERLAYS.replace(/\/?$/, '/'))
+    : url('../../');
+  // scripts/ → PRISM → overlays → "OBS Assets" → Pictures → home
+  const smConfig = process.env.SM_CONFIG
+    ? new URL('file://' + process.env.SM_CONFIG)
+    : url('../../../../../Desktop/Streaming/stream-manager-main/stream-manager-main/config.json');
+
+  let offered = null;
+  try {
+    if (fs.existsSync(smConfig)) offered = JSON.parse(fs.readFileSync(smConfig, 'utf8')).scene_sets;
+  } catch (e) { fail(`could not parse stream-manager config.json: ${e.message}`); }
+
+  if (!Array.isArray(offered)) {
+    // Never silent: a check that quietly verifies nothing is worse than no
+    // check, because the summary line still says everything passed.
+    console.warn('  ! scene-set check skipped — stream-manager config.json not found'
+                 + ' (set SM_CONFIG=/path/to/config.json to enable)');
+  } else {
+    for (const name of offered) {
+      const dir = new URL(name + '/', overlays);
+      if (!fs.existsSync(dir)) {
+        fail(`config.json offers scene set "${name}" but overlays/${name}/ does not exist`);
+        continue;
+      }
+      setsChecked++;
+      const missing = CANON.filter(c => !fs.existsSync(new URL(c + '.html', dir)));
+      if (missing.length) {
+        fail(`overlays/${name}/ is offered in config.json but is missing ${missing.length} of `
+           + `${CANON.length} scenes (${missing.join(', ')}) — picking it from the dashboard `
+           + `breaks those OBS sources mid-stream`);
+      }
+    }
+  }
+}
+
+// 8) The SoundAlerts stopgap is retired. PRISM has rendered chat itself since
+//    2.1.0, but the preview scenes went on linking the stopgap sheets and
+//    telling you to paste them into someone else's widget — for two releases,
+//    including one whose whole point was fixing that same claim in the README.
+{
+  const RETIRED = /prism-chat-(?:signal|soft)\.css/;
+  const walk = (dir) => fs.existsSync(dir)
+    ? fs.readdirSync(dir, { withFileTypes: true }).flatMap(d =>
+        d.isDirectory() ? walk(new URL(d.name + '/', dir)) : [new URL(d.name, dir)])
+    : [];
+  const scanned = [...walk(url('../themes/')), ...walk(url('../scenes/')),
+                   ...walk(url('../core/')), ...walk(url('../chat/')), ...walk(url('../widgets/'))];
+  for (const f of scanned) {
+    const rel = decodeURIComponent(f.pathname).split('/PRISM/')[1] || f.pathname;
+    if (!/\.(html|css|js)$/.test(rel)) continue;
+    const body = fs.readFileSync(f, 'utf8');
+    const live = body.replace(/<!--[\s\S]*?-->/g, '');
+    // Linking it is the defect; naming it in prose is how you document the
+    // history. Only <link>/<script> references count.
+    for (const [, ref] of live.matchAll(/(?:src|href)="([^"]+)"/g)) {
+      if (RETIRED.test(ref)) fail(`${rel}: still links the retired chat stopgap (${ref})`);
+    }
+    // Only pages, not stylesheets or scripts: a CSS header that explains why
+    // it replaced the old third-party sheet is accurate history and should
+    // stay. A *page* that tells the viewer to go and use that widget is the
+    // defect — that is what shipped in every set for two releases.
+    if (/\.html$/.test(rel) && /soundalert/i.test(body)) {
+      fail(`${rel}: a page still points the viewer at the retired third-party chat widget`);
+    }
+  }
+
+  // These are retired and no longer shipped (see THEME_SKIP and ASSETS in
+  // build-obs-set.py), but they are still on disk. Reported rather than
+  // failed: nothing is broken while they sit there unreferenced, and a red
+  // suite for a pending tidy-up is a suite people learn to ignore.
+  for (const rel of ['themes/signal/prism-chat-signal.css', 'themes/soft/prism-chat-soft.css',
+                     'core/prism-chat-holo-iridescent.css']) {
+    if (fs.existsSync(url('../' + rel))) {
+      console.warn(`  ! ${rel}: retired and shipped by nothing — safe to delete`);
+    }
+  }
+
+  // Strip comments before asking "does this file actually do X". A guard that
+  // matches the comment explaining the fix passes on a file that no longer
+  // applies it — this has now caught itself three times in one release.
+  const code = (t) => t.replace(/<!--[\s\S]*?-->/g, '')
+                       .replace(/\/\*[\s\S]*?\*\//g, '')
+                       .replace(/^\s*\/\/.*$/gm, '');
+
+  // The previews must preview what actually ships: the real .pc-* DOM under
+  // the base layer plus the set's skin.
+  for (const [rel, skin] of [
+    ['scenes/prism-chat-preview.html', '../widgets/theme-holo-chat.css'],
+    ...themes.map(t => [`themes/${t}/chat-preview.html`, 'chat-theme.css']),
+  ]) {
+    const p2 = url('../' + rel);
+    if (!fs.existsSync(p2)) continue;
+    const h = code(fs.readFileSync(p2, 'utf8'));
+    const links = [...h.matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]);
+    if (!links.some(l => l.endsWith('prism-chat-base.css'))) fail(`${rel}: does not LINK prism-chat-base.css — it is not previewing the real overlay`);
+    if (!links.some(l => l.endsWith(skin.split('/').pop()))) fail(`${rel}: does not link ${skin}`);
+    if (!/id="pc-feed"/.test(h)) fail(`${rel}: has no #pc-feed — the renderer and the demo both target it`);
+  }
+
+  // The demo feed must build the same DOM the renderer does, or the preview
+  // shows unstyled markup while every file still "exists".
+  const demo = code(fs.readFileSync(url('../core/prism-chat-demo.js'), 'utf8'));
+  for (const cls of ['pc-item', 'pc-inner', 'pc-meta', 'pc-name', 'pc-body', 'pc-newest']) {
+    if (!demo.includes(cls)) fail(`prism-chat-demo.js: never builds .${cls} — the preview will not match the real overlay`);
+  }
+  if (/chat__/.test(demo)) fail('prism-chat-demo.js: still builds the retired third-party markup');
+  if (/\.innerHTML\s*=/.test(demo)) fail('prism-chat-demo.js: assigns innerHTML — build nodes, like the renderer does');
+}
+
+// 9) Nothing the build copies may be dead. prism-chat-holo-iridescent.css was
+//    listed in build-obs-set.py's ASSETS and shipped into every holo build for
+//    two releases while being loaded by absolutely nothing.
+{
+  const build = fs.readFileSync(url('../build-obs-set.py'.replace('../', '../scripts/')), 'utf8');
+  const listed = [...build.matchAll(/^\s*"([A-Za-z0-9._-]+\.(?:css|js))",?\s*(?:#.*)?$/gm)].map(m => m[1]);
+  const loaders = [...walk2(url('../scenes/')), ...walk2(url('../themes/')),
+                   ...walk2(url('../chat/')), ...walk2(url('../widgets/')), ...walk2(url('../core/'))];
+  const blob = loaders.map(f => fs.readFileSync(f, 'utf8')).join('\n');
+  const loaded = new Set([...blob.matchAll(/(?:src|href)="([^"]+)"/g)]
+    .map(m => m[1].split('/').pop().split('?')[0]));
+  for (const n of new Set(listed)) {
+    // followers.json is fetched at runtime, not linked; the widgets' theme
+    // files are renamed on copy and loaded from /overlays/active/.
+    if (n.endsWith('.json') || n.startsWith('theme-holo-')) continue;
+    if (!loaded.has(n)) fail(`build-obs-set.py copies ${n} into every set, but no page loads it`);
+  }
+}
+function walk2(dir) {
+  return fs.existsSync(dir)
+    ? fs.readdirSync(dir, { withFileTypes: true }).flatMap(d =>
+        d.isDirectory() ? walk2(new URL(d.name + '/', dir)) : [new URL(d.name, dir)])
+        .filter(f => /\.(html|css|js)$/.test(f.pathname))
+    : [];
+}
+
 console.log(ok
-  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified, chat overlay + ${chatRefs} refs OK`
+  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified, chat overlay + ${chatRefs} refs OK, ${setsChecked} offered set(s) complete`
   : '✗ integrity checks failed');
 process.exit(ok ? 0 : 1);

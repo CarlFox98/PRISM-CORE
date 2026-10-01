@@ -74,7 +74,12 @@ ASSETS = [
     "prism-theme.css",
     "prism-config.js",
     "prism-engine.js",
-    "prism-chat-holo-iridescent.css",
+    # The chat preview now previews the real overlay, so it needs the real
+    # base layer. It replaces prism-chat-holo-iridescent.css, which was copied
+    # into every holo build while being loaded by absolutely nothing: the old
+    # preview had those styles pasted inline.
+    "prism-chat-base.css",
+    "prism-chat-demo.js",
     "prism-followers.json",
 ]
 ASSET_DIRS = ["fonts"]
@@ -93,14 +98,21 @@ HOLO_THEMES = {
 
 # 2.0 sets: every file in themes/<name>/ is copied (scenes are already named
 # canonically, plus the theme's css and chat-theme.css), together with these
-# shared files. Nothing to add here for chat: the whole theme folder ships.
+# shared files, minus THEME_SKIP.
 THEME_SCENES = ["starting-soon.html", "be-right-back.html", "stream-ending.html",
                 "tech-difficulties.html", "webcam-frame.html", "wallpaper.html",
                 "chat-preview.html", "thank-you.html", "gameplay.html"]
 THEME_ASSETS = [
     "prism-config.js", "prism-engine.js", "prism-countdown.js", "prism-techcheck.js",
     "prism-wallpaper.js", "prism-thankyou.js", "prism-chat-demo.js", "prism-followers.json",
+    "prism-chat-base.css",          # the chat preview previews the real overlay
 ]
+
+# Files in themes/<name>/ that must NOT ship. A theme set copies its whole
+# folder, which is how the retired stopgap sheets kept riding along into
+# overlays/active/ long after 2.1.0 stopped using them. Named rather than
+# pattern-matched so adding one back is a deliberate act.
+THEME_SKIP = {"prism-chat-signal.css", "prism-chat-soft.css"}
 SETS = {
     "prism-holo":   None,        # built from SCENES/ASSETS above
     "prism-signal": "signal",
@@ -113,7 +125,11 @@ SETS = {
 # Theme files sit one level deeper (themes/<name>/), so their ../../ forms are
 # rewritten first.
 FLATTEN = [("../../core/", ""), ("../../data/", ""), ("../../fonts/", "fonts/"),
-           ("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/")]
+           ("../core/", ""), ("../data/", ""), ("../fonts/", "fonts/"),
+           # The holo chat preview links the skin by its source name so the
+           # page also works opened straight from the repo; in a built set that
+           # same file is named chat-theme.css, like every other set's.
+           ("../widgets/theme-holo-chat.css", "chat-theme.css")]
 TEXT_EXT = (".html", ".css", ".js", ".json")
 
 
@@ -168,6 +184,8 @@ def plan_set(name):
                 missing.append("themes/%s/%s" % (theme, sc))
         if os.path.isdir(tdir):
             for fn in sorted(os.listdir(tdir)):
+                if fn in THEME_SKIP:
+                    continue
                 p = os.path.join(tdir, fn)
                 if os.path.isfile(p):
                     files.append((p, fn))

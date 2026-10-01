@@ -1,25 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-anchor="bottom" data-align="left">
 <head>
 <meta charset="UTF-8">
 <title>PRISM Signal — Chat Preview</title>
+<link rel="stylesheet" href="../../fonts/prism-fonts.css">
 <link rel="stylesheet" href="signal.css">
-<link rel="stylesheet" href="prism-chat-signal.css">
+<!-- Previews the REAL chat overlay: prism-chat-base.css for structure plus
+     this set's chat-theme.css for the skin, drawn with the same .pc-* DOM
+     core/prism-chat.js builds. What this page shows is what ships.
+     (History: see docs/CHANGELOG.md 2.2.2. Deliberately no mention of the
+     retired sheet's name here — scripts/test-socials.mjs greps this folder
+     for it, and a guard that matches its own explanation catches nothing.) -->
+<link rel="stylesheet" href="../../core/prism-chat-base.css">
+<link rel="stylesheet" href="chat-theme.css">
 <style>
-/* preview stage only — the overlay itself is prism-chat-signal.css */
-html,body{ background:#04090D !important; }
-.shell{ position:absolute; right:60px; top:60px; bottom:60px; width:520px; display:flex; flex-direction:column; }
-.shell .chat{ flex:1; }
-.cap{ left:60px; top:60px; width:900px; }
-.cap .lede{ font-family:var(--display) !important; }
+/* Preview stage only — none of this ships with the overlay.
+   prism-chat-base.css makes html/body transparent and full-height for OBS,
+   so the stage backdrop has to be put back here, after it. */
+html,body{ background:#050A12 !important; height:100%; overflow:hidden; }
+.shell{ position:absolute; right:60px; top:60px; bottom:60px; width:520px; z-index:3; }
+#pc-feed{ height:100%; }
+.cap{ position:absolute; left:60px; top:60px; width:820px;
+      display:flex; flex-direction:column; gap:14px; align-items:flex-start; z-index:3; }
 </style>
 </head>
 <body>
 <div class="stage">
-  <div class="cap"><div class="label">Chat preview · Signal</div><div class="lede" style="margin-top:12px">Paste <b>prism-chat-signal.css</b> into SoundAlerts (or the OBS source's Custom CSS). New lines drop in every few seconds.</div></div>
-  <div class="shell"><div class="chat"><div class="chat--list" id="feed"></div></div></div>
+  <div class="cap">
+    <div class="label">Chat preview · Signal</div>
+    <div class="lede">The live overlay is <b>chat/prism-chat.html</b>, deployed with
+      <b>scripts/deploy-chat.py</b> and added to OBS as
+      <b>http://localhost:5000/static/chat/chat.html</b>. It restyles itself from
+      this set's <b>chat-theme.css</b> within 60s of a set switch.</div>
+  </div>
+  <div class="shell"><div id="pc-feed" role="log" aria-label="Chat preview"></div></div>
 </div>
-<script>window.PRISM_CHATDEMO = { colors:['#5CF2E3','#FF5FA2','#FFC857','#7FB8FF','#B7F26B'] };</script>
+<script>window.PRISM_CHATDEMO = { colors:['#57F2E4','#6C8BFF','#B983FF','#FF7ACB','#FFD86B'] };</script>
 <script src="../../core/prism-chat-demo.js"></script>
 </body>
 </html>

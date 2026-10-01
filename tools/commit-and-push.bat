@@ -9,22 +9,23 @@ REM ============================================================
 title PRISM - commit and push
 cd /d "%~dp0.."
 set /p VER=<VERSION
-echo PRISM %VER%
-echo.
 
-findstr /c:"prism_shoutout_service" ".github\workflows\ci.yml" >nul 2>&1
-if %errorlevel%==0 (
-  echo [!] .github\workflows\ci.yml is still the old one - GitHub checks will keep failing
-  echo     until you replace it. Committing everything else anyway.
-  echo.
-)
+REM The subject used to be hardcoded to 2.0.0's headline, so every release
+REM after it was committed under the wrong description. Pass one as an
+REM argument, or get a plain version subject.
+REM     commit-and-push.bat "2.2.2: retire the chat stopgap"
+if "%~1"=="" (set "MSG=PRISM %VER%") else (set "MSG=PRISM %VER%: %~1")
+
+echo PRISM %VER%
+echo   commit subject: %MSG%
+echo.
 
 git add -A
 git diff --cached --quiet
 if %errorlevel%==0 (
   echo Nothing new to commit.
 ) else (
-  git commit -m "PRISM %VER%: Signal + Soft Holo scene sets, themed shoutout and now-playing" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_01BhZC2kXnnmGgNsAxePTeBh"
+  git commit -m "%MSG%" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_01BhZC2kXnnmGgNsAxePTeBh"
   if errorlevel 1 goto fail
 )
 

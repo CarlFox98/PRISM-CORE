@@ -41,7 +41,8 @@ from disk. The two deploy steps (`scripts/build-obs-set.py` and
 
 ## OBS scene sets
 
-Each PRISM set is a folder next to Stream Manager's `modern/` and `retro/`.
+Each PRISM set is a folder under `<assets_dir>/overlays/`, beside the
+`active/` folder Stream Manager copies the chosen set into.
 Build them with:
 
 ```
@@ -57,14 +58,22 @@ For the dashboard to offer a set, its name must be in stream-manager's
 `config.json` → `"scene_sets"` (restart Stream Manager after editing it):
 
 ```json
-"scene_sets": ["modern", "retro", "prism-holo", "prism-signal", "prism-soft"]
+"scene_sets": ["prism-holo", "prism-signal", "prism-soft"]
 ```
 
-Every set provides the same scene names: `starting-soon`, `be-right-back`,
-`stream-ending`, `tech-difficulties`, `webcam-frame`, `wallpaper`,
-`chat-preview`, `thank-you`. The 2.0 sets add **`gameplay`**, which the other
-sets don't have, so a `gameplay.html` source shows nothing while `modern`,
-`retro` or `prism-holo` is active.
+All three PRISM sets provide the same eight scene names: `starting-soon`,
+`be-right-back`, `stream-ending`, `tech-difficulties`, `webcam-frame`,
+`wallpaper`, `chat-preview`, `thank-you`. The 2.0 sets add **`gameplay`**,
+which `prism-holo` doesn't have, so a `gameplay.html` source shows nothing
+while holo is active.
+
+> **Only offer a set that provides all eight.** Stream Manager's `modern/` and
+> `retro/` folders are 1.x relics that `prism-holo` replaced: `modern` has four
+> of the eight and `retro` still uses its original filenames
+> (`starting-soon-win9x-v3.html` and friends), so choosing it 404s *every*
+> browser source at once. They were listed in `scene_sets` until 2.2.2.
+> `scripts/test-socials.mjs` now fails if `scene_sets` offers an incomplete
+> set, so this cannot come back quietly.
 
 No set folder is named plain `prism`: Windows paths are case-insensitive, so
 `overlays/prism` would collide with the `overlays/PRISM` source repo.
@@ -83,9 +92,11 @@ No set folder is named plain `prism`: Windows paths are case-insensitive, so
 | `thank-you` | Thank-a-follower card | Space / `?auto` / `?hidebar` / `?demo` |
 | `chat-preview` | Preview of the set's chat CSS | |
 
-Chat is a PRISM overlay of its own — see **[Chat](#chat)** below. The
-`prism-chat-signal.css` / `prism-chat-soft.css` files still in each set folder
-are the retired stopgap for styling SoundAlerts' widget, kept only for rollback.
+Chat is a PRISM overlay of its own — see **[Chat](#chat)** below, and
+`chat-preview` previews exactly that: the real `.pc-*` markup under
+`prism-chat-base.css` and the set's `chat-theme.css`. Until 2.2.2 it previewed
+the retired third-party stopgap instead and told you to paste that sheet into
+someone else's widget, two releases after PRISM took chat over.
 
 The shoutout card and the now-playing widget are separate sources (Stream
 Manager and GitHub Pages), but they still follow the set: each set ships
@@ -179,7 +190,7 @@ Shared scene modules in `core/` (used by the 2.0 sets): `prism-countdown.js`,
 - `prism-tech-difficulties.html`
 - `prism-wallpaper.html`
 - `prism-webcam-frame.html`
-- `prism-chat-preview.html` — styled with `../core/prism-chat-holo-iridescent.css`
+- `prism-chat-preview.html` — previews the real chat overlay: `../core/prism-chat-base.css` plus holo's skin
 - `prism-thank-you.html` — random-follower shout (reads `../data/prism-followers.json`)
 
 ## Info panels — `panels/` (standalone, load `../core/prism-panels.css`)
