@@ -94,6 +94,9 @@ HOLO_THEMES = {
     # PRISM's own markup, so holo gets a proper look rather than the 1.x sheet's
     # guesses about SoundAlerts' DOM.
     "theme-holo-chat.css":       "chat-theme.css",
+    # Stream Manager's coin flip / wheel / slots / hype overlays. Empty, like
+    # shoutout's: holo is those overlays' built-in look.
+    "theme-holo-redeem.css":     "redeem-theme.css",
 }
 
 # 2.0 sets: every file in themes/<name>/ is copied (scenes are already named

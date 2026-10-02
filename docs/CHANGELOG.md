@@ -3,6 +3,34 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.3.0] — 2026-10-01
+
+### Added
+- **Channel-point redeem overlays follow the active set.** Stream Manager's
+  coin flip / 50-50, Lucky + Risky wheel, slots and hype overlays
+  (`static/interactive/*.html`) were the last on-stream pieces still locked
+  to the 1.x holo look. Each set now ships `redeem-theme.css`, which they load
+  from `/overlays/active/` and re-read every 60s — the same contract as
+  `shoutout-theme.css`. Holo's (`widgets/theme-holo-redeem.css`) is empty, so
+  holo keeps the built-in look and switching back clears a 2.0 theme.
+  - **Soft Holo:** cream sticker cards with a tilt and offset shadow, pastel
+    pill labels, a flat pastel wheel, an iridescent-ring coin.
+  - **Signal:** notched panels with a `// CH.PTS` header strip and scanlines,
+    an octagonal token coin, a HUD wheel with lit rim arcs, `INCOMING // RAID`.
+  - The wheel is a canvas, which CSS cannot reach, so a theme hands it
+    `--wheel-*` tokens. A theme palette replaces only the default colours
+    games.py fills in; a colour set by hand on a segment is kept.
+
+### Changed (Stream Manager overlays)
+- The four overlays load the vendored `/overlays/PRISM/fonts/prism-fonts.css`
+  instead of Google Fonts — no network at load.
+- `hype.html` no longer shows `&amp;` for a name containing `&` (it escaped
+  into `textContent`, which escapes again).
+
+### Tests
+- `test-socials.mjs` requires `redeem-theme.css` in every 2.0 set, and the
+  no-`@import` guard now covers every widget theme, not just chat's.
+
 ## [2.2.2] — 2026-09-30
 
 A tree-wide audit of 2.0. Nothing here changes how a set looks; all of it is

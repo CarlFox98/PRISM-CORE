@@ -1,0 +1,5 @@
+/* PRISM Holo · interactive redeem theme — intentionally empty.
+   The coin flip / wheel / slots / hype overlays' built-in look IS the holo
+   look. This file exists so that switching back to the holo set clears a
+   Signal/Soft theme (the overlays re-read /overlays/active/redeem-theme.css
+   every minute). */

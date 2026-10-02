@@ -1,0 +1,106 @@
+/* ============================================================
+   PRISM 2.0 — SOFT HOLO · interactive redeem theme
+   Restyles Stream Manager's coin flip / 50-50, Lucky + Risky wheel,
+   slots and hype overlays (static/interactive/*.html), which load it
+   from /overlays/active/ so they follow the active set — the same
+   contract as shoutout-theme.css. Only restyles: markup, timing and
+   the .show transitions stay the overlays' own.
+   ============================================================ */
+/* Fonts come from the overlay page itself (/overlays/PRISM/fonts/prism-fonts.css).
+   Never @import here: this file is re-read every 60s. */
+
+:root{
+  --ink:#1A1030; --ink-soft:#5B4A7E;
+  --c1:#9FF3D6; --c2:#9CC9FF; --c3:#C8B6FF; --c4:#FFB5CF; --c5:#FFD9A0;
+  --cream:#FFF7F0; --night:#2A1D48; --shadow:rgba(10,4,24,0.6);
+  --iris:conic-gradient(from 200deg,#9FF3D6,#9CC9FF,#C8B6FF,#FFB5CF,#FFD9A0,#9FF3D6);
+
+  /* wheel canvas tokens (read by wheel.html) */
+  --wheel-style:flat;
+  --wheel-font:'Nunito',sans-serif; --wheel-weight:800; --wheel-ink:#1A1030;
+  --wheel-stroke:#FFF7F0; --wheel-stroke-w:7; --wheel-ring:#FFF7F0; --wheel-ring-w:16;
+  --wheel-palette:#9FF3D6,#FFB5CF,#9CC9FF,#FFD9A0,#C8B6FF,#FFB5A7;
+  --wheel-lucky:#9FF3D6; --wheel-risky:#FFB5CF;
+
+  /* hype accents per kind (read by hype.html) */
+  --hype-raid:#C8B6FF; --hype-bits:#9FF3D6; --hype-sub:#FFD9A0; --hype-follow:#FFB5CF; --hype-firstchat:#9CC9FF;
+}
+html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
+
+/* ---------- the shared card: a cream sticker with an offset shadow ---------- */
+.ov .card,.ov .banner{ padding:0; border:0; border-radius:40px; overflow:visible;
+  background:var(--cream); animation:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:14px 14px 0 var(--shadow);
+  transform:translateY(60px) scale(0.9) rotate(-1.5deg);
+  transition:opacity .45s ease, transform .6s cubic-bezier(.34,1.56,.64,1); }
+.ov .card.show,.ov .banner.show{ transform:rotate(-1.5deg); }
+.ov .card-inner,.ov-slots .inner,.ov-hype .inner{ background:transparent; border-radius:40px; }
+
+/* eyebrow -> pastel pill sticker, tilted the other way */
+.ov .eyebrow,.ov-hype .kind{ padding:8px 22px; border-radius:999px; background:var(--accent,var(--c4)); color:var(--ink);
+  font-family:'Sora',sans-serif; font-size:24px; font-weight:800; letter-spacing:0.5px; text-transform:lowercase;
+  text-shadow:none; box-shadow:4px 4px 0 rgba(26,16,48,0.18); transform:rotate(2deg); }
+.ov .eyebrow .dot{ display:none; }
+
+/* big words: Sora, solid ink, no shimmer */
+.ov .result,.ov .title,.ov .winner .label,.ov-hype .headline{
+  font-family:'Sora',sans-serif; font-weight:800; letter-spacing:-1.5px;
+  background:none; -webkit-text-fill-color:var(--ink); color:var(--ink); filter:none; animation:none; }
+
+/* "for <name>" -> lilac pill */
+.ov .who{ padding:8px 24px; border:0; border-radius:999px; animation:none;
+  background:var(--c3); color:var(--ink); font-size:24px; font-weight:700; letter-spacing:0;
+  box-shadow:4px 4px 0 rgba(26,16,48,0.18); }
+.ov .who b{ color:var(--ink); font-weight:800; }
+
+/* ---------- coin flip / 50-50 ---------- */
+.ov-coinflip .card{ width:560px; }
+.ov-coinflip .card-inner{ padding:44px 40px 40px; }
+.ov-coinflip .eyebrow{ --accent:var(--c1); }
+.ov-coinflip .card.is5050 .eyebrow{ --accent:var(--c5); }
+.ov-coinflip .card.lose .eyebrow{ --accent:var(--c4); color:var(--ink); text-shadow:none; }
+.ov-coinflip .face{ background:var(--iris); color:var(--cream);
+  font-family:'Sora',sans-serif; font-weight:800; font-size:34px; letter-spacing:-0.5px; text-shadow:none;
+  box-shadow:inset 0 0 0 6px rgba(255,255,255,0.55); }
+.ov-coinflip .face .inner{ width:calc(100% - 28px); height:calc(100% - 28px); background:var(--night); box-shadow:none; }
+.ov-coinflip .coin{ filter:drop-shadow(8px 10px 0 rgba(26,16,48,0.28)); }
+.ov-coinflip .result{ font-size:72px; }
+.ov-coinflip .card.lose .result{ background:none; -webkit-text-fill-color:#C2477B; color:#C2477B; }
+
+/* ---------- wheel ---------- */
+.ov-wheel .card-inner{ padding:34px 48px 40px; }
+.ov-wheel .eyebrow{ color:var(--ink); }
+.ov-wheel .title{ font-size:60px; }
+.ov-wheel canvas{ filter:drop-shadow(10px 12px 0 rgba(26,16,48,0.30)); }
+.ov-wheel .hub{ width:92px; height:92px; border:0; animation:none;
+  background:var(--cream); box-shadow:0 0 0 7px var(--night), 5px 6px 0 7px rgba(26,16,48,0.25); }
+.ov-wheel .hub .glyph{ font-size:40px; filter:none; }
+.ov-wheel .pointer{ top:-14px; border-left-width:24px; border-right-width:24px; border-top:42px solid var(--night);
+  filter:drop-shadow(4px 5px 0 rgba(26,16,48,0.25)); }
+.ov-wheel .winner .label{ font-size:40px; max-width:620px; line-height:1.1; }
+
+/* ---------- slots ---------- */
+.ov-slots .card.win{ box-shadow:14px 14px 0 var(--shadow), 0 0 0 8px var(--c5); }
+.ov-slots .inner{ padding:40px 48px 44px; }
+.ov-slots .eyebrow{ --accent:var(--c5); }
+.ov-slots .reel{ border:0; border-radius:26px; background:var(--night);
+  box-shadow:0 0 0 6px var(--c3), 6px 6px 0 6px rgba(26,16,48,0.22); }
+.ov-slots .reel:nth-child(2){ box-shadow:0 0 0 6px var(--c4), 6px 6px 0 6px rgba(26,16,48,0.22); }
+.ov-slots .reel:nth-child(3){ box-shadow:0 0 0 6px var(--c1), 6px 6px 0 6px rgba(26,16,48,0.22); }
+.ov-slots .reels{ gap:26px; }
+.ov-slots .reel::before{ background:linear-gradient(var(--night),transparent); }
+.ov-slots .reel::after{ background:linear-gradient(transparent,var(--night)); }
+.ov-slots .result{ font-size:52px; }
+.ov-slots .who{ padding:0; background:none; box-shadow:none; color:var(--ink-soft); font-size:24px; font-weight:700; }
+.ov-slots .who b{ color:var(--ink); }
+
+/* ---------- hype (raid / bits / sub / follow / first chat) ---------- */
+.ov-hype .banner{ min-width:720px; transform:translateY(-70px) scale(0.9) rotate(1.5deg); }
+.ov-hype .banner.show{ transform:rotate(1.5deg); }
+.ov-hype .inner{ padding:38px 64px 42px; gap:14px; }
+.ov-hype .emoji{ width:110px; height:110px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:var(--iris); box-shadow:6px 7px 0 rgba(26,16,48,0.25); font-size:56px; }
+.ov-hype .kind{ letter-spacing:0.5px; }
+.ov-hype .headline{ font-size:80px; line-height:1; }
+.ov-hype .sub{ font-size:28px; font-weight:700; color:var(--ink-soft); letter-spacing:0; }

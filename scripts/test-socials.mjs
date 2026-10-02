@@ -55,7 +55,7 @@ const themes = fs.existsSync(themesDir)
   ? fs.readdirSync(themesDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name) : [];
 let themeScenes = 0;
 for (const t of themes) {
-  for (const w of ['shoutout-theme.css', 'nowplaying-theme.css', 'chat-theme.css']) {
+  for (const w of ['shoutout-theme.css', 'nowplaying-theme.css', 'chat-theme.css', 'redeem-theme.css']) {
     if (!fs.existsSync(url(`../themes/${t}/${w}`))) fail(`themes/${t}/${w}: missing (a widget reads it from the active set, so the set must ship one)`);
   }
   for (const sc of THEME_SCENES) {
@@ -100,7 +100,8 @@ if (fs.existsSync(chatPage)) {
   if (!h.includes('/overlays/PRISM/fonts/prism-fonts.css')) fail('chat/prism-chat.html: does not load the vendored fonts');
 }
 // A theme re-read every 60s must never @import fonts (the 2.0.2 bug).
-for (const f of [...themes.map(t => `themes/${t}/chat-theme.css`), 'widgets/theme-holo-chat.css']) {
+for (const f of [...themes.flatMap(t => ['chat', 'shoutout', 'nowplaying', 'redeem'].map(w => `themes/${t}/${w}-theme.css`)),
+                 'widgets/theme-holo-chat.css', 'widgets/theme-holo-redeem.css']) {
   const p = url('../' + f);
   if (fs.existsSync(p) && /^\s*@import/m.test(fs.readFileSync(p, 'utf8'))) {
     fail(`${f}: @import in a theme re-read every 60s re-downloads on every poll`);

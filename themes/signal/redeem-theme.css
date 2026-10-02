@@ -1,0 +1,120 @@
+/* ============================================================
+   PRISM 2.0 — SIGNAL · interactive redeem theme
+   Restyles Stream Manager's coin flip / 50-50, Lucky + Risky wheel,
+   slots and hype overlays (static/interactive/*.html), which load it
+   from /overlays/active/ so they follow the active set — the same
+   contract as shoutout-theme.css. Only restyles: markup, timing and
+   the .show transitions stay the overlays' own.
+   Shapes use clip-path, never border-radius (Signal's notched look),
+   so depth comes from filter:drop-shadow — box-shadow would be clipped.
+   ============================================================ */
+/* Fonts come from the overlay page itself (/overlays/PRISM/fonts/prism-fonts.css).
+   Never @import here: this file is re-read every 60s. */
+
+:root{
+  --ink:#DDF7F4; --ink-soft:#A9D8D3; --dim:#6FA7A2;
+  --c1:#5CF2E3; --c2:#5CF2E3; --c3:#6FA7A2; --c4:#FF5FA2; --c5:#FFC857;
+  --sg-panel:rgba(6,20,24,0.95);
+  --notch:polygon(26px 0,100% 0,100% calc(100% - 26px),calc(100% - 26px) 100%,0 100%,0 26px);
+
+  /* wheel canvas tokens (read by wheel.html) */
+  --wheel-style:hud;
+  --wheel-font:'JetBrains Mono',monospace; --wheel-weight:700; --wheel-case:upper;
+  --wheel-hud-fill:#06161A; --wheel-stroke:rgba(92,242,227,0.35); --wheel-stroke-w:2;
+  --wheel-ring:#5CF2E3; --wheel-ring-w:4;
+  --wheel-palette:#5CF2E3,#FF5FA2,#FFC857,#5CF2E3,#FF5FA2,#A9D8D3;
+  --wheel-lucky:#5CF2E3; --wheel-risky:#FF5FA2;
+
+  /* hype accents per kind (read by hype.html) */
+  --hype-raid:#FFC857; --hype-bits:#5CF2E3; --hype-sub:#FF5FA2; --hype-follow:#5CF2E3; --hype-firstchat:#A9D8D3;
+}
+html,body{ font-family:'Chakra Petch','Segoe UI',sans-serif; }
+
+/* ---------- the shared card: a notched HUD panel ---------- */
+.ov .card,.ov .banner{ padding:0; border:0; border-radius:0; overflow:visible; background:none; animation:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none;
+  filter:drop-shadow(0 18px 40px rgba(0,0,0,0.6));
+  transform:translateY(24px); transition:opacity .35s steps(6,end), transform .5s cubic-bezier(.16,1,.3,1); }
+.ov .card.show,.ov .banner.show{ transform:none; }
+.ov .card-inner,.ov-slots .inner,.ov-hype .inner{ position:relative; border-radius:0; background:var(--sg-panel);
+  clip-path:var(--notch); padding-top:76px;
+  border:1px solid color-mix(in srgb,var(--accent,var(--c1)) 55%,transparent); }
+/* header strip — the overlay's eyebrow text sits on it */
+.ov .card-inner::before,.ov-slots .inner::before,.ov-hype .inner::before{ content:""; position:absolute; left:0; right:0; top:0; height:50px;
+  background:color-mix(in srgb,var(--accent,var(--c1)) 14%,transparent);
+  border-bottom:1px solid color-mix(in srgb,var(--accent,var(--c1)) 40%,transparent); }
+/* scanlines over the whole panel */
+.ov .card-inner::after,.ov-slots .inner::after,.ov-hype .inner::after{ content:""; position:absolute; inset:0; pointer-events:none; z-index:5;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.20) 0,rgba(0,0,0,0.20) 1px,transparent 1px,transparent 4px); }
+
+.ov .eyebrow,.ov-hype .kind{ position:absolute; left:34px; top:0; height:50px; z-index:2;
+  font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; letter-spacing:4px; text-transform:uppercase;
+  color:var(--accent,var(--c1)); text-shadow:none; }
+.ov .eyebrow::after{ content:"// CH.PTS"; margin-left:6px; color:var(--dim); letter-spacing:3px; }
+.ov .eyebrow .dot{ width:12px; height:12px; border-radius:0; background:currentColor; box-shadow:0 0 10px currentColor; }
+
+/* big words: Chakra Petch caps, flat colour with a soft glow */
+.ov .result,.ov .title,.ov .winner .label,.ov-hype .headline{
+  font-family:'Chakra Petch',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:3px;
+  background:none; -webkit-text-fill-color:var(--ink); color:var(--ink); animation:none;
+  filter:drop-shadow(0 0 18px color-mix(in srgb,var(--accent,var(--c1)) 45%,transparent)); }
+
+/* "for <name>" -> terminal readout */
+.ov .who{ padding:0; border:0; border-radius:0; background:none; animation:none;
+  font-family:'JetBrains Mono',monospace; font-size:24px; letter-spacing:1px; color:var(--dim); }
+.ov .who::before{ content:"> "; color:var(--accent,var(--c1)); }
+.ov .who b{ color:var(--ink); font-weight:700; }
+
+/* ---------- coin flip / 50-50 ---------- */
+.ov-coinflip .card{ width:580px; --accent:var(--c1); }
+.ov-coinflip .card.is5050{ --accent:var(--c5); }
+.ov-coinflip .card.lose{ --accent:var(--c4); }
+.ov-coinflip .card-inner{ padding-bottom:40px; gap:24px; }
+.ov-coinflip .card.lose .eyebrow{ color:var(--c4); text-shadow:none; }
+.ov-coinflip .card.lose .eyebrow .dot{ background:var(--c4); box-shadow:0 0 10px var(--c4); }
+/* octagonal token instead of a round coin */
+.ov-coinflip .face{ border-radius:0; background:var(--accent);
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);
+  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:30px; letter-spacing:2px;
+  color:var(--accent); text-shadow:0 0 14px color-mix(in srgb,var(--accent) 60%,transparent); box-shadow:none; }
+.ov-coinflip .face .inner{ width:calc(100% - 8px); height:calc(100% - 8px); border-radius:0; box-shadow:none;
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);
+  background:repeating-linear-gradient(0deg,rgba(92,242,227,0.06) 0 1px,transparent 1px 6px),#071418; }
+.ov-coinflip .coin{ filter:drop-shadow(0 0 18px color-mix(in srgb,var(--accent) 40%,transparent)); }
+.ov-coinflip .result{ font-size:72px; }
+.ov-coinflip .card.lose .result{ background:none; -webkit-text-fill-color:var(--c4); color:var(--c4); }
+
+/* ---------- wheel ---------- */
+.ov-wheel .card-inner{ padding:76px 48px 40px; }
+.ov-wheel .title{ font-size:56px; }
+.ov-wheel canvas{ filter:drop-shadow(0 0 24px color-mix(in srgb,var(--accent) 25%,transparent)); }
+.ov-wheel .hub{ width:96px; height:96px; border:0; border-radius:0; animation:none;
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);
+  background:var(--accent); box-shadow:none; }
+.ov-wheel .hub::before{ content:""; position:absolute; inset:3px; background:#071418;
+  clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%); }
+.ov-wheel .hub .glyph{ position:relative; font-size:38px; filter:none; }
+.ov-wheel .pointer{ top:-10px; border-left-width:16px; border-right-width:16px; border-top:36px solid var(--accent);
+  filter:drop-shadow(0 0 10px var(--accent)); }
+.ov-wheel .winner .label{ font-size:38px; max-width:640px; line-height:1.1; color:var(--accent); -webkit-text-fill-color:var(--accent); }
+
+/* ---------- slots ---------- */
+.ov-slots .card{ --accent:var(--c5); }
+.ov-slots .card.win{ box-shadow:none; filter:drop-shadow(0 18px 40px rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255,200,87,0.45)); }
+.ov-slots .inner{ padding:76px 48px 40px; }
+.ov-slots .eyebrow{ color:var(--c5); text-shadow:none; }
+.ov-slots .eyebrow .dot{ background:var(--c5); box-shadow:0 0 10px var(--c5); }
+.ov-slots .reel{ border:1px solid rgba(92,242,227,0.45); border-radius:0; background:#071418; box-shadow:inset 0 0 30px rgba(92,242,227,0.12);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px); }
+.ov-slots .reel::before{ background:linear-gradient(#071418,transparent); }
+.ov-slots .reel::after{ background:linear-gradient(transparent,#071418); }
+.ov-slots .result{ font-size:52px; color:var(--c5); -webkit-text-fill-color:var(--c5); }
+
+/* ---------- hype ---------- */
+.ov-hype .banner{ min-width:760px; transform:translateY(-40px); }
+.ov-hype .inner{ padding:84px 64px 40px; gap:12px; }
+.ov-hype .emoji{ font-size:52px; filter:drop-shadow(0 0 12px color-mix(in srgb,var(--accent) 50%,transparent)); }
+.ov-hype .kind{ display:flex; align-items:center; gap:12px; }
+.ov-hype .kind::before{ content:"INCOMING //"; opacity:.65; }
+.ov-hype .headline{ font-size:80px; line-height:1; }
+.ov-hype .sub{ font-family:'JetBrains Mono',monospace; font-size:24px; letter-spacing:1px; color:var(--ink-soft); }
