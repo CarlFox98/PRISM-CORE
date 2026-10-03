@@ -46,3 +46,12 @@ html[data-align="right"] .pc-inner{ box-shadow:-5px 5px 0 var(--pc-shadow) }
   to  { opacity:1; transform:none }
 }
 @media (prefers-reduced-motion: reduce){ .pc-item{ animation:none } }
+
+/* Phase 5 event cards: a pastel sticker per kind */
+.pc-event .pc-inner{ border-color:var(--pc-ev, #FFD9A0); background:rgba(40,24,72,0.96) }
+.pc-ev-sub, .pc-ev-resub{ --pc-ev:#9FF3D6 }
+.pc-ev-gift, .pc-ev-giftbomb{ --pc-ev:#FFB5CF }
+.pc-ev-raid{ --pc-ev:#FFD9A0 }
+.pc-ev-cheer{ --pc-ev:#C8B6FF }
+.pc-event-line{ display:inline-block; padding:2px 14px; border-radius:999px; background:var(--pc-ev, #FFD9A0);
+  color:#1A1030; font-family:'Sora', sans-serif; font-weight:800; font-size:24px; margin:4px 0 6px }

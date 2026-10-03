@@ -142,3 +142,17 @@ html[data-align="right"] .pc-reply{ text-align:right }
 @media (prefers-reduced-motion: reduce){
   .pc-item, .pc-item.pc-leaving{ transition:none }
 }
+
+/* ---------- Phase 5: sub / resub / gift / raid / cheer cards ----------
+   Readable with no theme: an accent edge and a bold line. Themes restyle
+   .pc-event / .pc-event-line / .pc-ev-<type>. */
+.pc-event .pc-inner{ border-left-color:var(--pc-accent); }
+.pc-event-line{
+  font-size:var(--pc-name-size);
+  font-weight:700;
+  line-height:1.3;
+  color:var(--pc-accent);
+  margin:2px 0 4px;
+}
+.pc-event-icon{ display:inline-block; min-width:1em; }
+.pc-body-empty{ display:none; }

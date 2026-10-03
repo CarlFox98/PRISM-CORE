@@ -53,3 +53,12 @@ html[data-align="right"] .pc-item{ animation-name:pc-sg-in-r }
   to  { opacity:1; transform:none }
 }
 @media (prefers-reduced-motion: reduce){ .pc-item{ animation:none } }
+
+/* Phase 5 event cards: a HUD readout line per kind */
+.pc-event .pc-inner{ border-left-color:var(--pc-ev, #FFC857) }
+.pc-ev-sub, .pc-ev-resub{ --pc-ev:#5CF2E3 }
+.pc-ev-gift, .pc-ev-giftbomb{ --pc-ev:#FF5FA2 }
+.pc-ev-raid{ --pc-ev:#FFC857 }
+.pc-ev-cheer{ --pc-ev:#FF5FA2 }
+.pc-event-line{ font-family:'JetBrains Mono', monospace; font-size:22px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--pc-ev, #FFC857) }

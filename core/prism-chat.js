@@ -90,6 +90,12 @@
     if (f.vip) item.classList.add("pc-vip");
     if (f.broadcaster) item.classList.add("pc-broadcaster");
     if (m.bits > 0) item.classList.add("pc-cheer");
+    // Phase 5: subs, resubs, gifts, raids and cheers carry an `event` and get
+    // a card line above the (optional) message. Type is whitelisted before it
+    // becomes a class name — it's server-built, but the class list is ours.
+    var ev = m.event;
+    var EV_TYPES = { sub: 1, resub: 1, gift: 1, giftbomb: 1, raid: 1, cheer: 1, announcement: 1 };
+    if (ev && EV_TYPES[ev.type]) item.classList.add("pc-event", "pc-ev-" + ev.type);
 
     var inner = el("div", "pc-inner");
 
@@ -111,6 +117,16 @@
       var rp = el("div", "pc-reply");
       rp.textContent = "\u21B3 " + (m.reply_to.name || "") + ": " + (m.reply_to.text || "");
       inner.appendChild(rp);
+    }
+
+    if (ev && EV_TYPES[ev.type] && ev.type !== "announcement") {
+      var line = el("div", "pc-event-line");
+      var icon = el("span", "pc-event-icon");
+      icon.textContent = { sub: "\u2605", resub: "\u2605", gift: "\u2766", giftbomb: "\u2766",
+                           raid: "\u27A4", cheer: "\u25C6" }[ev.type] || "";
+      line.appendChild(icon);
+      line.appendChild(document.createTextNode(" " + (ev.label || "")));
+      inner.appendChild(line);
     }
 
     var body = el("div", "pc-body");
@@ -137,6 +153,7 @@
       }
     });
     if (mentionsMe) item.classList.add("pc-mention");
+    if (!body.childNodes.length) body.classList.add("pc-body-empty");   // a bare sub card
     inner.appendChild(body);
 
     item.appendChild(inner);
@@ -214,7 +231,7 @@
     if (!m || m.v !== CONTRACT) {
       return warnOnce("contract v" + (m && m.v) + " (this overlay renders v" + CONTRACT + ")");
     }
-    if (m.kind === "msg") return add(m);
+    if (m.kind === "msg" || m.kind === "event") return add(m);
     if (m.kind === "clearmsg") {
       // Exactly one message. No login fallback: CLEARMSG without a target id
       // is not licence to wipe a chatter's whole visible history.

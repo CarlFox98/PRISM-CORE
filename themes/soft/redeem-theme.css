@@ -104,3 +104,25 @@ html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
 .ov-hype .kind{ letter-spacing:0.5px; }
 .ov-hype .headline{ font-size:80px; line-height:1; }
 .ov-hype .sub{ font-size:28px; font-weight:700; color:var(--ink-soft); letter-spacing:0; }
+
+/* ---------- featured viewers (Starting Soon) ---------- */
+.ov-featured .feat-title{ padding:8px 22px; border-radius:999px; background:var(--c4); color:var(--ink);
+  font-family:'Sora',sans-serif; font-size:24px; font-weight:800; letter-spacing:0.5px; text-transform:lowercase;
+  text-shadow:none; box-shadow:4px 4px 0 rgba(26,16,48,0.25); transform:rotate(2deg); }
+.ov-featured .fv{ width:210px; border:0; border-radius:28px; background:var(--cream);
+  -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:10px 10px 0 var(--shadow); }
+.ov-featured .fv:nth-child(odd){ transform:rotate(-2deg); }
+.ov-featured .fv:nth-child(even){ transform:rotate(2deg); }
+.ov-featured .fv img, .ov-featured .fv .fv-letter{ box-shadow:0 0 0 6px var(--cream), 0 0 0 12px #C8B6FF;
+  background:var(--night); color:var(--cream); font-family:'Sora',sans-serif; }
+.ov-featured .fv-name{ font-family:'Sora',sans-serif; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
+.ov-featured .fv.new{ animation:fvIn .6s cubic-bezier(.34,1.56,.64,1) backwards; }
+
+/* ---------- active-effect chips ---------- */
+.ov-status .chip{ border:0; border-radius:999px; background:var(--cream); color:var(--ink);
+  font-family:'Nunito',sans-serif; font-weight:800; box-shadow:6px 6px 0 var(--shadow); }
+.ov-status .chip:nth-child(odd){ transform:rotate(-1.5deg); }
+.ov-status .chip:nth-child(even){ transform:rotate(1.5deg); }
+.ov-status .chip .t{ padding:2px 12px; border-radius:999px; background:var(--c1); color:var(--ink);
+  font-family:'Sora',sans-serif; }
+.ov-status .chip.ending .t{ background:var(--c4); color:var(--ink); }

@@ -50,7 +50,12 @@
     { u: 'grumbot',     b: 0, m: 'chat is readable on my phone now' },
     { u: 'lumen',       b: 0, m: 'hi hi, just got here — what did I miss?', flags: ['pc-first'] },
     { u: 'Aria.exe',    b: 1, m: 'gg on that last run!!', mention: '@NeoTheFox98' },
-    { u: 'deltaWolf',   b: 1, m: 'x100 for the fox', flags: ['pc-cheer'] },
+    { u: 'deltaWolf',   b: 1, m: 'x100 for the fox', flags: ['pc-cheer', 'pc-event', 'pc-ev-cheer'],
+      event: '\u25C6 cheered 100 bits!' },
+    { u: 'moth_mage',   b: 1, m: 'six months already?!', flags: ['pc-event', 'pc-ev-resub'],
+      event: '\u2605 resubscribed — 6 months!' },
+    { u: 'StarRaider',  b: 0, m: '', flags: ['pc-event', 'pc-ev-raid'],
+      event: '\u27A4 is raiding with 24 viewers!' },
     { u: 'K3RN3L',      b: 2, m: 'the shoutout card slaps', flags: ['pc-vip'] },
     { u: 'NeoTheFox98', b: 2, m: 'thank you!! 💜', flags: ['pc-broadcaster'] },
     { u: 'soft_static', b: 1, m: 'followed! love the vibes in here',
@@ -89,6 +94,12 @@
     meta.appendChild(name);
     inner.appendChild(meta);
 
+    if (d.event) {
+      var ev = el('div', 'pc-event-line');
+      ev.textContent = d.event;
+      inner.appendChild(ev);
+    }
+
     if (d.reply) {
       var rp = el('div', 'pc-reply');
       rp.textContent = '↳ ' + d.reply.name + ': ' + d.reply.text;
@@ -104,7 +115,7 @@
     } else {
       body.appendChild(document.createTextNode(d.m));
     }
-    inner.appendChild(body);
+    if (d.m || d.mention) inner.appendChild(body);
 
     item.appendChild(inner);
     n++;

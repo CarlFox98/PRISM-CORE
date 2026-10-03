@@ -3,6 +3,39 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.4.0] — 2026-10-02
+
+Pairs with Stream Manager 0.13.0 (the wheel redesign).
+
+### Added
+- **Featured Viewers widget** (Stream Manager `static/interactive/featured.html`):
+  the Lucky Wheel's Featured Viewer outcome shows the last three winners'
+  Twitch avatars on Starting Soon. It replaces three hand-placed image sources
+  whose files went missing. Themed per set via `redeem-theme.css`
+  (`.ov-featured`): sticker cards in Soft Holo, notched readouts in Signal.
+- **Active-effect chips** (`status.html`, `.ov-status`): "Silly voice 4:12",
+  "Upside-down 0:41"… so chat can see what a spin turned on and for how long.
+- **Chat event cards (phase 5):** subs, resubs, gifts, gift bombs, raids and
+  cheers render inline as highlighted cards. `prism-chat.js` handles
+  `kind:"event"` and a `msg` carrying an `event`; the type is whitelisted
+  before it becomes a class name. Styled in all three chat skins
+  (`.pc-event`, `.pc-event-line`, `.pc-ev-<type>`), and readable with no
+  theme loaded (base layer). The chat preview cycles a cheer, a resub and a
+  raid so every set shows them.
+- **7TV / BetterTTV / FrankerFaceZ emotes (phase 6)** arrive as ordinary
+  `emote` fragments with a `provider` field — no overlay change was needed.
+
+### Fixed
+- **The chat harness's fake server truncated non-ASCII JSON.** It set
+  `Content-Length` from the string length, not the byte length, so any payload
+  with an em dash was cut short and the overlay silently rendered nothing. Any
+  test sending such a payload would have failed for the wrong reason.
+
+### Tests
+- `scripts/test-chat-overlay.mjs` section 11: event cards render with their
+  type class and line, keep the attached message, hide an empty body, a cheer
+  stays a message, and an unknown type never becomes a class (40 checks, was 33).
+
 ## [2.3.0] — 2026-10-01
 
 ### Added

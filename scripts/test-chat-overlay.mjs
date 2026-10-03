@@ -45,7 +45,9 @@ const lastId = () => (S.buf.length ? S.buf[S.buf.length - 1].id : S.seq);
 const srv = http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   const json = (o) => { const b = JSON.stringify(o);
-    res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': b.length }); res.end(b); };
+    // byteLength, not .length: a non-ASCII payload (an em dash in a sub card)
+    // got its JSON truncated and the overlay silently rendered nothing.
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(b) }); res.end(b); };
   if (u.pathname === '/api/chat/backfill') {
     const n = Math.max(0, Math.min(100, parseInt(u.searchParams.get('n') || '25', 10) || 0));
     let evs = [], seen = 0;
@@ -257,6 +259,31 @@ emit(msg('x2', 'waves', { action: true, fragments: [{ type: 'text', text: 'waves
   ok(px === 30, 'body still 30px with the theme 404ing (got ' + px + ')');
   const w = await page.$eval('[data-id="x1"] .pc-name', n => n.getBoundingClientRect().width);
   ok(w > 60, 'short usernames not ellipsised (' + Math.round(w) + 'px)');
+  await page.close();
+}
+
+// ── 11. Phase 5 event cards ──────────────────────────────────────────────
+console.log('\n11. event cards (sub / raid / cheer)');
+restart();
+const evt = (id, type, label, text = '', extra = {}) => ({
+  ...msg(id, text, { fragments: text ? [{ type: 'text', text }] : [] }), kind: 'event',
+  event: { type, label, system: '' }, ...extra });
+emit(evt('e1', 'resub', 'resubscribed — 6 months!', 'love this place'));
+emit(evt('e2', 'raid', 'is raiding with 24 viewers!'));
+emit(msg('e3', 'x100 for the fox', { bits: 100, event: { type: 'cheer', label: 'cheered 100 bits!' } }));
+emit(evt('e4', 'pwn" onerror="x', 'should not become a class'));
+{
+  const { page } = await open('?max=10');
+  ok(await count(page, 4), 'all four render (non-ASCII labels included)');
+  ok(await page.$eval('[data-id="e1"]', n => n.classList.contains('pc-event') && n.classList.contains('pc-ev-resub')),
+     'a resub renders as a card with its type class');
+  ok(await page.$eval('[data-id="e1"] .pc-event-line', n => n.textContent.includes('6 months')), 'the card line says what happened');
+  ok(await page.$eval('[data-id="e1"] .pc-body', n => n.textContent === 'love this place'), 'the attached message still shows');
+  ok(await page.$eval('[data-id="e2"] .pc-body', n => getComputedStyle(n).display === 'none'), 'a bare raid card hides its empty body');
+  ok(await page.$eval('[data-id="e3"]', n => n.classList.contains('pc-ev-cheer') && n.classList.contains('pc-cheer')),
+     'a cheer stays a message and gains a card line');
+  ok(await page.$eval('[data-id="e4"]', n => !n.classList.contains('pc-event') && n.querySelector('.pc-event-line') === null),
+     'an unknown event type never becomes a class name');
   await page.close();
 }
 
