@@ -119,17 +119,20 @@ html,body{ font-family:'Chakra Petch','Segoe UI',sans-serif; }
 .ov-hype .headline{ font-size:80px; line-height:1; }
 .ov-hype .sub{ font-family:'JetBrains Mono',monospace; font-size:24px; letter-spacing:1px; color:var(--ink-soft); }
 
-/* ---------- featured viewers (Starting Soon) ---------- */
-.ov-featured .feat-title{ font-family:'JetBrains Mono',monospace; font-size:22px; letter-spacing:4px; color:var(--c1); text-shadow:none; }
+/* ---------- featured viewers (Starting Soon) ----------
+   Under the right-hand column (Channels / Followers end at y=838), above the
+   bottom bar (y=977). Right edge lines up with the column. */
+.ov-featured{ --feat-top:858px; --feat-right:140px; --feat-dir:row; --feat-gap:8px;
+  --feat-avatar:46px; --feat-name-max:104px; }
+.ov-featured .feat-title{ font-family:'JetBrains Mono',monospace; font-size:16px; letter-spacing:4px; color:var(--c1); text-shadow:none; }
 .ov-featured .feat-title::before{ content:"// "; opacity:.6; }
-.ov-featured .fv{ border:1px solid rgba(92,242,227,0.45); border-radius:0; background:var(--sg-panel);
+.ov-featured .fv{ padding:5px 14px 5px 5px; border:1px solid rgba(92,242,227,0.45); border-radius:0; background:var(--sg-panel);
   -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none;
-  clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
-  filter:drop-shadow(0 14px 30px rgba(0,0,0,0.6)); }
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px); }
 .ov-featured .fv img, .ov-featured .fv .fv-letter{ border-radius:0; box-shadow:none; background:#071418; color:var(--c1);
-  clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
   font-family:'Chakra Petch',sans-serif; }
-.ov-featured .fv-name{ font-family:'JetBrains Mono',monospace; font-size:22px; color:var(--ink); }
+.ov-featured .fv-name{ font-family:'JetBrains Mono',monospace; font-size:17px; color:var(--ink); }
 .ov-featured .fv.new{ border-color:var(--c4); }
 
 /* ---------- active-effect chips ---------- */

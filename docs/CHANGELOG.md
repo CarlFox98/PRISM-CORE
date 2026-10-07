@@ -3,6 +3,18 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.4.1] — 2026-10-04
+
+Pairs with Stream Manager 0.13.1.
+
+### Fixed
+- **Featured Viewers covered the Starting Soon layout** (it sat bottom-right on
+  top of the Followers goal in every set). The widget is now compact avatar
+  chips, and each set's `redeem-theme.css` places it in its own free space via
+  `--feat-top/-right/-left/-dir/-gap/-avatar/-name-max`:
+  Signal under the Channels/Followers column, Soft under the countdown, Holo
+  (built-in defaults) in a column right of the timer.
+
 ## [2.4.0] — 2026-10-02
 
 Pairs with Stream Manager 0.13.0 (the wheel redesign).
