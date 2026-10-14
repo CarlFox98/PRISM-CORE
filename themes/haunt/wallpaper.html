@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Wallpaper</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+.stage{ --moon-x:1440; --moon-y:560; --moon-size:620; --fox-x:1400; --fox-y:850; }
+.mark{ left:0; right:0; top:120px; text-align:center; font-family:var(--display); font-size:150px; font-weight:900; letter-spacing:6px; z-index:3;
+  color:rgba(241,233,212,.10); text-shadow:0 0 60px rgba(109,255,196,.12); }
+/* falling leaves and embers, whatever the calendar says — it's always October here */
+#season{ inset:0; z-index:8; pointer-events:none; overflow:hidden; }
+#season .p{ position:absolute; top:-30px; opacity:var(--o); animation:fall linear infinite;
+  background:#B4561F; border-radius:0 70% 0 70%; box-shadow:inset -2px -2px 0 rgba(0,0,0,.25); }
+#season .p:nth-child(3n){ background:#7A2E1A; }
+#season .p:nth-child(4n){ background:var(--ember); border-radius:50%; box-shadow:0 0 10px 3px rgba(255,160,60,.7); width:5px !important; height:5px !important; }
+@keyframes fall{ to{ transform:translate(var(--drift),1140px) rotate(400deg); } }
+.js-surge.surge{ filter:brightness(1.6) saturate(1.3); transition:filter .4s; }
+#wp-wins{ left:150px; bottom:90px; display:flex; flex-direction:column-reverse; gap:14px; align-items:flex-start; }
+#wp-wins .w{ padding:12px 26px; border-radius:8px; background:rgba(9,7,28,.85); border:1.5px solid rgba(109,255,196,.55); color:var(--bone); font-size:24px;
+  box-shadow:0 0 22px rgba(109,255,196,.25); opacity:0; transform:translateY(16px); filter:blur(6px); transition:all .7s cubic-bezier(.2,.8,.2,1); }
+#wp-wins .w.on{ opacity:1; transform:none; filter:blur(0); }
+#wp-quote{ left:150px; top:420px; width:700px; opacity:0; transition:opacity 1.2s; }
+#wp-quote.on{ opacity:1; }
+#wp-quote .q{ display:block; font-family:var(--serif); font-size:34px; font-weight:700; line-height:1.35; color:var(--bone); }
+#wp-quote .by{ display:block; margin-top:12px; font-size:24px; color:var(--dim); }
+#fx{ inset:0; pointer-events:none; z-index:12; }
+.ripple{ position:absolute; left:50%; top:50%; width:40px; height:40px; margin:-20px 0 0 -20px; border:3px solid; border-radius:50%;
+  box-shadow:0 0 30px currentColor, inset 0 0 30px currentColor; animation:ripple 2.2s ease-out forwards; }
+@keyframes ripple{ to{ transform:scale(26); opacity:0; } }
+.spark{ position:absolute; left:50%; top:50%; width:14px; height:14px; border-radius:50%; background:currentColor; box-shadow:0 0 16px 4px currentColor; animation:spark 1.6s ease-out forwards; }
+@keyframes spark{ to{ transform:translate(var(--dx),var(--dy)) scale(.3); opacity:0; } }
+.tint{ inset:0; z-index:9; pointer-events:none; transition:background 3s; }
+body[data-tod="dawn"] .tint{ background:rgba(255,160,90,0.06); }
+body[data-tod="day"] .tint{ background:rgba(120,110,200,0.05); }
+body[data-tod="night"] .tint{ background:rgba(2,1,10,0.22); }
+</style>
+</head>
+<body>
+<div class="stage" data-haunt="moon tree fox pines eyes wisps bats lightning web graves" data-seed="99">
+  <div class="tint"></div>
+  <div id="season"></div>
+  <div class="mark js-name">NeoTheFox98</div>
+  <div id="wp-wins"></div>
+  <div id="wp-quote" class="card"></div>
+  <div id="fx"></div>
+</div>
+<script>window.PRISM_WALLPAPER = { tint:{ wheel:'#6DFFC4', coinflip:'#FFC062', slots:'#FF8A2A', hype:'#C8102E' }, fallbackTint:'#8E7CFF', seasonCount:26 };</script>
+<script src="haunt-scene.js"></script>
+<script>/* the moon flares on every redeem */ document.querySelectorAll('.h-moon,.h-halo').forEach(function(e){ e.classList.add('js-surge'); });</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-wallpaper.js"></script>
+</body>
+</html>

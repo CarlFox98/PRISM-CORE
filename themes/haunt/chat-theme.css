@@ -1,0 +1,68 @@
+/* ============================================================
+   PRISM 2.5 — HAUNT chat skin
+   Colour, shape and entry motion only. Fonts come from the chat page
+   (it loads /overlays/PRISM/fonts/prism-fonts.css) — never @import
+   here: this file is re-read every 60s.
+   Messages are dark obsidian slabs with a foxfire edge; names sit on
+   bone plates (a Twitch colour behind text is unreadable half the time,
+   so the user's colour lives on the edge and the glow instead).
+   ============================================================ */
+:root{
+  --pc-ink:#F1E9D4;
+  --pc-dim:#A9A1CF;
+  --pc-panel:rgba(9,7,28,0.90);
+  --pc-accent:#6DFFC4;
+  --pc-hot:#FF8A2A;
+  --pc-blood:#C8102E;
+  --pc-shadow:rgba(2,1,10,0.7);
+}
+html, body{ font-family:'Nunito', 'Segoe UI', sans-serif; font-weight:700 }
+
+.pc-inner{
+  border:1px solid rgba(241,233,212,.16);
+  border-left:4px solid var(--user-color, var(--pc-accent));
+  border-radius:6px 14px 14px 6px;
+  box-shadow:0 0 18px -4px var(--user-color, var(--pc-accent)), 0 10px 22px var(--pc-shadow);
+  padding:10px 18px 12px;
+}
+html[data-align="right"] .pc-inner{ border-left:1px solid rgba(241,233,212,.16); border-right:4px solid var(--user-color, var(--pc-accent)); border-radius:14px 6px 6px 14px }
+html[data-align="right"] .pc-event .pc-inner{ border-right-color:var(--pc-ev, #FF8A2A) }
+
+.pc-name{
+  display:inline-block;
+  font-family:'Cinzel', Georgia, serif;
+  font-weight:900;
+  letter-spacing:1px;
+  padding:1px 14px;
+  border-radius:4px;
+  background:linear-gradient(180deg,#FFF7E2,#E3D9BD);
+  color:#120E2E;
+  box-shadow:0 0 12px -2px var(--user-color, var(--pc-accent));
+}
+.pc-badge{ border-radius:3px }
+.pc-reply{ color:var(--pc-dim); font-style:italic }
+
+.pc-newest .pc-inner{ background:rgba(20,16,52,0.95) }
+.pc-mention .pc-inner{ border-color:var(--pc-hot); box-shadow:0 0 0 1px var(--pc-hot), 0 0 26px -2px rgba(255,138,42,.7), 0 10px 22px var(--pc-shadow) }
+.pc-first .pc-name{ background:linear-gradient(180deg,#A6FFE0,#6DFFC4) }
+.pc-cheer .pc-body{ color:#FFC062 }
+
+/* messages drift up out of the fog */
+.pc-item{ animation:pc-hn-rise .7s cubic-bezier(.2,.8,.2,1) backwards }
+@keyframes pc-hn-rise{
+  from{ opacity:0; transform:translateY(16px); filter:blur(8px) }
+  to  { opacity:1; transform:none; filter:none }
+}
+@media (prefers-reduced-motion: reduce){ .pc-item{ animation:none } }
+
+/* Phase 5 event cards */
+.pc-event .pc-inner{ border-left-color:var(--pc-ev, #FF8A2A); background:linear-gradient(90deg, rgba(40,20,60,.96), rgba(12,9,32,.96));
+  box-shadow:0 0 26px -4px var(--pc-ev, #FF8A2A), 0 10px 22px var(--pc-shadow) }
+.pc-ev-sub, .pc-ev-resub{ --pc-ev:#6DFFC4 }
+.pc-ev-gift, .pc-ev-giftbomb{ --pc-ev:#B98CFF }
+.pc-ev-raid{ --pc-ev:#C8102E }
+.pc-ev-cheer{ --pc-ev:#FFC062 }
+.pc-event-line{ display:inline-block; padding:3px 16px; background:var(--pc-ev, #FF8A2A); color:#0B0820;
+  font-family:'Cinzel', Georgia, serif; font-weight:900; letter-spacing:2px; text-transform:uppercase; font-size:24px; margin:4px 0 6px;
+  clip-path:polygon(0 0,100% 0,calc(100% - 10px) 50%,100% 100%,0 100%,10px 50%); padding-left:22px; padding-right:22px }
+.pc-ev-raid .pc-event-line{ color:#FFF1EC }

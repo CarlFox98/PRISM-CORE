@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" data-anchor="bottom" data-align="left">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Chat Preview</title>
+<link rel="stylesheet" href="../../fonts/prism-fonts.css">
+<link rel="stylesheet" href="haunt.css">
+<!-- Previews the REAL chat overlay: prism-chat-base.css for structure plus
+     this set's chat-theme.css for the skin, drawn with the same .pc-* DOM
+     core/prism-chat.js builds. What this page shows is what ships. -->
+<link rel="stylesheet" href="../../core/prism-chat-base.css">
+<link rel="stylesheet" href="chat-theme.css">
+<style>
+/* Preview stage only — none of this ships with the overlay.
+   prism-chat-base.css makes html/body transparent and full-height for OBS,
+   so the stage backdrop has to be put back here, after it. */
+html,body{ background:#07061A !important; height:100%; overflow:hidden; }
+.stage{ --moon-x:520; --moon-y:640; --moon-size:460; --fox-x:500; --fox-y:880; }
+.shell{ position:absolute; right:60px; top:60px; bottom:60px; width:520px; z-index:12; }
+#pc-feed{ height:100%; }
+.cap{ position:absolute; left:60px; top:60px; width:820px; display:flex; flex-direction:column; gap:14px; align-items:flex-start; z-index:12; }
+</style>
+</head>
+<body>
+<div class="stage" data-haunt="moon fox pines eyes wisps bats" data-seed="5">
+  <div class="cap">
+    <div class="tag">chat preview · haunt</div>
+    <div class="lede">The live overlay is <b>chat/prism-chat.html</b>, deployed with
+      <b>scripts/deploy-chat.py</b> and added to OBS as
+      <b>http://localhost:5000/static/chat/chat.html</b>. It restyles itself from
+      this set's <b>chat-theme.css</b> within 60s of a set switch.</div>
+  </div>
+  <div class="shell"><div id="pc-feed" role="log" aria-label="Chat preview"></div></div>
+</div>
+<script>window.PRISM_CHATDEMO = { colors:['#6DFFC4','#3FD9E8','#C3BCDF','#FF8A2A','#FFC062','#B98CFF'] };</script>
+<script src="haunt-scene.js"></script>
+<script src="../../core/prism-chat-demo.js"></script>
+</body>
+</html>

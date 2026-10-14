@@ -14,16 +14,17 @@ folder — the same source-vs-deployed split used for github-pages.
 
 Re-runnable and destructive only inside the target set folder.
 
-PRISM ships three sets, each its own folder next to modern/ and retro/:
+PRISM ships four sets, each its own folder next to modern/ and retro/:
 
     prism-holo     the 1.x holo-glass scenes      (source: scenes/)
     prism-signal   2.0 Signal — sci-fi HUD        (source: themes/signal/)
     prism-soft     2.0 Soft Holo — pastel/sticker (source: themes/soft/)
+    prism-haunt    2.5 Haunt — Halloween, foxfire (source: themes/haunt/)
 
 Each name must also be listed in stream-manager's config.json "scene_sets"
 for the dashboard to offer it (restart Stream Manager after editing that).
 
-    python scripts/build-obs-set.py                    # builds all three
+    python scripts/build-obs-set.py                    # builds all four
     python scripts/build-obs-set.py --set prism-signal # just one
     python scripts/build-obs-set.py --dry-run
 """
@@ -120,6 +121,7 @@ SETS = {
     "prism-holo":   None,        # built from SCENES/ASSETS above
     "prism-signal": "signal",
     "prism-soft":   "soft",
+    "prism-haunt":  "haunt",     # seasonal (Halloween); switch to it by hand
 }
 
 

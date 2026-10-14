@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — In-game Layout</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+/* In-game frame layer. Put it ABOVE your game capture in OBS; the middle is
+   transparent. The webcam goes behind the cam window (560x315 at 40,721),
+   and the now-playing + shoutout browser sources sit in the marked slots.
+   Add ?demo to the URL to see the slots filled with placeholders. */
+html,body{ background:transparent; }
+.stage{ background:transparent; }
+/* a thin mist creeping in at the bottom edge only — never over the game */
+.mist{ left:-200px; right:-200px; bottom:-60px; height:180px; z-index:1; pointer-events:none;
+  background:radial-gradient(40% 70% at 30% 100%, rgba(195,188,223,.16), transparent 70%), radial-gradient(35% 60% at 80% 100%, rgba(195,188,223,.12), transparent 70%);
+  animation:h-fog 80s ease-in-out infinite alternate; }
+.follow{ left:40px; top:36px; display:flex; align-items:center; gap:12px; padding:10px 22px; border-radius:8px;
+  background:rgba(9,7,28,.86); border:1.5px solid rgba(109,255,196,.5); box-shadow:0 0 18px rgba(109,255,196,.25); font-size:24px; font-weight:800; }
+.follow svg{ width:26px; height:26px; fill:var(--fire); filter:drop-shadow(0 0 6px var(--fire)); }
+.follow .k{ font-family:var(--serif); font-weight:900; font-size:22px; letter-spacing:2px; color:var(--mist); text-transform:uppercase; }
+.goal{ left:40px; top:108px; width:420px; padding:14px 20px; border-radius:8px; background:rgba(9,7,28,.86); border:1px solid rgba(241,233,212,.25); }
+.goal .top{ font-size:22px; } .goal .track{ height:18px; }
+.cam{ left:40px; bottom:44px; width:560px; height:315px; border-radius:14px; padding:5px; z-index:3;
+  background:conic-gradient(from 210deg, var(--fire), var(--fire2), #8E7CFF, var(--pumpkin), var(--fire));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;
+  filter:drop-shadow(0 0 10px rgba(109,255,196,.6)); }
+.camweb{ left:45px; bottom:264px; width:90px; height:90px; z-index:4; pointer-events:none; }
+.camweb svg{ width:100%; height:100%; }
+.name{ left:70px; bottom:22px; z-index:5; display:flex; align-items:center; gap:10px; padding:6px 22px; border-radius:8px;
+  background:linear-gradient(180deg,#2C2752,#17143A); border:1.5px solid rgba(241,233,212,.5); box-shadow:0 0 16px rgba(109,255,196,.35); }
+.name .plate{ font-size:24px; }
+.slot{ display:none; align-items:center; justify-content:center; font-family:var(--serif); font-size:22px; letter-spacing:4px; color:rgba(241,233,212,.5);
+  border:2px dashed rgba(109,255,196,.45); border-radius:14px; background:rgba(9,7,28,.5); }
+.slot.np{ right:40px; top:36px; width:520px; height:92px; border-radius:999px; }
+.slot.so{ right:40px; bottom:44px; width:900px; height:280px; }
+.game{ inset:0; display:none; align-items:center; justify-content:center; font-family:var(--serif); font-size:28px; letter-spacing:8px; color:rgba(255,255,255,0.16); }
+body.demo{ background:linear-gradient(160deg,#2b3140,#1b1f2a 55%,#12141b); }
+body.demo .slot, body.demo .game{ display:flex; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="game">GAME CAPTURE</div>
+  <div class="mist"></div>
+  <div class="follow js-latest-wrap" hidden><svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg><span class="k">new soul</span><span class="js-latest"></span></div>
+  <div class="goal"><div class="top"><span class="k">souls claimed</span><span><span class="js-goal-now">—</span> / <span class="js-goal-target">—</span></span></div><div class="track"><div class="fill js-goal-fill"></div></div></div>
+  <div class="cam"></div>
+  <div class="camweb"><svg viewBox="0 0 90 90" aria-hidden="true"><g fill="none" stroke="rgba(241,233,212,.45)" stroke-width="1.2"><path d="M0 0 L90 22 M0 0 L66 60 M0 0 L30 86 M0 0 L3 90"/><path d="M20 5 Q16 13 15 20 Q8 20 1 24"/><path d="M42 10 Q34 26 31 40 Q16 38 2 46"/><path d="M64 16 Q50 42 46 64 Q22 62 2 70"/></g></svg></div>
+  <div class="name"><span class="plate js-name">NeoTheFox98</span></div>
+  <div class="slot np">now playing · widget</div>
+  <div class="slot so">shoutout · widget</div>
+</div>
+<script>if(new URLSearchParams(location.search).has('demo')) document.body.classList.add('demo');</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body>
+</html>

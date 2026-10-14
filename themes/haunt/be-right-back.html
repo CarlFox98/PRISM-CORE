@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Be Right Back</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+/* The fox has left the ridge: only glowing paw prints lead off into the pines. */
+.stage{ --moon-x:1660; --moon-y:250; --moon-size:290; --fox-x:1480; --fox-y:880; }
+.who{ left:150px; top:230px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+.who .avatar{ width:380px; height:380px; }
+.main{ left:640px; top:200px; width:900px; display:flex; flex-direction:column; gap:26px; align-items:flex-start; }
+.main .title{ font-size:150px; }
+.latest{ margin-top:8px; display:flex; flex-direction:column; gap:6px; min-width:420px; }
+.latest .who-name{ font-family:var(--serif); font-size:52px; font-weight:900; color:var(--bone); text-shadow:0 0 22px rgba(109,255,196,.35); }
+.foot{ left:150px; right:150px; bottom:80px; display:flex; align-items:center; justify-content:space-between; }
+.chan{ font-family:var(--serif); font-weight:900; font-size:30px; letter-spacing:3px; color:var(--bone); text-shadow:0 0 18px rgba(109,255,196,.35); }
+.chan span{ color:var(--fire); }
+.prints{ z-index:7; left:0; top:0; width:1920px; height:1080px; pointer-events:none; }
+.prints svg{ position:absolute; width:34px; height:34px; fill:var(--fire); filter:drop-shadow(0 0 8px rgba(109,255,196,.9)); animation:h-print 7s ease-in-out infinite; }
+@keyframes h-print{ 0%,100%{ opacity:var(--o); } 50%{ opacity:calc(var(--o) * .45); } }
+</style>
+</head>
+<body>
+<div class="stage" data-haunt="crescent tree pines eyes wisps bats lightning graves" data-seed="7">
+  <div class="prints" aria-hidden="true"></div>
+  <div class="who rise">
+    <div class="avatar"><img class="js-avatar" alt="NeoTheFox98"></div>
+    <div class="plate js-name">NeoTheFox98</div>
+    <div class="credit">art · Yushy_Norev</div>
+  </div>
+  <div class="main">
+    <div class="tag fire rise d1">the fox wandered into the woods</div>
+    <div class="title flicker rise d2">Be Right<br>Back</div>
+    <div class="lede rise d3 js-game-wrap" hidden>Still haunting <b class="js-game"></b></div>
+    <div class="card latest rise d4 js-latest-wrap" hidden><span class="label">newest soul in the pack</span><div class="who-name js-latest"></div></div>
+  </div>
+  <div class="foot rise d5"><div class="socials" data-prism-socials></div><div class="chan">twitch.tv/<span class="js-name">NeoTheFox98</span></div></div>
+</div>
+<script>
+/* paw prints from the empty ridge, fading as they go into the trees */
+(function(){
+  var host = document.querySelector('.prints'), P = '<ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/>';
+  var pts = [[1462,870,.95],[1424,880,.82],[1386,890,.68],[1348,900,.54],[1310,912,.4],[1272,924,.26]];
+  pts.forEach(function(p, i){
+    var s = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 64 64'); s.innerHTML = P;
+    s.style.cssText = 'left:' + p[0] + 'px;top:' + (p[1] + (i % 2 ? 7 : -7)) + 'px;transform:rotate(-104deg);--o:' + p[2] + ';animation-delay:' + (-i * .6) + 's';
+    host.appendChild(s);
+  });
+})();
+</script>
+<script src="haunt-scene.js"></script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body></html>

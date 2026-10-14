@@ -7,13 +7,14 @@ The overlay system for the Twitch channel
 layout, chat styling and widgets, all rendered at **1920×1080**, fed by live
 Twitch data, and ready to drop into OBS as Browser Sources.
 
-PRISM 2.0 ships **three switchable scene sets**. Pick one from the Stream
+PRISM 2.0 ships **four switchable scene sets**. Pick one from the Stream
 Manager dashboard (Overview → Overlay Scene Set):
 
 | Set | Look | Source |
 |-----|------|--------|
 | **PRISM Signal** (`prism-signal`) | Sci-fi HUD: grid, scanlines, notched panels, terminal readouts. Cyan + magenta. | `themes/signal/` |
 | **PRISM Soft Holo** (`prism-soft`) | Pastel iridescence, sticker cards, paw marks. Sora + Nunito. | `themes/soft/` |
+| **PRISM Haunt** (`prism-haunt`) | Halloween: a moonlit wood, a fox howling at the moon, foxfire, headstones, creepy redeem sounds. Cinzel + Nunito. Seasonal, so switch to it by hand. Add `?calm` to a scene URL to drop the jump-scare bits (eyes, bats, lightning), or `?still` to freeze it. | `themes/haunt/` |
 | **PRISM Holo** (`prism-holo`) | The 1.x holo-glass look, unchanged. | `scenes/` |
 
 ## Repository layout
@@ -21,7 +22,7 @@ Manager dashboard (Overview → Overlay Scene Set):
 ```
 core/      prism-config.js, prism-engine.js, shared scene modules, holo css
 chat/      the chat overlay page (renderer + base css live in core/)
-themes/    2.0 sets: signal/ and soft/ (scenes + theme css + chat skin)
+themes/    2.0 sets: signal/, soft/, haunt/ (scenes + theme css + chat skin)
 scenes/    the 1.x holo scenes             panels/   standalone Twitch info panels
 widgets/   now-playing + shoutout overlays data/     follower list, secrets example
 fonts/     vendored woff2 + aggregator     tools/    .bat/.sh launchers
@@ -58,7 +59,7 @@ For the dashboard to offer a set, its name must be in stream-manager's
 `config.json` → `"scene_sets"` (restart Stream Manager after editing it):
 
 ```json
-"scene_sets": ["prism-holo", "prism-signal", "prism-soft"]
+"scene_sets": ["prism-holo", "prism-signal", "prism-soft", "prism-haunt"]
 ```
 
 All three PRISM sets provide the same eight scene names: `starting-soon`,

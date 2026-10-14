@@ -1,0 +1,31 @@
+/* ============================================================
+   PRISM 2.5 — HAUNT · now-playing widget theme
+   Loaded by the now-playing widget from Stream Manager
+   (http://localhost:5000/overlays/active/). No fonts imported here —
+   the widget page carries its own. Re-read every 60s.
+   A spectral radio: obsidian pill, the album art as a glowing seal.
+   ============================================================ */
+:root{
+  --ink:#F1E9D4; --ink-soft:#B3ABD6;
+  --c1:#6DFFC4; --c2:#3FD9E8; --c3:#C3BCDF; --c4:#FF8A2A; --c5:#FFC062;
+}
+html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
+.wrap{ top:12px; left:12px; }
+.card{ width:500px; padding:0; border:1px solid rgba(109,255,196,.55); border-radius:999px;
+  background:linear-gradient(100deg, rgba(24,18,60,.95), rgba(9,7,28,.95));
+  -webkit-backdrop-filter:none; backdrop-filter:none; animation:rise .7s cubic-bezier(.2,.8,.2,1) both;
+  box-shadow:0 0 30px rgba(109,255,196,.22), 0 12px 26px rgba(2,1,10,.7); overflow:hidden; }
+.inner{ background:transparent; border-radius:999px; padding:10px 30px 10px 10px; gap:16px; }
+.inner::after{ display:none; }
+.spark{ display:none; }
+.art{ width:72px; height:72px; border-radius:50%; box-shadow:0 0 0 3px #F1E9D4, 0 0 22px 4px rgba(109,255,196,.55); }
+.title{ font-family:'Cinzel',serif; font-size:24px; font-weight:900; letter-spacing:.5px; text-shadow:0 0 12px rgba(109,255,196,.35); }
+.artist{ font-size:20px; font-weight:700; color:var(--ink-soft); }
+.bar{ height:6px; border-radius:999px; background:rgba(241,233,212,.12); }
+.fill{ border-radius:999px; background:linear-gradient(90deg,#3FD9E8,#6DFFC4,#FFC062); box-shadow:0 0 8px rgba(109,255,196,.8); }
+.times{ font-family:'Nunito',sans-serif; font-weight:700; font-size:16px; color:#8D86B5; }
+.eq span{ width:5px; border-radius:999px; background:#6DFFC4; box-shadow:0 0 6px #6DFFC4; }
+.connect{ border-radius:24px; }
+.connect .cta{ font-family:'Cinzel',serif; font-weight:900; font-size:22px; letter-spacing:1px; }
+.connect .hint{ font-size:18px; }
+.btn{ background:#6DFFC4; color:#03140E; font-size:18px; font-weight:800; }

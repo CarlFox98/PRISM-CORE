@@ -3,6 +3,82 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.5.0] — 2026-10-13
+
+Pairs with Stream Manager 0.13.2 (the Haunt sound kit, per-kind hype cues and
+the Risky wheel rim).
+
+### Added
+- **PRISM Haunt (`prism-haunt`), the Halloween set: "Foxfire Moonlight".**
+  A moonlit wood at midnight with all 9 scenes plus chat, shoutout,
+  now-playing and redeem skins, so it switches from the dashboard like the
+  other sets. It is seasonal, so switch to it by hand.
+  - `themes/haunt/haunt-scene.js` builds the shared scenery from a
+    `data-haunt` word list: moon, crescent or blood moon, a dead tree, a fox
+    howling on the ridge, two layers of pines, eyes that open and blink,
+    foxfire wisps, bats, soft lightning, graves and a cobweb. It is seeded,
+    so every load looks the same. `?still` or reduced-motion freezes it all.
+  - Scenes:
+    - **Starting Soon:** the fox howls in front of a rising moon, and the
+      countdown is carved in headstones ("it begins…" at 0:00).
+    - **BRB:** the fox has gone, and glowing paw prints lead into the trees.
+    - **Stream Ending:** "Until Next Full Moon", with the tally on headstones.
+    - **Tech Difficulties:** blood moon, "The Spirits Are Interfering", and
+      check tiles shaped as headstones. The all-clear reads "It Lives!".
+    - **Thank You:** "a new soul joins the pack".
+    - **Wallpaper:** falling leaves and embers; the moon flares on each redeem.
+    - **Webcam frame and Gameplay:** a foxfire frame with a cobweb.
+  - The PFP credit (`art · Yushy_Norev`) sits under the avatar.
+  - Redeems:
+    - Every card is an obsidian slab ringed in foxfire, and Risky uses
+      blood red.
+    - Velvet wheel segments with a foxfire ring and a glowing seal hub.
+    - A cursed gold coin.
+    - Headstone slot reels.
+    - Featured Viewers hang in the upper-right sky on Starting Soon.
+  - The theme sets `--fx-kit:haunt` so Stream Manager plays creepy sounds:
+    - a knock and a bone rattle while things spin
+    - a detuned minor-key music box on a win
+    - a chapel bell over an organ swell on a big win
+    - a sinking ghost moan on a loss
+    - thunder on Risky and hype
+  - Preview and comfort switches on any Haunt scene URL: `?still` freezes all
+    motion (Windows' "reduce motion" does the same), and `?calm` keeps the slow
+    drift but drops the eyes, bats and lightning.
+  - Hype sounds scale with the event: a soft chime for follows and first-time
+    chatters, the bell for subs and bits, and thunder only for raids and the
+    Risky wheel. The Risky wheel gets a blood-red rim (`--wheel-ring-risky`).
+  - The countdown's settings gear is invisible on stream and appears when you
+    hover it in OBS Interact. A countdown over 99 minutes still fits.
+- **Fonts:** Cinzel and Cinzel Decorative (700/900, OFL) are vendored in
+  `fonts/` and added to `fetch-fonts.py`, so a re-fetch keeps them.
+
+### Fixed (found in review before release)
+- With `?still` or reduce-motion, every scene's title stayed invisible: the
+  entrance held it at opacity 0 and a heavier title selector beat the reset.
+  Entrances now use fill-mode `backwards`, so an element ends on its own
+  styles, and frozen modes simply drop the animation.
+- The same `forwards` fill was wiping the glow off every ribbon tag after its
+  entrance. It is fixed by the same change.
+- The blood-moon tint also filled the dead tree's open branch strokes.
+  Silhouette colours are now `--h-far/-mid/-near` on `.stage`, read by
+  `haunt-scene.js`.
+- A `.card` placed directly on the stage (the wallpaper quote) fell back to
+  `position:relative`.
+- Bats can no longer pile up while an OBS source is hidden but not shut down.
+- Fit-to-width names (Stream Ending headstone, Thank You) re-fit once the
+  webfonts load.
+- Right-aligned chat kept a coloured left edge.
+- The grain layer no longer uses a full-screen blend mode, which is cheaper
+  in OBS.
+
+### Changed
+- `build-obs-set.py` builds `prism-haunt`.
+- `test-chat-preview.mjs` renders Haunt's chat preview too. Its "PRISM family
+  is applied" check now reads the vendored families from `fonts/prism-fonts.css`
+  instead of a hard-coded list, which had gone stale the moment Cinzel arrived. Add it to Stream Manager's
+  `config.json` → `scene_sets` to have the dashboard offer it.
+
 ## [2.4.1] — 2026-10-04
 
 Pairs with Stream Manager 0.13.1.

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Thank You</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+html,body{ background:transparent; }
+/* A new soul materialises: it fades up out of blur with a foxfire flare, then a wisp circles it. */
+.ty{ position:absolute; left:50%; top:50%; width:980px; margin-left:-490px; margin-top:-160px; opacity:0; filter:blur(16px);
+  transform:translateY(30px) scale(.94); transition:opacity .6s, filter .9s, transform .9s cubic-bezier(.2,.8,.2,1); }
+.ty.show{ opacity:1; filter:blur(0); transform:none; }
+.ty .card{ padding:36px 44px 40px 210px; border-radius:10px; border-color:rgba(109,255,196,.55);
+  background:linear-gradient(110deg, rgba(20,16,52,.96), rgba(9,7,28,.96));
+  box-shadow:0 0 0 6px rgba(9,7,28,.55), 0 0 70px rgba(109,255,196,.30), 0 30px 60px var(--shadow); }
+.ty .emb{ position:absolute; left:40px; top:50%; margin-top:-70px; width:140px; height:140px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 45% 40%, #F4FFF9 0%, var(--fire) 34%, rgba(63,217,232,.35) 60%, transparent 72%);
+  box-shadow:0 0 40px 10px rgba(109,255,196,.45); }
+.ty .emb svg{ width:62px; height:62px; fill:#06221A; }
+.ty.show .emb{ animation:h-flare 1.4s ease-out; }
+@keyframes h-flare{ 0%{ transform:scale(.3); box-shadow:0 0 0 0 rgba(109,255,196,0); } 40%{ transform:scale(1.25); box-shadow:0 0 120px 50px rgba(109,255,196,.8); } 100%{ transform:none; } }
+.ty .orbit{ position:absolute; left:110px; top:50%; width:0; height:0; }
+.ty .orbit i{ position:absolute; left:-9px; top:-9px; width:18px; height:18px; border-radius:50%; background:var(--ember);
+  box-shadow:0 0 16px 6px rgba(255,160,60,.6); animation:h-orbit 3.2s linear infinite; }
+@keyframes h-orbit{ from{ transform:rotate(0deg) translateX(98px) rotate(0deg); } to{ transform:rotate(360deg) translateX(98px) rotate(-360deg); } }
+.ty .k{ display:inline-block; }
+.ty .name{ font-family:var(--display); font-size:92px; font-weight:900; line-height:1.05; letter-spacing:1px; margin-top:12px; white-space:nowrap; max-width:700px;
+  background:linear-gradient(180deg,#FFF9E8,#CFC6E8); -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter:drop-shadow(0 0 20px rgba(109,255,196,.35)); }
+.ty .msg{ font-size:30px; color:var(--mist); margin-top:8px; }
+#bar{ position:fixed; left:50%; bottom:40px; transform:translateX(-50%); display:flex; align-items:center; gap:16px; padding:10px 18px 10px 10px;
+  border-radius:999px; background:rgba(9,7,28,.9); border:1px solid rgba(241,233,212,.35); color:var(--bone); font-size:18px; }
+#bar button{ cursor:pointer; padding:10px 20px; border-radius:999px; border:0; background:var(--fire); color:#03140E; font-weight:800; }
+#note{ position:fixed; left:50%; top:30px; transform:translateX(-50%); padding:8px 18px; border-radius:999px; background:var(--pumpkin); color:#1A0A02; font-size:18px; }
+.hidden{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="ty" id="card" role="status">
+  <div class="card">
+    <div class="emb"><svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg></div>
+    <div class="orbit"><i></i></div>
+    <span class="tag fire k">a new soul joins the pack</span>
+    <div class="name" id="name">Follower</div>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+<div id="note" class="hidden"></div>
+<div id="bar" class="hidden"><button id="pick">Thank a follower</button><span>or Space · ?hidebar hides this · ?auto picks on load</span></div>
+<script>window.PRISM_THANKYOU = { messages:[
+  "Welcome to the coven — the foxfires burn a little brighter now.",
+  "Thanks for the follow. You can never leave. 🦊",
+  "The pack grows stronger. Welcome, wanderer.",
+  "Bound to the woods forever — thank you for following!",
+  "Something wicked this way follows. Welcome in!"
+]};</script>
+<script>
+/* long names shrink to fit rather than wrap mid-word */
+(function(){
+  var el = document.getElementById('name');
+  function fit(){ var fs = 92; el.style.fontSize = fs + 'px'; while(el.scrollWidth > el.clientWidth && fs > 40){ fs -= 4; el.style.fontSize = fs + 'px'; } }
+  new MutationObserver(fit).observe(el, { childList:true, characterData:true, subtree:true });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-thankyou.js"></script>
+</body>
+</html>

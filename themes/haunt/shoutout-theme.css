@@ -1,0 +1,53 @@
+/* ============================================================
+   PRISM 2.5 — HAUNT · shoutout card theme
+   Loaded by the shoutout card from /overlays/active/ so it follows the
+   active set. Only restyles; the show/hide transitions stay the card's.
+   Fonts come from the card page (prism-fonts.css carries every PRISM
+   family) — never @import here: this file is re-read every 60s.
+   A summoning: an obsidian slab ringed in foxfire, the streamer's
+   portrait in a glowing seal, their name in Cinzel Decorative.
+   ============================================================ */
+:root{
+  --ink:#F1E9D4; --ink-soft:#B3ABD6;
+  --c1:#6DFFC4; --c2:#3FD9E8; --c3:#C3BCDF; --c4:#FF8A2A; --c5:#C8102E;
+  --night:#09071C; --shadow:rgba(2,1,10,0.75);
+}
+html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
+
+.so{ --hex:circle(50% at 50% 50%);
+  width:1120px; padding:0; border:1px solid rgba(109,255,196,.55); border-radius:12px; overflow:visible;
+  background:linear-gradient(115deg, rgba(24,18,60,.97), rgba(9,7,28,.97) 60%);
+  -webkit-backdrop-filter:none; backdrop-filter:none; animation:none;
+  box-shadow:0 0 0 6px rgba(9,7,28,.6), 0 0 60px rgba(109,255,196,.28), 0 30px 60px var(--shadow); }
+.so::before{ content:""; position:absolute; inset:8px; border:1px solid rgba(241,233,212,.14); border-radius:6px; pointer-events:none; }
+.so-inner{ background:transparent; border-radius:12px; padding:30px 34px; }
+
+.so-id{ width:390px; gap:8px; }
+.so-ava{ width:150px; height:150px; filter:drop-shadow(0 0 26px rgba(109,255,196,.55)); }
+.so-ava::before{ background:conic-gradient(from 210deg,#6DFFC4,#3FD9E8,#8E7CFF,#FF8A2A,#6DFFC4); animation:none; }
+.so.raid .so-ava{ filter:drop-shadow(0 0 30px rgba(200,16,46,.65)); }
+.so.raid .so-ava::before{ background:conic-gradient(from 210deg,#C8102E,#FF8A2A,#C8102E); }
+.so-ava img, .so-ava-letter{ inset:7px; width:calc(100% - 14px); height:calc(100% - 14px); background:#1C1846; }
+.so-ava-letter{ font-family:'Cinzel Decorative','Cinzel',serif; font-weight:900; color:var(--ink); }
+
+/* eyebrow -> a ribbon */
+.so-eyebrow{ padding:6px 26px; background:linear-gradient(180deg,#A6FFE0,var(--c1)); color:#03140E;
+  font-family:'Cinzel',serif; font-size:20px; font-weight:900; letter-spacing:3px; text-transform:uppercase; text-shadow:none;
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 50%,100% 100%,0 100%,12px 50%); }
+.so-eyebrow .dot{ display:none; }
+.so.live .so-eyebrow{ background:linear-gradient(180deg,#FFA149,var(--c4)); color:#1A0A02; text-shadow:none; }
+.so.raid .so-eyebrow{ background:linear-gradient(180deg,#F0334F,var(--c5)); color:#FFF1EC; text-shadow:none; }
+
+.so-name{ font-family:'Cinzel Decorative','Cinzel',serif; font-size:56px; font-weight:900; line-height:1.05; letter-spacing:0;
+  background:linear-gradient(180deg,#FFF9E8,#CFC6E8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+  filter:drop-shadow(0 0 16px rgba(109,255,196,.35)); animation:none; }
+.so-handle{ font-family:'Nunito',sans-serif; font-size:22px; font-weight:800; color:var(--c1); letter-spacing:0; }
+.so-cat{ font-size:24px; font-weight:700; letter-spacing:0; color:var(--ink-soft); }
+.so-cat b{ color:var(--ink); font-weight:800; }
+
+.so-clip{ border-radius:8px; background:#07061A; box-shadow:0 0 0 2px rgba(241,233,212,.5), 0 0 30px rgba(109,255,196,.25); }
+.so-clip .noclip{ font-family:'Cinzel',serif; font-size:22px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:#C3BCDF;
+  background:radial-gradient(500px 340px at 50% 45%, rgba(109,255,196,.14), transparent 70%), #07061A; }
+
+.so-rail{ left:34px; right:34px; bottom:12px; height:4px; border-radius:999px; background:rgba(241,233,212,.1); }
+.so-rail i{ border-radius:999px; background:linear-gradient(90deg,#3FD9E8,#6DFFC4,#FFC062,#FF8A2A); box-shadow:0 0 10px rgba(109,255,196,.8); }

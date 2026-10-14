@@ -16,13 +16,16 @@ import sys
 import urllib.request
 
 # Holo (1.x): Space Grotesk + JetBrains Mono.  Signal: Chakra Petch (+ JetBrains
-# Mono).  Soft Holo: Sora + Nunito.  One file serves every set; browsers only
+# Mono).  Soft Holo: Sora + Nunito.  Haunt: Cinzel +
+# Cinzel Decorative (+ Nunito).  One file serves every set; browsers only
 # download the faces a scene actually uses.
 CSS_URL = ("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700"
            "&family=JetBrains+Mono:wght@400;500;600;700"
            "&family=Chakra+Petch:wght@500;600;700"
            "&family=Sora:wght@400;600;800"
-           "&family=Nunito:wght@600;700;800&display=swap")
+           "&family=Nunito:wght@600;700;800"
+           "&family=Cinzel:wght@700;900"
+           "&family=Cinzel+Decorative:wght@700;900&display=swap")
 # a modern browser UA so Google returns woff2 (not ttf)
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0 Safari/537.36")

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Stream Ending</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+/* The moon is setting, the fox keeps watch, and the night's tally is carved in stone. */
+.stage{ --moon-x:1580; --moon-y:700; --moon-size:560; --fox-x:1540; --fox-y:872; }
+.main{ left:150px; top:130px; width:1250px; display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
+.main .title{ font-size:150px; }
+.lede.sign{ margin-top:4px; }
+.row{ left:150px; top:618px; display:flex; gap:40px; align-items:flex-end; }
+.row .stone{ width:320px; height:262px; padding:44px 26px 18px; gap:4px; }
+.row .stone .label{ color:#ACA3D2; }
+.row .stone .big{ font-family:var(--serif); font-size:88px; font-weight:900; line-height:1; }
+.row .stone.wide{ width:480px; }
+.row .stone.wide .big{ font-size:56px; line-height:1.15; white-space:nowrap; max-width:400px; }
+.row .stone .rip{ font-family:var(--serif); font-size:22px; letter-spacing:6px; color:#8F86BC; }
+.foot{ left:150px; right:150px; bottom:80px; display:flex; align-items:center; justify-content:space-between; }
+.chan{ font-family:var(--serif); font-weight:900; font-size:30px; letter-spacing:3px; color:var(--bone); text-shadow:0 0 18px rgba(109,255,196,.35); }
+</style>
+</head>
+<body>
+<div class="stage" data-haunt="moon tree fox pines eyes wisps bats web" data-seed="23">
+  <div class="main">
+    <div class="tag rise">the candles burn low</div>
+    <div class="title flicker rise d1">Until Next<br>Full Moon</div>
+    <div class="lede sign rise d2">Thanks for haunting with me tonight.</div>
+  </div>
+  <div class="row">
+    <div class="stone rise d3"><span class="label">souls claimed</span><div class="big engraved js-followcount">—</div><span class="rip">R · I · P</span></div>
+    <div class="stone wide rise d4 js-latest-wrap" hidden><span class="label">newest soul</span><div class="big engraved js-latest"></div><span class="rip">welcome to the pack</span></div>
+  </div>
+  <div class="foot rise d5"><div class="socials" data-prism-socials></div><div class="chan">sleep tight…</div></div>
+</div>
+<script>
+/* shrink the newest follower's name until it fits its headstone */
+(function(){
+  var el = document.querySelector('.stone.wide .js-latest'); if(!el) return;
+  function fit(){ var fs = 56; el.style.fontSize = fs + 'px'; while(el.scrollWidth > el.clientWidth && fs > 26){ fs -= 2; el.style.fontSize = fs + 'px'; } }
+  new MutationObserver(fit).observe(el, { childList:true, characterData:true, subtree:true });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+<script src="haunt-scene.js"></script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+</body></html>

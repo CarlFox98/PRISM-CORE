@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Starting Soon</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+.stage{ --moon-x:1590; --moon-y:630; --moon-size:500; --fox-x:1530; --fox-y:868; }
+.who{ left:140px; top:190px; display:flex; flex-direction:column; align-items:center; gap:18px; }
+.who .plate{ margin-top:10px; }
+.who .credit{ margin-top:-10px; }
+.main{ left:590px; top:205px; width:860px; display:flex; flex-direction:column; gap:24px; align-items:flex-start; }
+.clock{ display:flex; align-items:flex-end; gap:22px; margin-top:6px; }
+.clock .stone{ min-width:176px; height:170px; padding:22px 20px 0; }
+.clock .n{ font-family:var(--serif); font-size:96px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums; }
+.clock .c{ font-family:var(--serif); font-size:76px; font-weight:900; color:var(--fire); padding-bottom:40px;
+  text-shadow:0 0 18px var(--fire-glow); }
+.gear{ cursor:pointer; background:none; border:0; font-size:26px; color:var(--dim); margin:0 0 20px 6px; opacity:0; transition:opacity .2s; }
+.gear:hover, .gear:focus-visible{ opacity:1; }
+.begins{ display:none; font-family:var(--serif); font-weight:900; font-size:40px; letter-spacing:6px; color:var(--pumpkin);
+  text-shadow:0 0 22px rgba(255,138,42,.7); padding-bottom:50px; margin-left:8px; }
+[data-prism-countdown].done .begins{ display:block; }
+[data-prism-countdown].done .stone .n{ color:#FFD9A8; text-shadow:0 0 22px rgba(255,138,42,.9), 0 2px 0 rgba(0,0,0,.6); }
+.foot{ left:140px; right:150px; bottom:76px; display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
+.foot .goal{ width:430px; }
+</style>
+</head>
+<body>
+<div class="stage" data-haunt="moon tree fox pines eyes wisps bats lightning web" data-seed="31">
+  <div class="who rise">
+    <div class="avatar"><img class="js-avatar" alt="NeoTheFox98"></div>
+    <div class="plate js-name">NeoTheFox98</div>
+    <div class="credit">art · Yushy_Norev</div>
+  </div>
+  <div class="main" data-prism-countdown>
+    <div class="tag rise d1"><svg class="skull" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.5 2 3 5.8 3 10.5c0 3 1.4 5 3.5 6.2V20a1 1 0 0 0 1 1h2v-2h1v2h3v-2h1v2h2a1 1 0 0 0 1-1v-3.3c2.1-1.2 3.5-3.2 3.5-6.2C21 5.8 17.5 2 12 2zM8.5 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>something stirs in the woods</div>
+    <div class="title flicker rise d2">Starting<br>Soon</div>
+    <div class="lede rise d3 js-game-wrap" hidden>Tonight's haunting: <b class="js-game"></b></div>
+    <div class="clock rise d4">
+      <div class="stone"><span class="n engraved js-cd-min">05</span></div>
+      <span class="c">:</span>
+      <div class="stone"><span class="n engraved js-cd-sec">00</span></div>
+      <span class="begins">it begins…</span>
+      <button class="gear js-cd-settings" title="Set countdown length">⚙</button>
+    </div>
+  </div>
+  <div class="foot rise d5">
+    <div class="socials" data-prism-socials></div>
+    <div class="goal"><div class="top"><span class="k">souls claimed</span><span><span class="js-goal-now">—</span> / <span class="js-goal-target">—</span></span></div><div class="track"><div class="fill js-goal-fill"></div></div></div>
+  </div>
+</div>
+<script src="haunt-scene.js"></script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-countdown.js"></script>
+</body></html>

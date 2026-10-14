@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Webcam Frame</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+/* Size the OBS browser source to your camera; the frame follows it. */
+html,body{ width:100%; height:100%; background:transparent; overflow:hidden; }
+.cam{ position:fixed; inset:14px 14px 30px 14px; border-radius:14px; padding:5px;
+  background:conic-gradient(from 210deg, var(--fire), var(--fire2), #8E7CFF, var(--pumpkin), var(--fire));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;
+  animation:h-camglow 6s ease-in-out infinite; }
+@keyframes h-camglow{ 0%,100%{ filter:drop-shadow(0 0 6px rgba(109,255,196,.5)); } 50%{ filter:drop-shadow(0 0 16px rgba(109,255,196,.9)); } }
+.hair{ position:fixed; inset:24px 24px 40px 24px; border:1px solid rgba(241,233,212,.35); border-radius:8px; pointer-events:none; }
+.corner.tl{ left:4px; top:4px; } .corner.tr{ right:4px; top:4px; } .corner.bl{ left:4px; bottom:20px; } .corner.br{ right:4px; bottom:20px; }
+.web{ position:fixed; left:19px; top:19px; width:120px; height:120px; pointer-events:none; }
+.web svg{ width:100%; height:100%; }
+.bat{ position:fixed; right:70px; top:16px; width:46px; fill:#0A0820; filter:drop-shadow(0 0 4px rgba(241,233,212,.5)); transform-origin:50% 0; animation:h-sway 5s ease-in-out infinite alternate; }
+.bat svg{ display:block; width:100%; }
+@keyframes h-sway{ from{ transform:rotate(-6deg); } to{ transform:rotate(6deg); } }
+.name{ position:fixed; left:40px; bottom:4px; display:flex; align-items:center; gap:10px; padding:8px 24px 8px 18px;
+  background:linear-gradient(180deg,#2C2752,#17143A); border:1.5px solid rgba(241,233,212,.5); border-radius:8px;
+  box-shadow:0 0 18px rgba(109,255,196,.35), 0 8px 18px var(--shadow); }
+.name .plate{ font-size:26px; }
+.name svg{ width:24px; height:24px; fill:var(--fire); filter:drop-shadow(0 0 6px var(--fire)); }
+body.demo{ background:#0d0b20; }
+</style>
+</head>
+<body>
+<div class="cam"></div>
+<div class="hair"></div>
+<div class="web"><svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="rgba(241,233,212,.4)" stroke-width="1.2"><path d="M0 0 L120 30 M0 0 L90 80 M0 0 L40 115 M0 0 L4 120"/><path d="M24 6 Q20 16 18 24 Q10 24 1 30"/><path d="M52 13 Q42 32 38 50 Q20 48 2 58"/><path d="M84 21 Q66 54 60 84 Q30 82 3 92"/></g></svg></div>
+<div class="corner tl"><svg viewBox="0 0 70 70" aria-hidden="true"><path d="M6 60 V14 Q6 6 14 6 H60 M6 30 Q18 30 18 18 Q30 18 30 6 M14 14 l6 6"/></svg></div>
+<div class="corner tr"><svg viewBox="0 0 70 70" aria-hidden="true"><path d="M6 60 V14 Q6 6 14 6 H60 M6 30 Q18 30 18 18 Q30 18 30 6 M14 14 l6 6"/></svg></div>
+<div class="corner bl"><svg viewBox="0 0 70 70" aria-hidden="true"><path d="M6 60 V14 Q6 6 14 6 H60 M6 30 Q18 30 18 18 Q30 18 30 6 M14 14 l6 6"/></svg></div>
+<div class="corner br"><svg viewBox="0 0 70 70" aria-hidden="true"><path d="M6 60 V14 Q6 6 14 6 H60 M6 30 Q18 30 18 18 Q30 18 30 6 M14 14 l6 6"/></svg></div>
+<div class="bat"><svg viewBox="0 0 44 60" aria-hidden="true"><path d="M22 2 L22 10 C14 10 8 16 6 24 C4 32 6 42 10 48 C12 42 14 40 16 42 C17 46 19 50 22 54 C25 50 27 46 28 42 C30 40 32 42 34 48 C38 42 40 32 38 24 C36 16 30 10 22 10 Z M18 44 l-2 6 4-3z M26 44 l2 6 -4-3z"/><circle cx="18.5" cy="38" r="2" fill="#FF8A2A"/><circle cx="25.5" cy="38" r="2" fill="#FF8A2A"/></svg></div>
+<div class="name"><svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="14" cy="26" rx="7" ry="9"/><ellipse cx="26" cy="14" rx="7" ry="9"/><ellipse cx="40" cy="14" rx="7" ry="9"/><ellipse cx="52" cy="26" rx="7" ry="9"/><path d="M32 30c-10 0-18 10-18 18 0 7 6 10 12 8 3-1 4-2 6-2s3 1 6 2c6 2 12-1 12-8 0-8-8-18-18-18z"/></svg><span class="plate js-name">NeoTheFox98</span></div>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script>if(new URLSearchParams(location.search).has('demo')) document.body.classList.add('demo');</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+/* ============================================================
+   PRISM 2.5 — HAUNT · interactive redeem theme
+   Restyles Stream Manager's coin flip / 50-50, Lucky + Risky wheel,
+   slots, hype, featured viewers and active-effect chips
+   (static/interactive/*.html), which load it from /overlays/active/ —
+   the same contract as shoutout-theme.css. Only restyles: markup, timing
+   and the .show transitions stay the overlays' own.
+   ============================================================ */
+/* Fonts come from the overlay page itself (/overlays/PRISM/fonts/prism-fonts.css).
+   Never @import here: this file is re-read every 60s. */
+
+:root{
+  --ink:#F1E9D4; --ink-soft:#B3ABD6;
+  --c1:#6DFFC4; --c2:#3FD9E8; --c3:#C3BCDF; --c4:#FF8A2A; --c5:#FFC062; --blood:#C8102E;
+  --night:#09071C; --stone:#2C2752; --shadow:rgba(2,1,10,0.75);
+  --seal:radial-gradient(circle at 45% 40%, #F4FFF9 0%, #6DFFC4 34%, rgba(63,217,232,.45) 62%, rgba(9,7,28,.9) 74%);
+
+  /* Stream Manager's sound kit (fx.js) reads this: creaks, bells and ghosts. */
+  --fx-kit:haunt;
+
+  /* wheel canvas tokens (read by wheel.html) */
+  --wheel-style:flat;
+  --wheel-font:'Cinzel',serif; --wheel-weight:900; --wheel-ink:#F1E9D4;
+  --wheel-stroke:#07061A; --wheel-stroke-w:5; --wheel-ring:#6DFFC4; --wheel-ring-w:10;
+  --wheel-palette:#5B2A86,#B4451F,#1E6F5C,#7A1E2C,#2E2A78,#8A5A1A;
+  --wheel-case:upper;
+  --wheel-lucky:#6DFFC4; --wheel-risky:#C8102E;
+  --wheel-ring-risky:#C8102E;   /* Stream Manager 0.13.2+: Risky gets a blood rim */
+
+  /* hype accents per kind (read by hype.html) */
+  --hype-raid:#C8102E; --hype-bits:#FFC062; --hype-sub:#6DFFC4; --hype-follow:#B98CFF; --hype-firstchat:#3FD9E8;
+}
+html,body{ font-family:'Nunito','Segoe UI',sans-serif; }
+
+/* ---------- the shared card: an obsidian slab ringed in foxfire ---------- */
+.ov .card,.ov .banner{ padding:0; border:1px solid rgba(109,255,196,.55); border-radius:12px; overflow:visible;
+  background:linear-gradient(160deg, rgba(26,20,64,.97), rgba(9,7,28,.97) 65%); animation:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:0 0 0 6px rgba(9,7,28,.6), 0 0 70px rgba(109,255,196,.28), 0 30px 60px var(--shadow);
+  filter:blur(10px); transform:translateY(40px) scale(.94);
+  transition:opacity .5s ease, transform .8s cubic-bezier(.2,.8,.2,1), filter .8s ease; }
+.ov .card.show,.ov .banner.show{ transform:none; filter:none; }
+.ov .card::before,.ov .banner::before{ content:""; position:absolute; inset:8px; border:1px solid rgba(241,233,212,.14); border-radius:6px; pointer-events:none; }
+.ov .card-inner,.ov-slots .inner,.ov-hype .inner{ background:transparent; border-radius:12px; }
+.ov .card.risky{ border-color:rgba(200,16,46,.75); box-shadow:0 0 0 6px rgba(9,7,28,.6), 0 0 80px rgba(200,16,46,.40), 0 30px 60px var(--shadow); }
+
+/* eyebrow -> cut-ended ribbon */
+.ov .eyebrow,.ov-hype .kind{ padding:8px 30px; border-radius:0; background:linear-gradient(180deg,#A6FFE0,var(--accent,var(--c1))); color:#03140E;
+  font-family:'Cinzel',serif; font-size:24px; font-weight:900; letter-spacing:3px; text-transform:uppercase; text-shadow:none;
+  clip-path:polygon(0 0,100% 0,calc(100% - 14px) 50%,100% 100%,0 100%,14px 50%); filter:drop-shadow(0 0 14px rgba(109,255,196,.4)); }
+.ov .eyebrow .dot{ display:none; }
+
+/* big words: Cinzel Decorative, bone with a foxfire glow */
+.ov .result,.ov .title,.ov .winner .label,.ov-hype .headline{
+  font-family:'Cinzel Decorative','Cinzel',serif; font-weight:900; letter-spacing:0;
+  background:linear-gradient(180deg,#FFF9E8,#CFC6E8); -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent; filter:drop-shadow(0 0 16px rgba(109,255,196,.35)); animation:none; }
+
+/* "for <name>" */
+.ov .who{ padding:8px 24px; border:1px solid rgba(241,233,212,.4); border-radius:999px; animation:none;
+  background:rgba(9,7,28,.85); color:var(--ink-soft); font-size:24px; font-weight:700; letter-spacing:0; }
+.ov .who b{ color:var(--ink); font-weight:800; }
+
+/* ---------- coin flip / 50-50: a cursed coin ---------- */
+.ov-coinflip .card{ width:580px; }
+.ov-coinflip .card-inner{ padding:44px 40px 40px; }
+.ov-coinflip .eyebrow{ --accent:var(--c1); }
+.ov-coinflip .card.is5050 .eyebrow{ --accent:var(--c5); }
+.ov-coinflip .card.lose{ border-color:rgba(200,16,46,.75); }
+.ov-coinflip .card.lose .eyebrow{ background:linear-gradient(180deg,#F0334F,var(--blood)); color:#FFF1EC; }
+.ov-coinflip .face{ background:conic-gradient(from 200deg,#FFC062,#FF8A2A,#8A3A10,#FFC062,#FF8A2A,#FFC062); color:var(--ink);
+  font-family:'Cinzel',serif; font-weight:900; font-size:30px; letter-spacing:2px; text-transform:uppercase; text-shadow:0 2px 0 rgba(0,0,0,.6);
+  box-shadow:inset 0 0 0 4px rgba(255,240,200,.55), 0 0 40px rgba(255,138,42,.45); }
+.ov-coinflip .face .inner{ width:calc(100% - 26px); height:calc(100% - 26px);
+  background:radial-gradient(circle at 40% 35%, #2C2752, #09071C 75%); box-shadow:inset 0 0 18px rgba(255,138,42,.4); }
+.ov-coinflip .coin{ filter:drop-shadow(0 16px 20px rgba(0,0,0,.6)); }
+.ov-coinflip .result{ font-size:72px; }
+.ov-coinflip .card.lose .result{ background:linear-gradient(180deg,#FF8A9A,#C8102E); -webkit-background-clip:text; background-clip:text;
+  filter:drop-shadow(0 0 18px rgba(200,16,46,.6)); }
+
+/* ---------- wheel: a ring of foxfire, segments of old velvet ---------- */
+.ov-wheel .card-inner{ padding:34px 48px 40px; }
+.ov-wheel .title{ font-size:60px; }
+.ov-wheel .card.risky .eyebrow{ background:linear-gradient(180deg,#F0334F,var(--blood)); color:#FFF1EC; filter:drop-shadow(0 0 14px rgba(200,16,46,.6)); }
+.ov-wheel canvas{ filter:drop-shadow(0 0 24px rgba(109,255,196,.35)) drop-shadow(0 18px 26px rgba(0,0,0,.6)); }
+.ov-wheel .card.risky canvas{ filter:drop-shadow(0 0 28px rgba(200,16,46,.5)) drop-shadow(0 18px 26px rgba(0,0,0,.6)); }
+.ov-wheel .hub{ width:96px; height:96px; border:0; animation:none; background:var(--seal);
+  box-shadow:0 0 0 5px #07061A, 0 0 0 7px rgba(241,233,212,.6), 0 0 40px rgba(109,255,196,.7); }
+.ov-wheel .card.risky .hub{ background:radial-gradient(circle at 45% 40%, #FFE0E4 0%, #FF4D63 34%, rgba(200,16,46,.6) 62%, rgba(9,7,28,.9) 74%);
+  box-shadow:0 0 0 5px #07061A, 0 0 0 7px rgba(241,233,212,.6), 0 0 40px rgba(200,16,46,.8); }
+.ov-wheel .hub .glyph{ font-size:42px; filter:none; }
+.ov-wheel .pointer{ top:-16px; border-left-width:22px; border-right-width:22px; border-top:44px solid #F1E9D4;
+  filter:drop-shadow(0 0 10px rgba(109,255,196,.8)) drop-shadow(0 4px 0 rgba(0,0,0,.5)); }
+.ov-wheel .winner .label{ font-size:42px; max-width:640px; line-height:1.15; }
+
+/* ---------- slots: three graves, three fates ---------- */
+.ov-slots .card.win{ border-color:var(--c5); box-shadow:0 0 0 6px rgba(9,7,28,.6), 0 0 90px rgba(255,160,60,.55), 0 30px 60px var(--shadow); }
+.ov-slots .inner{ padding:40px 48px 44px; }
+.ov-slots .eyebrow{ --accent:var(--c5); background:linear-gradient(180deg,#FFD9A0,var(--c5)); color:#1A0A02; }
+.ov-slots .reel{ border:0; border-radius:50% 50% 10px 10px / 26% 26% 10px 10px;
+  background:radial-gradient(120% 90% at 30% 15%, #4A4479 0%, var(--stone) 45%, #17143A 100%);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.10), inset 0 -10px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(109,255,196,.45), 0 16px 24px rgba(0,0,0,.55); }
+.ov-slots .reel:nth-child(2){ box-shadow:inset 0 3px 0 rgba(255,255,255,.10), inset 0 -10px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(255,138,42,.55), 0 16px 24px rgba(0,0,0,.55); }
+.ov-slots .reels{ gap:26px; }
+.ov-slots .reel::before{ background:linear-gradient(#211C48,transparent); }
+.ov-slots .reel::after{ background:linear-gradient(transparent,#17143A); }
+.ov-slots .result{ font-size:52px; }
+.ov-slots .who{ padding:0; border:0; background:none; color:var(--ink-soft); font-size:24px; font-weight:700; }
+.ov-slots .who b{ color:var(--ink); }
+
+/* ---------- hype (raid / bits / sub / follow / first chat) ---------- */
+.ov-hype .banner{ min-width:760px; }
+.ov-hype .inner{ padding:40px 64px 44px; gap:14px; }
+.ov-hype .emoji{ width:120px; height:120px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:var(--seal); box-shadow:0 0 0 3px rgba(241,233,212,.5), 0 0 60px rgba(109,255,196,.6); font-size:58px;
+  animation:hn-pulse 2.4s ease-in-out infinite; }
+@keyframes hn-pulse{ 0%,100%{ box-shadow:0 0 0 3px rgba(241,233,212,.5), 0 0 40px rgba(109,255,196,.45); } 50%{ box-shadow:0 0 0 3px rgba(241,233,212,.5), 0 0 90px rgba(109,255,196,.85); } }
+.ov-hype .headline{ font-size:80px; line-height:1.02; }
+.ov-hype .sub{ font-size:28px; font-weight:700; color:var(--ink-soft); letter-spacing:0; }
+
+/* ---------- featured viewers (Starting Soon) ----------
+   Haunt's Starting Soon keeps the upper-right sky empty above the moon,
+   so the three chips hang there in a column, clear of the title and fox. */
+.ov-featured{ --feat-top:84px; --feat-right:130px; --feat-left:auto; --feat-dir:column; --feat-align:flex-end;
+  --feat-gap:12px; --feat-avatar:52px; --feat-name-max:200px; }
+.ov-featured .feat-title{ padding:6px 26px; background:linear-gradient(180deg,#A6FFE0,var(--c1)); color:#03140E;
+  font-family:'Cinzel',serif; font-size:20px; font-weight:900; letter-spacing:3px; text-transform:uppercase; text-shadow:none;
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 50%,100% 100%,0 100%,12px 50%); }
+.ov-featured .fv{ border:1px solid rgba(109,255,196,.5); background:rgba(9,7,28,.86); padding:6px 22px 6px 6px;
+  -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:0 0 22px rgba(109,255,196,.22), 0 10px 20px var(--shadow); }
+.ov-featured .fv img, .ov-featured .fv .fv-letter{ box-shadow:0 0 0 2px #F1E9D4, 0 0 14px rgba(109,255,196,.6);
+  background:#1C1846; color:var(--ink); font-family:'Cinzel',serif; font-weight:900; }
+.ov-featured .fv-name{ font-family:'Cinzel',serif; font-weight:900; color:var(--ink); letter-spacing:.5px; }
+
+/* ---------- active-effect chips ---------- */
+.ov-status .chip{ border:1px solid rgba(255,138,42,.6); border-radius:999px; background:rgba(9,7,28,.9); color:var(--ink);
+  font-family:'Nunito',sans-serif; font-weight:800; box-shadow:0 0 22px rgba(255,138,42,.25), 0 10px 20px var(--shadow); }
+.ov-status .chip .t{ padding:2px 12px; border-radius:4px; background:var(--c4); color:#1A0A02; font-family:'Cinzel',serif; font-weight:900; }
+.ov-status .chip.ending{ border-color:rgba(200,16,46,.8); }
+.ov-status .chip.ending .t{ background:var(--blood); color:#FFF1EC; }

@@ -1,6 +1,6 @@
 // Chat-preview behaviour test.
 //
-// Builds all three sets the way a deploy does, then renders each set's
+// Builds every set the way a deploy does, then renders each set's
 // chat-preview.html in a real browser and checks it is showing the REAL chat
 // overlay: the .pc-* DOM core/prism-chat.js builds, under prism-chat-base.css
 // plus that set's chat-theme.css.
@@ -29,7 +29,9 @@ catch { console.log('· chat preview test skipped (playwright not installed)'); 
 const REPO = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
                '.json': 'application/json', '.woff2': 'font/woff2' };
-const SETS = ['prism-holo', 'prism-signal', 'prism-soft'];
+const SETS = ['prism-holo', 'prism-signal', 'prism-soft', 'prism-haunt'];
+const VENDORED = new Set([...fs.readFileSync(path.join(REPO, 'fonts', 'prism-fonts.css'), 'utf8')
+  .matchAll(/font-family:\s*'([^']+)'/g)].map(m => m[1].toLowerCase()));
 
 const LAUNCH = { args: ['--no-sandbox'] };
 if (process.env.PW_CHROMIUM) LAUNCH.executablePath = process.env.PW_CHROMIUM;
@@ -105,9 +107,12 @@ for (const set of SETS) {
   ok(parseFloat(st.radius) > 0 || (st.clip && st.clip !== 'none'),
      `and shapes it (${parseFloat(st.radius) > 0 ? 'radius ' + st.radius : 'clip-path'})`);
 
+  // The name's first family must be one PRISM vendors in fonts/, read from
+  // prism-fonts.css rather than listed here: a hard-coded list went stale the
+  // first time a set (Haunt, Cinzel) brought a new family.
   const nameFont = await page.$eval('.pc-name', n => getComputedStyle(n).fontFamily);
-  ok(/Chakra|Sora|Grotesk|JetBrains|Nunito/i.test(nameFont),
-     `a PRISM family is applied (${nameFont.split(',')[0]})`);
+  const first = nameFont.split(',')[0].trim().replace(/^['"]|['"]$/g, '');
+  ok(VENDORED.has(first.toLowerCase()), `a PRISM family is applied (${first})`);
 
   // The base layer owns sizing so a skin cannot shrink chat by accident.
   const size = await page.$eval('.pc-body', n => getComputedStyle(n).fontSize);

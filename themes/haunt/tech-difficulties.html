@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PRISM Haunt — Technical Difficulties</title>
+<link rel="stylesheet" href="haunt.css">
+<style>
+/* Blood moon. Something has gotten into the machine. */
+.stage{ --moon-x:1560; --moon-y:330; --moon-size:400; --h-far:#2B0A24; --h-mid:#1A0619; --h-near:#0C0310; }
+.stage > .h-sky{ background:
+  radial-gradient(900px 600px at 80% 30%, rgba(200,16,46,.20), transparent 70%),
+  linear-gradient(180deg, #08030F 0%, #1A0718 50%, #2E0B22 85%, #3A0E25 100%); }
+.main{ left:150px; top:170px; width:1450px; display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
+.main .title{ font-size:124px; }
+.main .lede{ max-width:1100px; }
+.main .title.rise{ animation:h-rise-title 1.2s cubic-bezier(.2,.8,.2,1) .15s backwards, h-glitch 7s steps(1) 2s infinite; }
+.main .title{ filter:drop-shadow(0 0 22px rgba(200,16,46,.45)) drop-shadow(0 6px 0 rgba(2,1,10,.55)); }
+@keyframes h-glitch{ 0%,93%,100%{ transform:none; } 94%{ transform:translate(-6px,2px) skewX(-6deg); } 95%{ transform:translate(5px,-2px); } 96%{ transform:none; } 97.5%{ transform:translate(3px,0) skewX(4deg); } 98%{ transform:none; } }
+.status .who{ position:static; display:block; margin:-6px 4px -6px -16px; }
+.status .avatar{ display:block; width:64px; height:64px; padding:3px; animation:none; }
+.status .avatar::before{ display:none; }
+.status .avatar img{ border-width:3px; }
+.tiles{ left:150px; bottom:84px; display:flex; gap:20px; }
+.icon-item{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:8px; width:176px; height:196px; padding:30px 12px 18px;
+  border-radius:50% 50% 10px 10px / 30% 30% 10px 10px;
+  background:radial-gradient(120% 90% at 30% 15%, #4A3B66 0%, #2A2045 45%, #150F2A 100%);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.08), inset 0 -10px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(0,0,0,.45), 0 18px 34px var(--shadow); }
+.icon-item svg{ width:48px; height:48px; fill:none; stroke:#B9AFD8; stroke-width:3.2; stroke-linecap:round; stroke-linejoin:round; }
+.icon-label{ font-family:var(--serif); font-size:22px; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:#D9D1EE; text-shadow:0 2px 0 rgba(0,0,0,.65); }
+.icon-check{ font-size:22px; font-weight:800; color:var(--dim); min-height:30px; text-transform:lowercase; }
+.icon-check:empty::before{ content:"…"; }
+.icon-item.state-ok{ box-shadow:inset 0 3px 0 rgba(255,255,255,.08), inset 0 -10px 24px rgba(0,0,0,.45), 0 0 0 2px var(--fire), 0 0 30px rgba(109,255,196,.35); }
+.icon-item.state-ok svg{ stroke:var(--fire); } .icon-item.state-ok .icon-check{ color:var(--fire); }
+.icon-item.state-warn{ box-shadow:inset 0 3px 0 rgba(255,255,255,.08), inset 0 -10px 24px rgba(0,0,0,.45), 0 0 0 2px var(--pumpkin), 0 0 30px rgba(255,138,42,.35); }
+.icon-item.state-warn svg{ stroke:var(--pumpkin); } .icon-item.state-warn .icon-check{ color:var(--ember); }
+.icon-item.state-error{ box-shadow:inset 0 3px 0 rgba(255,255,255,.08), inset 0 -10px 24px rgba(0,0,0,.45), 0 0 0 2px var(--blood), 0 0 34px rgba(200,16,46,.5); }
+.icon-item.state-error svg{ stroke:#FF5A6E; } .icon-item.state-error .icon-check{ color:#FF7A8A; }
+.status{ right:150px; bottom:96px; display:flex; align-items:center; gap:14px; padding:14px 28px; border-radius:999px;
+  background:rgba(9,4,18,.8); border:1.5px solid rgba(241,233,212,.4); font-size:24px; font-weight:800; }
+#statusText{ text-transform:lowercase; }
+.status-dot{ width:18px; height:18px; border-radius:50%; background:var(--dim); }
+.status-dot.live{ background:var(--fire); box-shadow:0 0 12px var(--fire); }
+.status-dot.offline{ background:var(--blood); box-shadow:0 0 12px var(--blood); }
+.status-dot.error{ background:var(--pumpkin); box-shadow:0 0 12px var(--pumpkin); }
+#backAnnouncement{ inset:0; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;
+  background:radial-gradient(circle at 50% 50%, rgba(20,60,50,.85), rgba(4,3,14,.96) 70%); opacity:0; pointer-events:none; transition:opacity .6s; }
+#backAnnouncement.visible{ opacity:1; }
+#backAnnouncement .title{ font-size:190px; filter:drop-shadow(0 0 40px rgba(109,255,196,.7)) drop-shadow(0 6px 0 rgba(2,1,10,.55)); }
+#backAnnouncement.visible .title{ animation:h-alive .9s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes h-alive{ from{ transform:scale(.6); opacity:0; } to{ transform:none; opacity:1; } }
+</style>
+</head>
+<body>
+<div class="stage" data-haunt="blood tree pines eyes bats lightning web" data-seed="66">
+  <div class="main">
+    <div class="tag blood rise">uh oh… the blood moon rises</div>
+    <div class="title rise d1">The Spirits Are<br>Interfering</div>
+    <div class="lede rise d2">Something got into the machine. Banishing it now — don't leave the circle.</div>
+  </div>
+  <div class="tiles rise d3">
+    <div class="icon-item" id="itemPc"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="26" rx="5"/><path d="M18 40h12M24 34v6"/></svg><span class="icon-label">pc link</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemOverlay"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="32" rx="6"/><path d="M5 17h38M11 12.5h.01M16 12.5h.01"/></svg><span class="icon-label">overlay</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemGame"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="15" width="40" height="20" rx="10"/><path d="M13 21v8M9 25h8M31 23h.01M36 27h.01"/></svg><span class="icon-label">game</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemAudio"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="18" y="5" width="12" height="22" rx="6"/><path d="M11 22a13 13 0 0 0 26 0M24 35v8M17 43h14"/></svg><span class="icon-label">audio</span><span class="icon-check"></span></div>
+    <div class="icon-item" id="itemPower"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6v16"/><path d="M14 12a14 14 0 1 0 20 0"/></svg><span class="icon-label">power</span><span class="icon-check"></span></div>
+  </div>
+  <div class="status rise d4"><span class="who"><span class="avatar"><img class="js-avatar" alt="NeoTheFox98"></span></span><span class="status-dot" id="statusDot"></span><span id="statusText">checking…</span></div>
+  <div id="backAnnouncement" role="status">
+    <div class="tag fire">the spirits are banished</div>
+    <div class="title">It Lives!</div>
+    <div class="lede">Resuming the stream…</div>
+  </div>
+</div>
+<script src="haunt-scene.js"></script>
+<script src="../../core/prism-config.js"></script>
+<script src="../../core/prism-engine.js"></script>
+<script src="../../core/prism-techcheck.js"></script>
+</body></html>
