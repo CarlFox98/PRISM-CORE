@@ -195,8 +195,11 @@ button{ font:inherit; color:inherit; }
   text-shadow:0 0 18px rgba(109,255,196,.35), 0 3px 0 rgba(0,0,0,.6); }
 .credit{ font-size:22px; color:var(--dim); letter-spacing:.5px; }
 
-/* socials */
+/* socials. In OBS the Spotify now-playing widget sits bottom-centre on every
+   standby scene (x 700-1220, y 925-1080), so a footer's chips wrap into a 2x2
+   block that ends before x 700 instead of running underneath it. */
 .socials{ display:flex; gap:16px; flex-wrap:wrap; }
+.foot .socials{ max-width:540px; }
 .social-item{ display:inline-flex; align-items:center; gap:10px; padding:12px 24px; border-radius:999px; color:var(--bone);
   background:rgba(9,7,28,.78); border:1.5px solid rgba(241,233,212,.45); font-weight:800; font-size:24px;
   box-shadow:0 0 18px rgba(0,0,0,.5); }

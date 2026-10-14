@@ -3,6 +3,16 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.5.1] — 2026-10-14
+
+### Fixed
+- **Haunt's social chips ran under the Spotify now-playing widget** in OBS.
+  The widget sits bottom-centre on every standby scene (x 700-1220,
+  y 925-1080). Found in the first live check in OBS. Footer chips now wrap
+  into a 2x2 block that ends before x 700 (`.foot .socials`). Tech
+  Difficulties' headstone tiles moved up out of the same slot, and Stream
+  Ending's headstones moved up 26px to make room for the second row of chips.
+
 ## [2.5.0] — 2026-10-13
 
 Pairs with Stream Manager 0.13.2 (the Haunt sound kit, per-kind hype cues and
