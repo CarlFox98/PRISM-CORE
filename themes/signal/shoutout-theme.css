@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM 2.0 — SIGNAL · shoutout card theme
+   PRISM 2.0 SIGNAL · shoutout card theme
    Loaded by the shoutout card (Stream Manager's
    static/interactive/shoutout.html) from /overlays/active/, so the
    card follows whichever set the dashboard has active. Holo has no
@@ -8,7 +8,7 @@
    transitions (.so / .so.show) are untouched.
    ============================================================ */
 /* Fonts come from the card page itself (it imports /overlays/PRISM/fonts/prism-fonts.css,
-   which carries every PRISM family) — importing them here too would re-download
+   which carries every PRISM family). Importing them here too would re-download
    them each time the card re-reads this file. */
 
 :root{

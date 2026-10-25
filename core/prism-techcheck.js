@@ -1,15 +1,15 @@
 /* ============================================================
-   PRISM — Technical Difficulties status checker
+   PRISM Technical Difficulties status checker
    Shared by the 2.0 sets (the 1.x holo scene keeps its inline copy).
 
-   Watches whether the channel is live (DecAPI uptime — no token, no
+   Watches whether the channel is live (DecAPI uptime: no token, no
    secret). OBS state comes from Stream Manager's /api/status when the
    scene is served by it (it already polls OBS with the password from
    its .env, so nothing secret lives in this page); OBS's own websocket
    is used on top of that for the desktop-audio tile and to switch OBS
    to sceneToSwitch once the stream is back. The websocket only works
    when OBS's WebSocket authentication is off, or a password is given
-   below — prefer leaving it out and letting Stream Manager report.
+   below. Prefer leaving it out and letting Stream Manager report.
 
    Markup hooks (all optional):
      #itemPc, #itemAudio        status tiles; get state-ok|warn|error,

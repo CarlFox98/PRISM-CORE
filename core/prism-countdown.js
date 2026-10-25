@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM — countdown (Starting Soon)
+   PRISM countdown (Starting Soon)
    Shared by the 2.0 sets. Markup hooks:
      [data-prism-countdown]     container (gets class "done" at 00:00)
        .js-cd-min / .js-cd-sec  filled with zero-padded minutes / seconds

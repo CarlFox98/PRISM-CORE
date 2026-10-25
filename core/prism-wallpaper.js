@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM — living wallpaper behaviour
+   PRISM living wallpaper behaviour
    Shared by the 2.0 sets. Everything is optional; each part runs only
    when its element exists.
 
@@ -98,7 +98,7 @@
   function showQuote(){
     if(!qEl || !quotes.length) return;
     var q = quotes[(Math.random() * quotes.length) | 0];
-    qEl.innerHTML = '<span class="q">“' + esc(q.text) + '”</span>' + (q.added_by ? ' <span class="by">— ' + esc(q.added_by) + '</span>' : '');
+    qEl.innerHTML = '<span class="q">“' + esc(q.text) + '”</span>' + (q.added_by ? ' <span class="by">~ ' + esc(q.added_by) + '</span>' : '');
     qEl.classList.add('on'); setTimeout(function(){ qEl.classList.remove('on'); }, 9000);
   }
   if(qEl){ loadQuotes(); setInterval(loadQuotes, 240000); setTimeout(function(){ showQuote(); setInterval(showQuote, 25000); }, 3000); }

@@ -1,7 +1,7 @@
 /* ============================================================
-   PRISM 2.5 — HAUNT chat skin
+   PRISM 2.5 HAUNT chat skin
    Colour, shape and entry motion only. Fonts come from the chat page
-   (it loads /overlays/PRISM/fonts/prism-fonts.css) — never @import
+   (it loads /overlays/PRISM/fonts/prism-fonts.css), so never @import
    here: this file is re-read every 60s.
    Messages are dark obsidian slabs with a foxfire edge; names sit on
    bone plates (a Twitch colour behind text is unreadable half the time,

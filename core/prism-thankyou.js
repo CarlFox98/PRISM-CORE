@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM — Thank-a-follower card
+   PRISM Thank-a-follower card
    Shared by the 2.0 sets. Picks a random follower (no repeats until
    everyone has been thanked) and shows the card.
 
@@ -21,10 +21,10 @@
     autoHideSeconds: O.autoHideSeconds != null ? O.autoHideSeconds : 8,
     noRepeatUntilExhausted: O.noRepeatUntilExhausted !== false,
     messages: O.messages || [
-      "Welcome to the pack — glad you're here!",
+      "Welcome to the pack! Glad you're here.",
       "Thanks for the follow. Enjoy the stream!",
       "You just made the stream a little brighter.",
-      "Big thanks for following — see you in chat!"
+      "Big thanks for following. See you in chat!"
     ]
   };
   /* used only if prism-followers.json can't be read */
@@ -84,7 +84,7 @@
     return;
   }
   loadList().then(function(){
-    showNote(source === 'fallback' ? 'Using placeholder names — run tools\\refresh-followers.bat to load your real followers' : '');
+    showNote(source === 'fallback' ? 'Using placeholder names. Run tools\\refresh-followers.bat to load your real followers' : '');
     if(params.has('auto')) setTimeout(pick, 900);
   });
 })();

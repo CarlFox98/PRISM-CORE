@@ -2,7 +2,7 @@
 <html lang="en" data-anchor="bottom" data-align="left">
 <head>
 <meta charset="UTF-8">
-<title>PRISM Holo — Chat Preview</title>
+<title>PRISM Holo: Chat Preview</title>
 <link rel="stylesheet" href="../fonts/prism-fonts.css">
 <!-- Previews the REAL chat overlay: prism-chat-base.css for structure plus
      holo's skin for the look, drawn with the same .pc-* DOM
@@ -10,12 +10,12 @@
      The skin is referenced by its source name; the set build renames it to
      chat-theme.css (see the FLATTEN rule in scripts/build-obs-set.py).
      (History: docs/CHANGELOG.md 2.2.2. Deliberately no mention of the retired
-     sheet's name here — scripts/test-socials.mjs greps for it, and a guard
+     sheet's name here: scripts/test-socials.mjs greps for it, and a guard
      that matches its own explanation catches nothing.) -->
 <link rel="stylesheet" href="../core/prism-chat-base.css">
 <link rel="stylesheet" href="../widgets/theme-holo-chat.css">
 <style>
-/* Preview stage only — none of this ships with the overlay. prism-theme.css
+/* Preview stage only; none of this ships with the overlay. prism-theme.css
    carries no stage chrome, so unlike the 2.0 sets the backdrop is defined
    here. prism-chat-base.css makes html/body transparent and full-height for
    OBS, which is why this block comes after it. */

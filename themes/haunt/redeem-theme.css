@@ -1,8 +1,8 @@
 /* ============================================================
-   PRISM 2.5 — HAUNT · interactive redeem theme
+   PRISM 2.5 HAUNT · interactive redeem theme
    Restyles Stream Manager's coin flip / 50-50, Lucky + Risky wheel,
    slots, hype, featured viewers and active-effect chips
-   (static/interactive/*.html), which load it from /overlays/active/ —
+   (static/interactive/*.html), which load it from /overlays/active/,
    the same contract as shoutout-theme.css. Only restyles: markup, timing
    and the .show transitions stay the overlays' own.
    ============================================================ */
