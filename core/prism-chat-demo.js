@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM 2.0 — chat preview feed (preview scenes only)
+   PRISM 2.0 chat preview feed (preview scenes only)
 
    Draws synthetic messages into #pc-feed using the SAME DOM the real
    renderer builds (core/prism-chat.js: .pc-item > .pc-inner > .pc-meta /
@@ -7,7 +7,7 @@
    browser without Stream Manager running.
 
    It used to emit the retired third-party widget's markup instead, so the
-   preview showed something the overlay has not used since 2.1.0 — and
+   preview showed something the overlay has not used since 2.1.0, and
    chat-theme.css, the sheet that actually ships, was previewed by nothing.
    See docs/CHANGELOG.md 2.2.2. (The old class names are deliberately not
    written out here: scripts/test-socials.mjs greps this file for them, and
@@ -48,12 +48,12 @@
     { u: 'Nova_Rider',  b: 1, m: 'the new overlay goes so hard' },
     { u: 'pixel_witch', b: 2, m: 'okay that countdown font is perfect', flags: ['pc-mod'] },
     { u: 'grumbot',     b: 0, m: 'chat is readable on my phone now' },
-    { u: 'lumen',       b: 0, m: 'hi hi, just got here — what did I miss?', flags: ['pc-first'] },
+    { u: 'lumen',       b: 0, m: 'hi hi, just got here, what did I miss?', flags: ['pc-first'] },
     { u: 'Aria.exe',    b: 1, m: 'gg on that last run!!', mention: '@NeoTheFox98' },
     { u: 'deltaWolf',   b: 1, m: 'x100 for the fox', flags: ['pc-cheer', 'pc-event', 'pc-ev-cheer'],
       event: '\u25C6 cheered 100 bits!' },
     { u: 'moth_mage',   b: 1, m: 'six months already?!', flags: ['pc-event', 'pc-ev-resub'],
-      event: '\u2605 resubscribed — 6 months!' },
+      event: '\u2605 resubscribed for 6 months!' },
     { u: 'StarRaider',  b: 0, m: '', flags: ['pc-event', 'pc-ev-raid'],
       event: '\u27A4 is raiding with 24 viewers!' },
     { u: 'K3RN3L',      b: 2, m: 'the shoutout card slaps', flags: ['pc-vip'] },

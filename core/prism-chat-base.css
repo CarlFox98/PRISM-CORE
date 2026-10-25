@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM 2.0 — chat, base layer
+   PRISM 2.0 chat, base layer
    Structure, sizing and lifecycle transitions. A theme
    (/overlays/active/chat-theme.css) owns colour, shape and its own
    entry animation; everything here must stay readable with no theme
@@ -7,8 +7,8 @@
    failure mode this project has already hit once.
 
    Sizes are the audit's conclusion, set here so a theme can't undo
-   them by accident: 30px message, 26px name. At 720p — the most
-   common Twitch quality — that reads as 20px and 17px.
+   them by accident: 30px message, 26px name. At 720p (the most
+   common Twitch quality) that reads as 20px and 17px.
    ============================================================ */
 
 :root{
@@ -20,7 +20,7 @@
   --pc-name-size: 26px;
   --pc-line: 1.4;
 
-  /* Neutral fallback palette — themes override all of these. */
+  /* Neutral fallback palette; themes override all of these. */
   --pc-ink: #F2F5F7;
   --pc-dim: #9FB0B8;
   --pc-panel: rgba(10,12,18,0.82);
@@ -35,7 +35,7 @@ html, body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* The column fills whatever box OBS gives the source — placement is the
+/* The column fills whatever box OBS gives the source; placement is the
    OBS transform, per scene, not a constant in here. */
 #pc-feed{
   box-sizing:border-box;
@@ -132,7 +132,7 @@ html[data-align="right"] .pc-reply{ text-align:right }
   vertical-align:middle;
 }
 
-/* /me — Twitch renders an action in the chatter's own colour, italic. */
+/* /me: Twitch renders an action in the chatter's own colour, italic. */
 .pc-action .pc-body{ font-style:italic; color:var(--user-color, var(--pc-ink)) }
 
 .pc-at{ font-weight:700; color:var(--pc-accent) }
