@@ -1,4 +1,4 @@
-# PRISM — Spotify Now-Playing Widget (permanent setup)
+# PRISM Spotify Now-Playing Widget (permanent setup)
 
 A standalone Spotify "now playing" card you add as its **own OBS Browser Source**,
 floating over any scene (local or hosted). Set it up once; every scene benefits,
@@ -36,6 +36,6 @@ That's it. The card shows your current track and auto-refreshes.
 - Client ID: defaults to your existing app. Override with `?cid=YOUR_ID` on the URL.
 - Nothing playing → the card shows a paused state; it keeps the last art briefly.
 - The widget self-computes its redirect URI from its own address, so it works at
-  any repo/path — just register whatever URL it prints.
+  any repo/path; just register whatever URL it prints.
 - To retheme, edit the `--c1`…`--c5` palette variables in `core/prism-theme.css` (same as the
   rest of the PRISM set).

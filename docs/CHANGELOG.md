@@ -3,7 +3,7 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
-## [2.5.1] — 2026-10-14
+## [2.5.1] - 2026-10-14
 
 ### Fixed
 - **Haunt's social chips ran under the Spotify now-playing widget** in OBS.
@@ -13,7 +13,7 @@ and [Semantic Versioning](https://semver.org).
   Difficulties' headstone tiles moved up out of the same slot, and Stream
   Ending's headstones moved up 26px to make room for the second row of chips.
 
-## [2.5.0] — 2026-10-13
+## [2.5.0] - 2026-10-13
 
 Pairs with Stream Manager 0.13.2 (the Haunt sound kit, per-kind hype cues and
 the Risky wheel rim).
@@ -89,7 +89,7 @@ the Risky wheel rim).
   instead of a hard-coded list, which had gone stale the moment Cinzel arrived. Add it to Stream Manager's
   `config.json` → `scene_sets` to have the dashboard offer it.
 
-## [2.4.1] — 2026-10-04
+## [2.4.1] - 2026-10-04
 
 Pairs with Stream Manager 0.13.1.
 
@@ -101,7 +101,7 @@ Pairs with Stream Manager 0.13.1.
   Signal under the Channels/Followers column, Soft under the countdown, Holo
   (built-in defaults) in a column right of the timer.
 
-## [2.4.0] — 2026-10-02
+## [2.4.0] - 2026-10-02
 
 Pairs with Stream Manager 0.13.0 (the wheel redesign).
 
@@ -121,7 +121,7 @@ Pairs with Stream Manager 0.13.0 (the wheel redesign).
   theme loaded (base layer). The chat preview cycles a cheer, a resub and a
   raid so every set shows them.
 - **7TV / BetterTTV / FrankerFaceZ emotes (phase 6)** arrive as ordinary
-  `emote` fragments with a `provider` field — no overlay change was needed.
+  `emote` fragments with a `provider` field; no overlay change was needed.
 
 ### Fixed
 - **The chat harness's fake server truncated non-ASCII JSON.** It set
@@ -134,14 +134,14 @@ Pairs with Stream Manager 0.13.0 (the wheel redesign).
   type class and line, keep the attached message, hide an empty body, a cheer
   stays a message, and an unknown type never becomes a class (40 checks, was 33).
 
-## [2.3.0] — 2026-10-01
+## [2.3.0] - 2026-10-01
 
 ### Added
 - **Channel-point redeem overlays follow the active set.** Stream Manager's
   coin flip / 50-50, Lucky + Risky wheel, slots and hype overlays
   (`static/interactive/*.html`) were the last on-stream pieces still locked
   to the 1.x holo look. Each set now ships `redeem-theme.css`, which they load
-  from `/overlays/active/` and re-read every 60s — the same contract as
+  from `/overlays/active/` and re-read every 60s, the same contract as
   `shoutout-theme.css`. Holo's (`widgets/theme-holo-redeem.css`) is empty, so
   holo keeps the built-in look and switching back clears a 2.0 theme.
   - **Soft Holo:** cream sticker cards with a tilt and offset shadow, pastel
@@ -154,7 +154,7 @@ Pairs with Stream Manager 0.13.0 (the wheel redesign).
 
 ### Changed (Stream Manager overlays)
 - The four overlays load the vendored `/overlays/PRISM/fonts/prism-fonts.css`
-  instead of Google Fonts — no network at load.
+  instead of Google Fonts, so there is no network at load.
 - `hype.html` no longer shows `&amp;` for a name containing `&` (it escaped
   into `textContent`, which escapes again).
 
@@ -162,7 +162,7 @@ Pairs with Stream Manager 0.13.0 (the wheel redesign).
 - `test-socials.mjs` requires `redeem-theme.css` in every 2.0 set, and the
   no-`@import` guard now covers every widget theme, not just chat's.
 
-## [2.2.2] — 2026-09-30
+## [2.2.2] - 2026-09-30
 
 A tree-wide audit of 2.0. Nothing here changes how a set looks; all of it is
 things that were quietly wrong, found by checking rather than by breaking.
@@ -171,7 +171,7 @@ things that were quietly wrong, found by checking rather than by breaking.
 - **The dashboard offered two scene sets that cannot work.** `modern` and
   `retro` were still in stream-manager's `scene_sets`, so either was one click
   away on the Overview tab. `modern` provides four of the eight canonical
-  scenes; `retro` provides *none* — it still carries its 1.x filenames
+  scenes; `retro` provides *none*: it still carries its 1.x filenames
   (`starting-soon-win9x-v3.html`, `be-right-back-win98.html` and friends), so
   choosing it mid-stream 404s every OBS browser source at once. Both are relics
   that `prism-holo` replaced. They are out of `scene_sets`, and
@@ -179,7 +179,7 @@ things that were quietly wrong, found by checking rather than by breaking.
   canonical scene.
 - **Every set's `chat-preview` scene still advertised the retired third-party
   widget.** It linked the stopgap sheet and its on-screen copy told you to
-  paste that file into someone else's Custom CSS — two releases after 2.1.0
+  paste that file into someone else's Custom CSS, two releases after 2.1.0
   made chat PRISM's own, and one release after 2.2.1 fixed exactly that claim
   in the README without touching the page it described. Worse than stale: the
   preview and the overlay had no DOM in common. `core/prism-chat-demo.js`
@@ -200,7 +200,7 @@ things that were quietly wrong, found by checking rather than by breaking.
   pattern-matching, so putting one back has to be deliberate.
 - **`core/prism-chat-holo-iridescent.css` was dead and still built.** 15.5 KB,
   listed in `build-obs-set.py`'s `ASSETS` and copied into every holo build,
-  loaded by absolutely nothing — the old preview had those styles pasted
+  loaded by absolutely nothing; the old preview had those styles pasted
   inline. The README claimed the preview was styled by it. Out of the manifest;
   `prism-chat-base.css` and `prism-chat-demo.js` take its place because the
   preview now needs the real base layer.
@@ -218,7 +218,7 @@ things that were quietly wrong, found by checking rather than by breaking.
   `build-obs-set.py` copies into every set that no page loads.
 - The set check reads stream-manager's `config.json`, overridable with
   `SM_CONFIG` / `PRISM_OVERLAYS`. When it can't find it, it says so rather than
-  passing silently — a check that verifies nothing while the summary reports
+  passing silently. A check that verifies nothing while the summary reports
   success is worse than no check.
 
 ### Notes
@@ -227,7 +227,7 @@ things that were quietly wrong, found by checking rather than by breaking.
 - Three retired files are now shipped by nothing but are still on disk:
   `themes/signal/prism-chat-signal.css`, `themes/soft/prism-chat-soft.css`,
   `core/prism-chat-holo-iridescent.css`. The test suite reports them as safe to
-  delete rather than failing — a red suite for a pending tidy-up is one people
+  delete rather than failing; a red suite for a pending tidy-up is one people
   learn to ignore.
 - Checked and clean, so nobody re-audits them: all five vendored font families
   are genuinely used (Chakra Petch + JetBrains Mono for Signal, Sora + Nunito
@@ -237,14 +237,14 @@ things that were quietly wrong, found by checking rather than by breaking.
   because the build renames them and the widgets load them from
   `/overlays/active/`.
 
-## [2.2.1] — 2026-09-27
+## [2.2.1] - 2026-09-27
 
 Documentation and CI. No change to any overlay.
 
 ### Fixed
 - **The README documented the retired stopgap as the way to style chat.** It
   told you to paste `prism-chat-signal.css` into SoundAlerts' Custom CSS, which
-  has been wrong since 2.1.0 — PRISM renders chat itself. There is now a **Chat**
+  has been wrong since 2.1.0: PRISM renders chat itself. There is now a **Chat**
   section covering the four files, `scripts/deploy-chat.py`, the OBS URL, every
   query option, and the fact that chat is blank when Stream Manager is not
   running. The retired stopgap sheets are named as rollback-only.
@@ -260,7 +260,7 @@ Documentation and CI. No change to any overlay.
   maintenance service already checked that weekly on the streaming PC; doing it
   at the commit is what catches the drift this release exists to fix.
 
-## [2.2.0] — 2026-09-25
+## [2.2.0] - 2026-09-25
 
 A full audit-and-fix pass over the chat overlay, end to end, plus moderation
 sync pulled forward from Phase 4 because a message a mod deleted was staying on
@@ -277,9 +277,9 @@ stream. Two of the findings were load-bearing enough to measure.
   server-side and the message renders italic in the chatter's colour
   (`.pc-action`). Twitch does not document whether a `/me` line's emote offsets
   are measured against the wrapped string or the body, so the feed *detects* it
-  per message rather than guessing — an emote code is always a whole
+  per message rather than guessing. An emote code is always a whole
   space-delimited word, so the origin whose spans land on whole words wins.
-- **`scripts/test-chat-overlay.mjs`** — 33 behaviour tests that drive the real
+- **`scripts/test-chat-overlay.mjs`**: 33 behaviour tests that drive the real
   `prism-chat.js` in a real browser against a scriptable fake Stream Manager.
   The greps in `test-socials.mjs` check that the guards are still *spelled*
   right; this checks they still *work*. Skips cleanly when playwright is absent.
@@ -292,14 +292,14 @@ stream. Two of the findings were load-bearing enough to measure.
   *global* effect id whenever a channel has no ring buffer yet, so once any
   other overlay's effect pushed that id past the chat overlay's high-water mark,
   every poll returned instantly with no events and was re-issued with zero
-  delay — from overlay load until the first chat message of the run. A shoutout
+  delay, from overlay load until the first chat message of the run. A shoutout
   before anyone has chatted is enough to trigger it. The overlay now always
   takes a higher reported id, events or not (effect ids are global and
   monotonic, so this loses nothing), with a 1s floor behind it. Measured:
   1209 requests in 3s before, 3 after.
 - **Badge lookups blocked the IRC thread, on every single message.** The badge
   cache judged staleness on its `ok` flag, so a failed Helix read was never
-  considered fresh and the *next* message tried again — up to two 6-second
+  considered fresh and the *next* message tried again, up to two 6-second
   requests on the one thread that answers Twitch's PING and dispatches every
   `!command`. A sustained Helix outage would have stalled chat and dropped the
   connection. The fetch now happens on a background thread, one at a time, and
@@ -355,7 +355,7 @@ Each of these looks like an obvious simplification. It is not.
 - **A `CONTRACT_VERSION` bump for the new `action` field.** The renderer refuses
   any payload whose `v` it does not equal, so a bump would blank the overlay
   until both halves redeploy. An additive field degrades to rendering `/me`
-  upright — the better failure mode.
+  upright, the better failure mode.
 - **Falling back to a login when `CLEARMSG` carries no target id.** It would
   remove every message from that chatter, which is `CLEARCHAT`'s job. A single
   deletion must never wipe a visible history.
@@ -374,27 +374,27 @@ Each of these looks like an obvious simplification. It is not.
 - Requires stream-manager v0.11.1. Run `python scripts/deploy-chat.py` after
   pulling, then refresh the OBS browser source.
 
-## [2.1.0] — 2026-09-23
+## [2.1.0] - 2026-09-23
 
 PRISM renders chat itself. The overlay reads Stream Manager's chat feed
 (stream-manager v0.11.0) instead of restyling somebody else's widget, so
-message lifecycle, mentions, moderation and event cards all become possible —
+message lifecycle, mentions, moderation and event cards all become possible,
 and chat finally follows the active set like every other surface.
 
 ### Added
-- **`chat/prism-chat.html` + `core/prism-chat.js` + `core/prism-chat-base.css`** —
+- **`chat/prism-chat.html` + `core/prism-chat.js` + `core/prism-chat-base.css`**:
   the chat overlay. Backfills the newest 25 messages on load, then long-polls
   `/api/effects/chat`. No framework, no build step, no dependency.
 - **`scripts/deploy-chat.py`** flattens the three sources into stream-manager's
   `static/chat/`. One OBS URL that never changes and is not tied to a set:
   `http://localhost:5000/static/chat/chat.html`
-- **Three chat skins** — `themes/signal/chat-theme.css`,
+- **Three chat skins**: `themes/signal/chat-theme.css`,
   `themes/soft/chat-theme.css` and `widgets/theme-holo-chat.css` (built to
   `chat-theme.css` for `prism-holo`). Unlike the shoutout and now-playing holo
   themes, holo's chat skin is a real look, not an empty file: we own this
   markup now.
 - **Placement is a feature, not a constant.** The page fills whatever box OBS
-  gives the source, so geometry is the OBS transform — per scene, for free.
+  gives the source, so geometry is the OBS transform: per scene, for free.
   `?anchor=top|bottom` and `?align=left|right` set orientation; `?max`,
   `?ageout`, `?backfill` and `?theme` tune the rest.
 
@@ -429,12 +429,12 @@ and chat finally follows the active set like every other surface.
   60s, so an import re-downloads the whole set each time (the 2.0.2 shoutout
   bug). `scripts/test-socials.mjs` now fails the build if one appears.
 
-## [2.0.3] — 2026-09-23
+## [2.0.3] - 2026-09-23
 
 ### Fixed
 - **The chat sheets hid the six newest messages.** `.chat--list` is a flex
   column with `justify-content:flex-end` and `overflow:hidden`, so SoundAlerts
-  appends new messages at the bottom and clips old ones off the top — the
+  appends new messages at the bottom and clips old ones off the top, so the
   newest message is `:last-child`, not `:first-child`. Both 2.0 sheets (and the
   1.x holo sheet they inherited it from) counted from the wrong end, so the
   message cap and the fade ramp applied to the newest messages instead of the
@@ -458,7 +458,7 @@ and chat finally follows the active set like every other surface.
   50% / 30% opacity.
 - Emotes render at `1.4em` instead of Twitch's 28px default.
 
-## [2.0.2] — 2026-09-21
+## [2.0.2] - 2026-09-21
 
 ### Added
 - **The shoutout card and the now-playing widget follow the active set.**
@@ -480,7 +480,7 @@ and chat finally follows the active set like every other surface.
   Stream Manager isn't reachable, the widget keeps its last theme, or the holo
   look on a cold start.
 
-## [2.0.1] — 2026-09-21
+## [2.0.1] - 2026-09-21
 
 ### Fixed
 - **Tech Difficulties never authenticated with OBS.** The websocket login
@@ -497,7 +497,7 @@ and chat finally follows the active set like every other surface.
   websocket is still used, when it can connect, for the desktop-audio tile
   and the scene switch.
 
-## [2.0.0] — 2026-09-18
+## [2.0.0] - 2026-09-18
 
 PRISM 2.0: two new scene sets, switchable from the Stream Manager dashboard.
 The 1.x holo-glass set stays as a third option, unchanged.
@@ -564,7 +564,7 @@ The 1.x holo-glass set stays as a third option, unchanged.
   `static/dashboard.js` gives all three PRISM sets proper labels. Restart
   Stream Manager to pick up the config (it reads `scene_sets` at startup).
 
-## [1.7.4] — 2026-09-15
+## [1.7.4] - 2026-09-15
 
 ### Changed
 - **The overlay harness takes a path and no longer assumes a transport.**
@@ -587,7 +587,7 @@ The 1.x holo-glass set stays as a third option, unchanged.
 - The comparison table no longer lists "OBS audio ducking" as something the
   service does. It does not; Stream Manager dropped ducking deliberately.
 
-## [1.7.3] — 2026-09-15
+## [1.7.3] - 2026-09-15
 
 ### Changed
 - **The maintenance script now checks what this repo actually owns.** With the
@@ -595,18 +595,18 @@ The 1.x holo-glass set stays as a third option, unchanged.
   it looked for `requests`/`websockets` and for `prismenv/prism-secrets.json`,
   both of which moved to stream-manager with the service. Those two checks are
   replaced by one that runs `scripts/test-shoutout-overlay.mjs` and reports how
-  many checks passed — the overlay is this repo's half of the feature, so that
+  many checks passed. The overlay is this repo's half of the feature, so that
   is the thing worth guarding.
 - The **Launchers** check understands the `set "PY=python"` fallback every
   `tools/*.bat` carries, so a missing `prismenv/` is no longer reported as six
   broken launchers. It counts them separately instead.
-- Removed `tools/Start-PRISM-Shoutout.bat` — it started a service that is not
+- Removed `tools/Start-PRISM-Shoutout.bat`; it started a service that is not
   here any more. Start the shoutout service with the rest of Stream Manager.
 
 ### Fixed
 - The overlay harness has **32** checks, not 33 as 1.7.1 and the README claimed.
 
-## [1.7.2] — 2026-09-14
+## [1.7.2] - 2026-09-14
 
 ### Changed
 - **The shoutout service has moved out of this repo.** It was merged into
@@ -616,19 +616,19 @@ The 1.x holo-glass set stays as a third option, unchanged.
   carried a stale second copy. Removed `prism-shoutout/` and
   `prism_shoutout_service.py`, and rewrote the README around the split.
 
-  PRISM keeps the presentation half — `widgets/prism-shoutout.html` and
+  PRISM keeps the presentation half: `widgets/prism-shoutout.html` and
   `scripts/test-shoutout-overlay.mjs`. The WebSocket contract between them
   (`ws://127.0.0.1:8777`, card payload out, `clipstart`/`clipend` back) is
   unchanged and is what has to stay in step across the two repos.
 
-## [1.7.1] — 2026-09-13
+## [1.7.1] - 2026-09-13
 
 ### Fixed
 - **Shoutout clips no longer freeze on screen.** A starved `<video>` is not a
   `<video>` in error: when the MP4 stops arriving mid-playback (a CDN hiccup, a
   signed URL that has gone stale while the card waited in the queue, a decode
   stumble) the element simply stops advancing. No `error` fires, no `ended`
-  fires — so nothing released the OBS duck and nothing shortened the card. The
+  fires, so nothing released the OBS duck and nothing shortened the card. The
   result was a frozen frame holding the screen for the clip's full runtime
   while game and music audio stayed lowered until the service's 65-second
   safety timeout.
@@ -637,7 +637,7 @@ The 1.x holo-glass set stays as a third option, unchanged.
   stall into the same recovery path as an outright error: release the duck,
   fall back to the thumbnail, shorten the card. Two thresholds, both
   overridable per card from the service payload:
-  `CFG.startMs` (8s — playback never began) and `CFG.stallMs` (3s — it stopped
+  `CFG.startMs` (8s: playback never began) and `CFG.stallMs` (3s: it stopped
   advancing). Detection lands within ~3.5s of a freeze.
 
   Every way a clip can die now goes through one `failClip()` path, so the duck
@@ -651,14 +651,14 @@ The 1.x holo-glass set stays as a third option, unchanged.
   32 checks, including a stalled clip, a clip that never starts, a clip that
   plays through untouched, and an outright error.
 
-## [1.7.0] — 2026-08-31
+## [1.7.0] - 2026-08-31
 
-Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
+Shoutout hardening pass, worked from the Aug 2026 audit of the feature.
 
 ### Added
 - **Shoutout safety gates.** A raid used to reach the screen with nothing in
   front of it: no blocklist, no threshold, no human. There are now three gates
-  in `config.py` — `BLOCKLIST` (never shouted, by command or raid),
+  in `config.py`: `BLOCKLIST` (never shouted, by command or raid),
   `RAID_ALLOWLIST` (if set, only these are auto-shouted on raid) and
   `RAID_REQUIRE_APPROVAL`, which parks the raid and waits for a mod to type
   `!so ok` (lapsing after `RAID_APPROVAL_TTL`).
@@ -666,7 +666,7 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   drops the queue behind it, `!so off` / `!so on` stop and resume shoutouts
   (raids included), `!so ok` approves a pending raid and `!so status` prints
   the state. `skip` and `clear` are pushed to the overlay over the existing
-  WebSocket, so they land mid-clip — killing the service is no longer the only
+  WebSocket, so they land mid-clip, and killing the service is no longer the only
   way out of a bad card. A bare word is a control; `!so @skip` still shouts out
   a streamer called *skip*.
 
@@ -679,10 +679,10 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   ride along in the card payload; the overlay ramps the clip up to that ceiling
   instead of snapping to 1.0 at a fixed 250ms. With the fade matched to
   `DUCK_FADE_MS` the clip now arrives together with the duck rather than on top
-  of it — that overlap used to be the loudest moment of the card.
+  of it; that overlap used to be the loudest moment of the card.
 - **Per-source duck levels.** `DUCK_LEVELS` sets how much each OBS input keeps
   while a clip plays, falling back to `DUCK_KEEP`. One flat level dropped your
-  mic along with the game, which is backwards — you talk over the clip.
+  mic along with the game, which is backwards: you talk over the clip.
 - **Raids look like raids.** The payload carries `raid` and `raiders`, and the
   card has a third state next to `.live`: gold eyebrow reading "Raid · 42
   viewers", gold pulse, warmer glow on the hex. The viewer count used to be
@@ -699,11 +699,11 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   streamers got a grey play icon on exactly the shoutouts that needed the most
   help. The label now sits as a caption so the art reads.
 - **A shoutout log.** `SHOUTOUT_LOG` records one JSONL line per shoutout, and
-  the service reads it back at startup to restore clip rotation — previously
+  the service reads it back at startup to restore clip rotation. Previously
   nothing was persisted, so a restart forgot what it had shown and could replay
   the same clip. Best-effort: a log that can't be written never costs a shoutout.
 - `COMMAND_ALIASES` (`!shoutout`), and `!so` now accepts a pasted
-  `twitch.tv/name` link as well as `@name` — mods paste links.
+  `twitch.tv/name` link as well as `@name`, because mods paste links.
 - `ALLOW_SELF_SHOUTOUT` (off): `!so @yourself` no longer plays your own clip to
   your own chat.
 - The console warns when more than one overlay is connected, since every one of
@@ -717,12 +717,12 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 - **One held obs-websocket connection instead of two handshakes per shoutout.**
   `_duck_down` and `_duck_up` each opened, authenticated and closed their own
   socket, putting a round-trip in the path of something that has to feel
-  instant. The connection is now held and reopened only when a request fails —
+  instant. The connection is now held and reopened only when a request fails,
   deliberately without inspecting socket state, which moved between
   `websockets` releases.
 - **The duck no longer re-discovers your OBS inputs on every clip.** It probed
   `GetInputList` plus a `GetInputVolume` per input, then read every volume
-  again — roughly 2N sequential round-trips before the fade could start. The
+  again: roughly 2N sequential round-trips before the fade could start. The
   list is cached for `DUCK_TARGET_TTL` (60s) and dropped on reconnect.
 - CI now byte-compiles `prism-shoutout/prism_shoutout/*.py` and runs both test
   suites. It previously compiled only the launcher shim and `scripts/`, so a
@@ -736,13 +736,13 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   now cleared on success only, the watchdog is cancelled only once they are
   actually back, and it retries.
 - **The OBS socket is only ever used under `_duck_lock`.** `emergency_restore`
-  ran unlocked, and `server.close()` only *schedules* the overlay shutdown — so
+  ran unlocked, and `server.close()` only *schedules* the overlay shutdown, so
   at exit it could race a handler still releasing its duck on the same held
   connection, tearing the socket down mid-fade. The service now awaits
   `server.wait_closed()` first.
 - **`OBS_REQ_TIMEOUT` on every OBS request.** Holding the connection open made a
   half-open socket a realistic state, where a bare `recv` hangs forever holding
-  the lock — stranding the watchdog that exists to un-duck your audio.
+  the lock, stranding the watchdog that exists to un-duck your audio.
 - **The overlay no longer cuts the following card short.** A clip that errored
   during the 700ms exit window armed a hold timer that outlived its own card and
   fired partway through the next one, retiring it early and pulling an extra
@@ -760,7 +760,7 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 - **A failed duck no longer leaves your mix down.** `_duck_down()` saves the
   original levels *before* it fades, so if the OBS socket dropped mid-fade the
   handler zeroed `active` and returned, leaving sources lowered with nothing
-  scheduled to raise them — audible for the rest of the stream. It now restores
+  scheduled to raise them, audible for the rest of the stream. It now restores
   on that path, and arms the watchdog to retry if the restore fails too.
 - **A clip that fails mid-play no longer holds a dead frame.** The service sizes
   the card from the clip's duration before anyone knows the MP4 plays, so a
@@ -771,19 +771,19 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   to the first letter of the name, and the same fallback covers an avatar URL
   that fails to load.
 - **Long display names no longer wrap mid-word.** The identity column was 330px
-  in a 1080px card — roughly 55px of the available width was going unused while
+  in a 1080px card; roughly 55px of the available width was going unused while
   a 13-character name wrapped and shoved the rest of the column around. The
   column is now 376px and the name is measured and fitted to it.
 - **The overlay no longer loads fonts from Google.** v1.5.0 vendored the fonts
   so overlays need no network; the shoutout card missed that pass and still
-  blocked on a Google request as OBS loaded the source — the one moment where a
+  blocked on a Google request as OBS loaded the source, the one moment where a
   slow response shows a flash of fallback type on stream. It now imports
   `../fonts/prism-fonts.css`, and `scripts/deploy-pages.py` copies `fonts/` into
   the hosted folder (it rewrote the path but never shipped the files).
   *The thank-you, webcam-frame and now-playing overlays still need this pass.*
 - `prism_shoutout.__version__` read `1.0.0` while the repo was at 1.6.1; it now
   reads the `VERSION` file so it can't drift again.
-- `service._until` and `clips._last_clips` are bounded — both grew for the life
+- `service._until` and `clips._last_clips` are bounded; both grew for the life
   of the process. `_until` has a hard cap as well as expiry (a raid train holds
   hundreds of live guards), and clip memory evicts least-recently-used rather
   than first-seen, which had it forgetting your regulars first.
@@ -791,7 +791,7 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   sat outside the try, so a failure in either killed the task silently with an
   unretrieved-exception warning and no console line.
 
-## [1.6.1] — 2026-08-28
+## [1.6.1] - 2026-08-28
 
 ### Fixed
 - `tools/deploy-to-pages.sh` still used the pre-restructure flat copy logic; it
@@ -803,11 +803,11 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 
 ### Added
 - Maintenance checks: **Launchers** (every path a `tools/*.bat` points at must
-  exist — catches a future move breaking them) and **OBS scene set** (flags a
+  exist; catches a future move breaking them) and **OBS scene set** (flags a
   `prism-holo` build that has drifted from source).
 - CI now byte-compiles everything in `scripts/`, not just the service shim.
 
-## [1.6.0] — 2026-08-28
+## [1.6.0] - 2026-08-28
 
 ### Changed
 - **Restructured the repo.** Root went from 33 loose files to 2. Source is now
@@ -827,11 +827,11 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 
 ### Fixed
 - The set builder refuses to write into the source repo, and the set folder is
-  named `prism-holo` rather than `prism` — on case-insensitive Windows paths
+  named `prism-holo` rather than `prism`: on case-insensitive Windows paths
   `overlays/prism` resolves to the `overlays/PRISM` repo, which the build's
   clear-target step would have wiped.
 
-## [1.5.0] — 2026-08-28
+## [1.5.0] - 2026-08-28
 
 ### Changed
 - **Self-hosted social icons.** The social pills now draw inline SVG brand
@@ -845,7 +845,7 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 
 ### Security
 - The tech-difficulties overlay no longer embeds a Twitch client secret; live
-  detection uses DecAPI. The secret was purged from all git history — **it was
+  detection uses DecAPI. The secret was purged from all git history, and **it was
   public, so it must be rotated.**
 - `scan-secrets.sh` now matches camelCase and kebab-case key names
   (`clientSecret`, `apiKey`, `accessToken`, …). It previously only caught
@@ -854,10 +854,10 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 ### Added
 - The integrity test fails if a configured social has no inline icon.
 
-## [1.4.0] — 2026-08-09
+## [1.4.0] - 2026-08-09
 
 ### Added
-- **Maintenance service** — `scripts/prism-maintenance.py` runs non-destructive
+- **Maintenance service**: `scripts/prism-maintenance.py` runs non-destructive
   health checks (venv/deps, `prism-secrets.json` validity, secret-not-committed,
   git status vs origin, config/scene integrity, DecAPI reachability) plus light
   cleanup (repo `__pycache__`, prune old logs), writing a timestamped report to
@@ -866,26 +866,26 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   `prism-maintenance.bat` runs it on demand; `uninstall-maintenance-task.bat`
   removes it. Logs are gitignored.
 
-## [1.3.0] — 2026-08-07
+## [1.3.0] - 2026-08-07
 
 ### Added
 - **DecAPI resilience.** `prism-engine.js` caches the last good avatar, follower
   count, and latest follower in `localStorage` (per channel), paints them
-  instantly on load, and falls back to them during brief DecAPI outages — the
+  instantly on load, and falls back to them during brief DecAPI outages, so the
   overlay no longer blanks when the endpoint hiccups. Identical behavior when
   DecAPI is healthy.
-- **Follower list refresh** — `scripts/refresh-followers.py` + `refresh-followers.bat`
+- **Follower list refresh**: `scripts/refresh-followers.py` + `refresh-followers.bat`
   pull your real follower list from Twitch Helix (using the stream-manager
   token) and write `prism-followers.json`. Requires the `moderator:read:followers`
   scope (re-authorize stream-manager once if the token lacks it).
-- **Offline fonts** — `scripts/fetch-fonts.py` + `fetch-fonts.bat` download the
+- **Offline fonts**: `scripts/fetch-fonts.py` + `fetch-fonts.bat` download the
   woff2 files into `fonts/` and rewrite `fonts/prism-fonts.css` to use them.
 
 ### Changed
 - `prism-theme.css` and `prism-panels.css` now import fonts via the single
   `fonts/prism-fonts.css` aggregator (online by default; local after fetch).
 
-## [1.2.0] — 2026-08-07
+## [1.2.0] - 2026-08-07
 
 ### Changed
 - **Merged the shoutout service into the repo.** The modular `prism-shoutout/`
@@ -899,19 +899,19 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
   setup to the top-level launcher for correct console rendering.
 
 ### Notes
-- No behavior change intended — verified all package modules import and resolve
+- No behavior change intended; verified all package modules import and resolve
   credentials. Do one `!so` test before relying on it live.
 
-## [1.1.0] — 2026-08-07
+## [1.1.0] - 2026-08-07
 
 ### Added
-- **CI** — GitHub Actions workflow (`.github/workflows/ci.yml`) runs JS syntax
+- **CI**: GitHub Actions workflow (`.github/workflows/ci.yml`) runs JS syntax
   checks, a config/scene integrity test, Python service compile, and a secret scan
   on every push and PR.
-- **Secret guard** — `scripts/scan-secrets.sh` plus a `.githooks/pre-commit` hook
+- **Secret guard**: `scripts/scan-secrets.sh` plus a `.githooks/pre-commit` hook
   block credentials (and `prism-secrets.json`) from ever being committed.
   Enable locally with `git config core.hooksPath .githooks`.
-- **Deploy script** — `deploy-to-pages.bat` / `.sh` copy the canonical overlays
+- **Deploy script**: `deploy-to-pages.bat` / `.sh` copy the canonical overlays
   into `github-pages/` so hosted copies can't drift from source.
 - **`prism-secrets.example.json`** at the repo root, plus this `CHANGELOG.md` and
   a `VERSION` marker.
@@ -925,10 +925,10 @@ Shoutout hardening pass — worked from the Aug 2026 audit of the feature.
 - Continues 1.0.0's fix: no credentials are hardcoded; all load via the
   `_secret()` / config loader from `prism-secrets.json` or env.
 
-## [1.0.0] — 2026-08-07
+## [1.0.0] - 2026-08-07
 
 ### Added
-- `prism-config.js` — single source of truth for channel, socials, follower goal,
+- `prism-config.js`: single source of truth for channel, socials, follower goal,
   Spotify client id, and avatar; `prism-engine.js` renders socials from it.
 - Root `.gitignore`, `README.md`, MIT `LICENSE`; first public release as
   [CarlFox98/PRISM-CORE](https://github.com/CarlFox98/PRISM-CORE).
