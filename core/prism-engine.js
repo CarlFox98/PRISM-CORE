@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM — shared engine
+   PRISM shared engine
    Particle motes + live Twitch data (via DecAPI, no secrets).
 
    Per-scene config, set on <body>:
@@ -150,7 +150,7 @@
   function each(sel, fn){ Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
   function fmt(n){ return (''+n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
-  /* last-good cache — keeps the overlay populated across brief DecAPI outages
+  /* last-good cache: keeps the overlay populated across brief DecAPI outages
      and OBS restarts. Keyed per channel; degrades silently if storage is off. */
   var LS = 'prism_' + CH + '_';
   function cacheGet(k){ try{ return localStorage.getItem(LS + k); }catch(e){ return null; } }
@@ -160,8 +160,8 @@
     if(!/^https?:\/\//.test(url)) return;
     each('img.js-avatar', function(img){ img.src = url; });
   }
-  /* the goal to show for count n: the configured one, or — once it has been
-     reached and goalStep is set — the next multiple of goalStep above n */
+  /* the goal to show for count n: the configured one, or (once it has been
+     reached and goalStep is set) the next multiple of goalStep above n */
   function effectiveGoal(n){
     if(GOAL > 0 && STEP > 0 && n >= GOAL) return (Math.floor(n / STEP) + 1) * STEP;
     return GOAL;

@@ -1,8 +1,8 @@
 /* ============================================================
-   PRISM 2.0 — SIGNAL chat skin
+   PRISM 2.0 SIGNAL chat skin
    Colour, shape and entry motion only. Structure and sizing belong to
    prism-chat-base.css; fonts are loaded once by the page from
-   /overlays/PRISM/fonts/prism-fonts.css — never @import them here, because
+   /overlays/PRISM/fonts/prism-fonts.css. Never @import them here, because
    this file is re-read every 60s and each import re-downloads the lot.
    ============================================================ */
 :root{

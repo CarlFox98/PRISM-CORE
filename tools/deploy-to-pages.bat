@@ -23,7 +23,7 @@ cd github-pages
 
 REM "git diff --quiet" ignores UNTRACKED files, so a deploy that only adds new
 REM files (a new overlay, the fonts/ folder) used to report "no changes" and
-REM push nothing. Ask git status instead -- it sees untracked files too.
+REM push nothing. Ask git status instead; it sees untracked files too.
 set "CHANGES="
 for /f "delims=" %%i in ('git status --porcelain') do set "CHANGES=1"
 if not defined CHANGES (

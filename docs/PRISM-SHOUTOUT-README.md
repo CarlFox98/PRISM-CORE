@@ -1,92 +1,57 @@
-# PRISM Shoutout — setup
+# PRISM Shoutout: setup
 
-A mod types **`!so @username`** in your Twitch chat →  a PRISM card slides
-in with that streamer's hex avatar, their last category, and an
-**autoplaying recent clip**, then gracefully fades out.
+A mod types **`!so @username`** in Twitch chat, and a PRISM card slides in
+with that streamer's avatar, their last category and a recent clip, then fades
+out. A raid gets the gold "Raid · N viewers" variant automatically.
 
-Two pieces:
+**Shoutouts are run by [Stream Manager](https://github.com/CarlFox98/stream-manager)
+now.** The Python service that used to live here (`prism_shoutout_service.py`,
+the `prism-shoutout/` package and `tools\Start-PRISM-Shoutout.bat`) was merged
+into Stream Manager in September 2026 as `stream_manager/shoutout.py`, and
+removed from this repo.
 
-| File | What it is | Where it runs |
-|------|------------|---------------|
-| `widgets/prism-shoutout.html` | the on-screen overlay | **hosted** (GitHub Pages) → OBS Browser Source |
-| `prism_shoutout_service.py` | watches chat, does Twitch lookups, drives the overlay | on your PC (Python) |
+## Setup
 
-The overlay must be **hosted** (not a local file) so the Twitch clip can
-autoplay — the clip embed requires a real domain as its "parent", and your
-`carlfox98.github.io` gives us that.
+1. Run Stream Manager. It already has the Twitch login the shoutout needs.
+2. In OBS, add a **Browser Source** at
+   `http://localhost:5000/static/interactive/shoutout.html`, sized
+   **1920×1080**, above your scenes. It's transparent and idle until a
+   shoutout fires.
+3. Have a mod (or you) type `!so @someone`.
 
---------------------------------------------------------------------
-## 1. Host the overlay
+Stream Manager serves its own copy of the card over HTTP and feeds it through
+a long-poll on `/api/effects/shoutout`. It plays the clip's video file
+directly, so the card doesn't need to be hosted on a real domain.
 
-*(Easiest: run `tools\deploy-to-pages.bat`, which copies and pushes for you.)*
---------------------------------------------------------------------
-Add `widgets/prism-shoutout.html` to your existing Pages repo (the `streaming`
-one). From that repo folder:
+## Options
 
-```
-copy "C:\Users\NeoTheFox98\Pictures\OBS Assets\overlays\PRISM\widgets\prism-shoutout.html" .
-git add prism-shoutout.html
-git commit -m "PRISM shoutout overlay"
-git push
-```
+Settings live in Stream Manager's `config.json` under `shoutout` (see
+`DEFAULTS` in `stream_manager/shoutout.py`). The main ones:
 
-Live URL:  **`https://carlfox98.github.io/streaming/prism-shoutout.html`**
+- **`mods_only`** (on): only mods and the broadcaster can use `!so`.
+- **`chat_send`** (on): post the shoutout line in chat as well.
+- **`raid_shoutout`** (on), **`raid_min_viewers`** (2) and
+  **`raid_require_approval`** (off): automatic raid shoutouts, optionally
+  waiting for a mod's `!so ok`.
+- **`blocklist`**: channels that never get a card.
+- **How long the card stays:** with a clip, the clip's length (clamped to
+  6–40 s); with no clip, `noclip_hold_ms` (8 s). `hold_ms` (18 s) is the
+  fallback when a clip's length is unknown.
 
---------------------------------------------------------------------
-## 2. Add it to OBS
---------------------------------------------------------------------
-Add a **Browser Source** → URL = the link above, **1920×1080**, and place
-it above your scene(s) where you want the card to appear. It's transparent
-and idle until a shout fires. It auto-connects to the service on
-`ws://127.0.0.1:8777`.
+Mod controls in chat: `!so skip`, `!so clear`, `!so off`, `!so on`,
+`!so ok` (approve a waiting raid) and `!so status`.
 
---------------------------------------------------------------------
-## 3. Run the service
---------------------------------------------------------------------
-```
-prismenv\Scripts\python.exe -m pip install -r prism-shoutout\requirements.txt
-```
+## The card in this repo
 
-Credentials are **not** in code — they load from `prismenv\prism-secrets.json`
-(git-ignored). Copy `data/prism-secrets.example.json` there and fill in:
+`widgets/prism-shoutout.html` is the original WebSocket build
+(`ws://127.0.0.1:8777`). Nothing serves that socket any more, so the card in
+this repo is a reference implementation and the target of the headless test,
+not what OBS loads. A change to the card's look or timing has to be made in
+**both** copies. The test runs against either:
 
-- `CHANNEL` → `NeoTheFox98`
-- `CLIENT_ID` → your SYSFOX app Client ID
-- `CLIENT_SECRET` → your SYSFOX app **Client Secret**
-- `OBS_WS_PASSWORD` → (optional) for audio ducking
-
-Then run it (keep it running while you stream) — double-click
-`tools\Start-PRISM-Shoutout.bat`, or:
-
-```
-python prism_shoutout_service.py
+```bash
+node scripts/test-shoutout-overlay.mjs
+node scripts/test-shoutout-overlay.mjs "<stream-manager>/static/interactive/shoutout.html"
 ```
 
-(The service itself lives in the modular `prism-shoutout/` package;
-`prism_shoutout_service.py` is just a launcher shim.)
-
-You'll see `[chat] listening…` and `[overlay] connected` once OBS loads the
-source. Have a mod (or you) type `!so @someone` — the card appears.
-
---------------------------------------------------------------------
-## Options / notes
---------------------------------------------------------------------
-- **Mods only** by default (`MODS_ONLY = True`). Broadcaster always allowed.
-- **Chat message:** off by default. Either let SYSFOX post the `!so` line,
-  or set `CHAT_SEND = True` + `BOT_USERNAME` + `BOT_OAUTH` (an `oauth:...`
-  token for the sending account) to have this service post it too.
-- **On-screen time:** `HOLD_MS` (default 18s). Clips can be up to 60s.
-- **Clip choice:** newest clip within `CLIP_LOOKBACK_DAYS` (90); falls back
-  to the channel's top clip if none recent. Shows a tasteful "No recent
-  clip" panel if the user has none.
-- **No secret is ever exposed** — the secret lives only in this local
-  service; the hosted overlay just receives display data over local WS.
-- **Prefer to fold it into SYSFOX?** Import the logic and call
-  `await do_shoutout("username")` from your own command handler instead of
-  using the built-in chat reader — the WebSocket overlay push is the same.
-- The service must be running for shouts to show. If the overlay ever fails
-  to connect (rare CEF quirk with loopback WebSockets), tell me and I'll add
-  a secure-tunnel fallback.
-
-Tip: open `…/prism-shoutout.html?demo` in a normal browser to preview the
-card design any time.
+Open either copy with `?demo` in a normal browser to preview the design.

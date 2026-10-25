@@ -164,7 +164,7 @@
     <div class="holo-pill ent-logo"><span class="live-dot"></span>SIGNAL DISRUPTED</div>
     <div class="heading ent-heading">Technical Difficulties</div>
     <div class="divider ent-divider"></div>
-    <div class="message ent-message">Re-establishing the <span class="accent">connection</span><br>&mdash; back with you in a moment</div>
+    <div class="message ent-message">Re-establishing the <span class="accent">connection</span><br>Back with you in a moment</div>
   </div>
 
   <div class="stream-status ent-status" id="streamStatus">
@@ -181,7 +181,7 @@
 <script>
 /* ---- OBS + Twitch status checker (auto "We're back!") ---- */
 const CONFIG = {
-  // Live detection uses DecAPI (no secrets, no token) — never embed a client
+  // Live detection uses DecAPI (no secrets, no token). Never embed a client
   // secret in a browser source; anyone who opens the page can read it.
   twitch: { channel: 'NeoTheFox98' },
   obs: { enabled: true, host: 'localhost', port: 4455, password: '', sceneToSwitch: 'Starting Soon' },
@@ -273,7 +273,7 @@ async function startOBSPolling() {
 }
 async function checkStream() {
   // DecAPI returns an uptime string when live, or "<channel> is offline" when
-  // not — no auth, no secret. Matches prism-engine.js's approach.
+  // not. No auth, no secret. Matches prism-engine.js's approach.
   try {
     const ctrl = new AbortController();
     const to = setTimeout(() => ctrl.abort(), 6000);

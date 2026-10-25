@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PRISM — Shoutout</title>
+<title>PRISM: Shoutout</title>
 <style>
 /* ============================================================
-   PRISM — Shoutout overlay
+   PRISM Shoutout overlay
    A mod types  !so @user  in chat -> the companion service
    (prism_shoutout_service.py) pushes a payload here over a
    local WebSocket, and this card slides in with the user's
@@ -18,7 +18,7 @@
 
    Test layout with ?demo on the URL.
    ============================================================ */
-@import url('../fonts/prism-fonts.css');   /* vendored — no network at load.
+@import url('../fonts/prism-fonts.css');   /* vendored, no network at load.
    scripts/deploy-pages.py rewrites this to fonts/ for the hosted copy. */
 :root{
   --ink:#EAF0FF; --ink-soft:#A9B4D6;
@@ -54,7 +54,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
   background-size:320% 100%; animation:flow 9s linear infinite; }
 .so-ava img{ position:absolute; inset:4px; width:calc(100% - 8px); height:calc(100% - 8px); object-fit:cover;
   background:#0b0e18; -webkit-clip-path:var(--hex); clip-path:var(--hex); }
-/* stand-in when the avatar is missing or fails to load — an empty <img src="">
+/* stand-in when the avatar is missing or fails to load: an empty <img src="">
    resolves to this page and paints a broken-image glyph inside the hex */
 .so-ava-letter{ position:absolute; inset:4px; display:none; align-items:center; justify-content:center;
   -webkit-clip-path:var(--hex); clip-path:var(--hex); background:#0b0e18;
@@ -64,10 +64,10 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
 .so-eyebrow{ display:inline-flex; align-items:center; gap:9px; font-size:14px; font-weight:700; letter-spacing:5px;
   text-transform:uppercase; color:var(--c1); text-shadow:0 0 12px rgba(87,242,228,0.5); }
 .so-eyebrow .dot{ width:9px; height:9px; border-radius:50%; background:var(--c1); box-shadow:0 0 8px var(--c1),0 0 16px var(--c1); animation:blip 1.4s ease-in-out infinite; }
-/* LIVE NOW state — magenta accent when the shouted user is streaming right now */
+/* LIVE NOW state: magenta accent when the shouted user is streaming right now */
 .so.live .so-eyebrow{ color:var(--c4); text-shadow:0 0 12px rgba(255,122,203,0.6); }
 .so.live .so-eyebrow .dot{ background:var(--c4); box-shadow:0 0 8px var(--c4),0 0 16px var(--c4); animation-duration:0.9s; }
-/* RAID state — gold accent, and the hex picks up the same warmth so a raid
+/* RAID state: gold accent, and the hex picks up the same warmth so a raid
    reads as a raid from across the room, not just in the eyebrow text */
 .so.raid .so-eyebrow{ color:var(--c5); text-shadow:0 0 12px rgba(255,216,107,0.6); }
 .so.raid .so-eyebrow .dot{ background:var(--c5); box-shadow:0 0 8px var(--c5),0 0 16px var(--c5); animation-duration:0.75s; }
@@ -106,7 +106,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
 .so-rail i{ display:block; height:100%; transform:scaleX(1); transform-origin:left center;
   background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5)); }
 
-/* staggered reveal — the card assembles instead of arriving as one block */
+/* staggered reveal: the card assembles instead of arriving as one block */
 .so-ava,.so-eyebrow,.so-name,.so-handle,.so-cat,.so-clip{
   opacity:0; transform:translateY(16px);
   transition:opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
@@ -160,7 +160,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
         <div class="so-eyebrow"><span class="dot"></span><span id="eyebrow">Shoutout</span></div>
         <div class="so-name" id="name">Streamer</div>
         <div class="so-handle" id="handle">@streamer</div>
-        <div class="so-cat" id="cat">Last seen streaming <b>&mdash;</b></div>
+        <div class="so-cat" id="cat">Last seen streaming <b>-</b></div>
       </div>
       <div class="so-clip" id="clip">
         <div class="noclip" id="noclip">
@@ -219,7 +219,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
 
   /* A starved <video> is not an <video> in error: if the MP4 stops arriving
      mid-playback (CDN hiccup, a stale signed URL, a decode stumble) the element
-     just stops advancing. No 'error', no 'ended' — so without this watchdog
+     just stops advancing. No 'error', no 'ended', so without this watchdog
      nothing releases the duck, nothing shortens the card, and a frozen frame
      sits on screen for the clip's full runtime while your game audio stays
      lowered until the service's 65s safety timeout. */
@@ -284,11 +284,11 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
       clip.classList.add('has-offline');
     }
   }
-  // The clip died after the service already sized the card from its duration —
+  // The clip died after the service already sized the card from its duration;
   // don't sit on a dead frame for the rest of that runtime.
   function shortenHold(){
     // busy stays true through the 700ms exit, and the video is still in the
-    // DOM and can still error during it — arming a timer here would outlive
+    // DOM and can still error during it, and arming a timer here would outlive
     // this card and cut the NEXT one short.
     if(!busy || exitTimer) return;
     var left = Math.max(0, cardHold - (Date.now() - cardStart));
@@ -333,7 +333,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
   }
   function setClip(d){
     clearClip();
-    if(d.clip){                       // direct mp4 — autoplays, no mature gate
+    if(d.clip){                       // direct mp4: autoplays, no mature gate
       noclip.style.display='none';
       var v=document.createElement('video');
       // muted autoplay is ALWAYS allowed; we unmute the moment it's actually playing
@@ -392,7 +392,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
       catEl.innerHTML = (d.live ? 'Live now &middot; <b>' : 'Last seen streaming <b>')
         + esc(d.category) + '</b>';
     } else {
-      catEl.innerHTML = d.live ? 'Live right now &mdash; go watch!' : 'Go give them a follow';
+      catEl.innerHTML = d.live ? 'Live right now, go watch!' : 'Go give them a follow';
     }
     setAvatar(d);
     setClip(d);
@@ -406,7 +406,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
   // retire the card that's on screen (its hold elapsed, or a mod skipped it)
   function endCard(){
     if(holdTimer){ clearTimeout(holdTimer); holdTimer=null; }
-    if(exitTimer) return;            // already leaving — don't restart the exit
+    if(exitTimer) return;            // already leaving; don't restart the exit
     card.classList.remove('show');
     exitTimer = setTimeout(function(){
       exitTimer=null; onScreen=''; clearClip(); busy=false; next();
@@ -428,7 +428,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
     // non-string here used to throw before play()'s guard could catch it
     var login = String(d.login||'').toLowerCase();
     if(login && (login === onScreen || queued(login))) return;   // already showing/waiting
-    if(queue.length >= CFG.maxQueue) return;                     // backed up — drop it
+    if(queue.length >= CFG.maxQueue) return;                     // backed up, drop it
     queue.push(d);
     next();
   }
@@ -461,7 +461,7 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
 
   /* The name is measured against whatever font is active. With the fonts now
      vendored rather than pulled from Google, the first card after OBS loads
-     the source can be measured against the fallback — re-fit once they land. */
+     the source can be measured against the fallback, so re-fit once they land. */
   if(document.fonts && document.fonts.ready && document.fonts.ready.then){
     document.fonts.ready.then(function(){
       if(busy && nameEl.textContent) fitName(nameEl.textContent);

@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM 2.0 — SIGNAL
+   PRISM 2.0 SIGNAL
    Sci-fi HUD: grid, scanlines, notched panels, corner brackets,
    terminal readouts. Two accents (cyan + magenta), amber for warnings.
 
@@ -103,7 +103,7 @@ button{ font:inherit; text-transform:inherit; letter-spacing:inherit; color:inhe
 .seg i{ height:18px; background:rgba(92,242,227,0.15); transition:background .4s; }
 .seg i.on{ background:var(--cy); box-shadow:0 0 8px rgba(92,242,227,0.5); }
 
-/* slow scan sweep — the one moving thing on most scenes */
+/* slow scan sweep, the one moving thing on most scenes */
 .sweep{ left:0; right:0; top:0; height:180px; z-index:4; pointer-events:none;
   background:linear-gradient(180deg,transparent,rgba(92,242,227,0.07) 60%,rgba(92,242,227,0.16) 98%,transparent);
   animation:sweep 9s linear infinite; }

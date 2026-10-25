@@ -1,9 +1,9 @@
 /* ============================================================
-   PRISM 2.5 — HAUNT · shoutout card theme
+   PRISM 2.5 HAUNT · shoutout card theme
    Loaded by the shoutout card from /overlays/active/ so it follows the
    active set. Only restyles; the show/hide transitions stay the card's.
    Fonts come from the card page (prism-fonts.css carries every PRISM
-   family) — never @import here: this file is re-read every 60s.
+   family), so never @import here: this file is re-read every 60s.
    A summoning: an obsidian slab ringed in foxfire, the streamer's
    portrait in a glowing seal, their name in Cinzel Decorative.
    ============================================================ */

@@ -1,8 +1,8 @@
 /**
  * Headless conformance test for the shoutout overlay.
  *
- * Two implementations exist — this repo's hosted card and the copy Stream
- * Manager serves — and they must behave identically. Run the same spec against
+ * Two implementations exist (this repo's hosted card and the copy Stream
+ * Manager serves), and they must behave identically. Run the same spec against
  * both:
  *
  *   node scripts/test-shoutout-overlay.mjs
@@ -26,7 +26,7 @@ import vm from 'node:vm';
 
 const here = dirname(fileURLToPath(import.meta.url));
 // Default: this repo's overlay. Pass a path to run the same spec against another
-// implementation — Stream Manager serves its own copy of this card, and the two
+// implementation. Stream Manager serves its own copy of this card, and the two
 // have to behave identically or the split silently drifts.
 const target = process.argv[2]
   ? resolve(process.argv[2])
@@ -108,8 +108,8 @@ const getElementById = (id) => {
 };
 
 /* The service has to learn when a clip actually starts and stops. The two
-   overlays report it differently — one over the WebSocket, one by POSTing to
-   /api/shoutout/clip — so record either. The spec cares that the report
+   overlays report it differently (one over the WebSocket, one by POSTing to
+   /api/shoutout/clip), so record either. The spec cares that the report
    happens, not how it travels. */
 const sent = [];
 const record = (raw) => { try { sent.push(JSON.parse(raw)); } catch { sent.push(raw); } };

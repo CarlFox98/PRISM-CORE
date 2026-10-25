@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PRISM pre-commit hook — blocks credentials from being committed.
+# PRISM pre-commit hook: blocks credentials from being committed.
 # Enable once with:  git config core.hooksPath .githooks
 staged="$(git diff --cached --name-only --diff-filter=ACM)"
 [ -z "$staged" ] && exit 0

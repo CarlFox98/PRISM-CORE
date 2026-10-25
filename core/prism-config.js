@@ -1,21 +1,21 @@
 /* ============================================================
-   PRISM — shared config  (single source of truth)
+   PRISM shared config  (single source of truth)
    Change your identity ONCE here and every scene follows.
    Load this BEFORE prism-engine.js in each scene:
        <script src="prism-config.js"></script>
        <script src="prism-engine.js"></script>
 
    What lives here:
-     channel        — Twitch login name (drives all live data)
-     displayName    — how your name is shown / avatar alt text
-     goal           — default follower-goal target (a scene may
+     channel:         Twitch login name (drives all live data)
+     displayName:     how your name is shown / avatar alt text
+     goal:            default follower-goal target (a scene may
                       still override with data-goal on <body>)
-     goalStep       — once the goal is reached, show the next multiple
+     goalStep:        once the goal is reached, show the next multiple
                       of this instead (0 = off, bar stays full)
-     avatarFallback — avatar shown before live data loads
-     spotifyClientId— reference for the now-playing widget
+     avatarFallback:  avatar shown before live data loads
+     spotifyClientId: reference for the now-playing widget
                       (must match the id inside prism-nowplaying.html)
-     socials        — the pills rendered into any element marked
+     socials:         the pills rendered into any element marked
                       <div class="socials" data-prism-socials></div>
    ============================================================ */
 window.PRISM_CONFIG = {

@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PRISM — Game Scene Wallpaper</title>
+<title>PRISM: Game Scene Wallpaper</title>
 <link rel="stylesheet" href="../core/prism-theme.css">
 <style>
 /* ============================================================
-   PRISM — Game Scene Wallpaper
+   PRISM Game Scene Wallpaper
    Full-screen ambient background for the moments before a game
    is captured. Add as a Browser Source (1920x1080) at the
    BOTTOM of your Game Scene's layer stack; the game capture
@@ -252,7 +252,7 @@
   function showQuote(){
     if (!qEl || !quotes.length) return;
     var q=quotes[(Math.random()*quotes.length)|0];
-    qEl.innerHTML='<span class="q">“'+esc(q.text)+'”</span>'+(q.added_by?' <span class="by">— '+esc(q.added_by)+'</span>':'');
+    qEl.innerHTML='<span class="q">“'+esc(q.text)+'”</span>'+(q.added_by?' <span class="by">~ '+esc(q.added_by)+'</span>':'');
     qEl.classList.add('on'); setTimeout(function(){ qEl.classList.remove('on'); },9000);
   }
   loadQuotes(); setInterval(loadQuotes, 240000);

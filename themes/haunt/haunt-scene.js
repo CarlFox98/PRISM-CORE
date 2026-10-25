@@ -1,5 +1,5 @@
 /* ============================================================
-   PRISM HAUNT — the night scenery every Haunt scene shares.
+   PRISM HAUNT: the night scenery every Haunt scene shares.
    Builds the backdrop into .stage[data-haunt] so the scene files only
    carry their own content. Pick layers with space-separated words:
 

@@ -268,7 +268,7 @@ restart();
 const evt = (id, type, label, text = '', extra = {}) => ({
   ...msg(id, text, { fragments: text ? [{ type: 'text', text }] : [] }), kind: 'event',
   event: { type, label, system: '' }, ...extra });
-emit(evt('e1', 'resub', 'resubscribed — 6 months!', 'love this place'));
+emit(evt('e1', 'resub', '★ resubscribed for 6 months!', 'love this place'));
 emit(evt('e2', 'raid', 'is raiding with 24 viewers!'));
 emit(msg('e3', 'x100 for the fox', { bits: 100, event: { type: 'cheer', label: 'cheered 100 bits!' } }));
 emit(evt('e4', 'pwn" onerror="x', 'should not become a class'));

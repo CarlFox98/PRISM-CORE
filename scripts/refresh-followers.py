@@ -4,12 +4,12 @@ Refresh prism-followers.json with your REAL Twitch follower list.
 
 Uses a Twitch user access token (e.g. the one your stream-manager already
 caches in .twitch_user_token.json) plus your app's Client ID. The token MUST
-include the ``moderator:read:followers`` scope — Twitch requires it for both
+include the ``moderator:read:followers`` scope; Twitch requires it for both
 the follower list and the total count. If your current token predates that
 scope, re-authorize (see the printed message) once and re-run.
 
 Runs on YOUR machine (Twitch isn't reachable from the build sandbox). No
-third-party dependencies — standard library only.
+third-party dependencies: standard library only.
 
 Usage (see refresh-followers.bat for a filled-in launcher):
     python scripts/refresh-followers.py \
@@ -83,7 +83,7 @@ def fetch_followers(token_path, client_id, client_secret):
     broadcaster = str(tok.get("user_id") or "")
     login = tok.get("login") or ""
     if not broadcaster:
-        sys.exit("Token file has no user_id — re-authorize stream-manager and retry.")
+        sys.exit("Token file has no user_id. Re-authorize stream-manager and retry.")
 
     def _headers():
         return {"Client-ID": client_id, "Authorization": "Bearer " + tok["access_token"]}
@@ -141,7 +141,7 @@ def main():
     client_id = a.client_id or env.get("TWITCH_CLIENT_ID", "")
     client_secret = a.client_secret or env.get("TWITCH_CLIENT_SECRET", "")
     if not client_id:
-        sys.exit("No Client ID — pass --client-id or --env <path to .env with TWITCH_CLIENT_ID>.")
+        sys.exit("No Client ID. Pass --client-id or --env <path to .env with TWITCH_CLIENT_ID>.")
 
     login, total, names = fetch_followers(a.token, client_id, client_secret)
 

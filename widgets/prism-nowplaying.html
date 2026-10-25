@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PRISM — Now Playing</title>
+<title>PRISM: Now Playing</title>
 <style>
 /* ============================================================
-   PRISM — Standalone Spotify "Now Playing" widget
+   PRISM Standalone Spotify "Now Playing" widget
    Host this on GitHub Pages (HTTPS) and add it as its OWN OBS
    Browser Source, on top of any scene. It reads your current
    Spotify track and never needs per-scene setup.
@@ -17,7 +17,7 @@
       click CONNECT and log in. The token is stored inside OBS
       and survives restarts.
    ============================================================ */
-@import url('../fonts/prism-fonts.css');   /* vendored — no network at load. deploy-pages.py rewrites this to fonts/ for the hosted copy. */
+@import url('../fonts/prism-fonts.css');   /* vendored, no network at load. deploy-pages.py rewrites this to fonts/ for the hosted copy. */
 *{ margin:0; padding:0; box-sizing:border-box; }
 html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
   font-family:'Space Grotesk','Segoe UI',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
@@ -145,10 +145,10 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
 
   function renderTrack(tr){
     if(!tr || !tr.item){
-      // nothing playing / paused — keep last art if we have it, but mark paused
+      // nothing playing / paused: keep last art if we have it, but mark paused
       var art = lastTrack && lastTrack.art ? lastTrack.art : '';
       document.getElementById('card').classList.add('paused');
-      inner.innerHTML = cardHTML({art:art, title:'Nothing playing', artist:'—', prog:0, dur:0, cur:0}, true);
+      inner.innerHTML = cardHTML({art:art, title:'Nothing playing', artist:'-', prog:0, dur:0, cur:0}, true);
       return;
     }
     document.getElementById('card').classList.toggle('paused', tr.is_playing===false);
@@ -200,8 +200,8 @@ html,body{ width:100%; height:100%; overflow:hidden; background:transparent;
           accessToken=d.access_token; expiresAt=Date.now()+(d.expires_in||3600)*1000;
           if(d.refresh_token){ refreshToken=d.refresh_token; localStorage.setItem(STORE, JSON.stringify({refresh_token:refreshToken})); }
           cleanUrl(); startPolling();
-        } else { showConnect('Auth failed — retry'); cleanUrl(); }
-      }).catch(function(){ showConnect('Network error — retry'); cleanUrl(); });
+        } else { showConnect('Auth failed. Retry'); cleanUrl(); }
+      }).catch(function(){ showConnect('Network error. Retry'); cleanUrl(); });
       return true;
     }
     return false;

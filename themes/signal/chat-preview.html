@@ -2,19 +2,19 @@
 <html lang="en" data-anchor="bottom" data-align="left">
 <head>
 <meta charset="UTF-8">
-<title>PRISM Signal — Chat Preview</title>
+<title>PRISM Signal: Chat Preview</title>
 <link rel="stylesheet" href="../../fonts/prism-fonts.css">
 <link rel="stylesheet" href="signal.css">
 <!-- Previews the REAL chat overlay: prism-chat-base.css for structure plus
      this set's chat-theme.css for the skin, drawn with the same .pc-* DOM
      core/prism-chat.js builds. What this page shows is what ships.
      (History: see docs/CHANGELOG.md 2.2.2. Deliberately no mention of the
-     retired sheet's name here — scripts/test-socials.mjs greps this folder
+     retired sheet's name here: scripts/test-socials.mjs greps this folder
      for it, and a guard that matches its own explanation catches nothing.) -->
 <link rel="stylesheet" href="../../core/prism-chat-base.css">
 <link rel="stylesheet" href="chat-theme.css">
 <style>
-/* Preview stage only — none of this ships with the overlay.
+/* Preview stage only; none of this ships with the overlay.
    prism-chat-base.css makes html/body transparent and full-height for OBS,
    so the stage backdrop has to be put back here, after it. */
 html,body{ background:#050A12 !important; height:100%; overflow:hidden; }

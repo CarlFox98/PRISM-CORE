@@ -1,12 +1,12 @@
 /* ============================================================
-   PRISM 2.0 — SIGNAL · interactive redeem theme
+   PRISM 2.0 SIGNAL · interactive redeem theme
    Restyles Stream Manager's coin flip / 50-50, Lucky + Risky wheel,
    slots and hype overlays (static/interactive/*.html), which load it
-   from /overlays/active/ so they follow the active set — the same
+   from /overlays/active/ so they follow the active set, the same
    contract as shoutout-theme.css. Only restyles: markup, timing and
    the .show transitions stay the overlays' own.
    Shapes use clip-path, never border-radius (Signal's notched look),
-   so depth comes from filter:drop-shadow — box-shadow would be clipped.
+   so depth comes from filter:drop-shadow; box-shadow would be clipped.
    ============================================================ */
 /* Fonts come from the overlay page itself (/overlays/PRISM/fonts/prism-fonts.css).
    Never @import here: this file is re-read every 60s. */
@@ -39,7 +39,7 @@ html,body{ font-family:'Chakra Petch','Segoe UI',sans-serif; }
 .ov .card-inner,.ov-slots .inner,.ov-hype .inner{ position:relative; border-radius:0; background:var(--sg-panel);
   clip-path:var(--notch); padding-top:76px;
   border:1px solid color-mix(in srgb,var(--accent,var(--c1)) 55%,transparent); }
-/* header strip — the overlay's eyebrow text sits on it */
+/* header strip: the overlay's eyebrow text sits on it */
 .ov .card-inner::before,.ov-slots .inner::before,.ov-hype .inner::before{ content:""; position:absolute; left:0; right:0; top:0; height:50px;
   background:color-mix(in srgb,var(--accent,var(--c1)) 14%,transparent);
   border-bottom:1px solid color-mix(in srgb,var(--accent,var(--c1)) 40%,transparent); }

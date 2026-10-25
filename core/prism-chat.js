@@ -1,9 +1,9 @@
 /* ============================================================
-   PRISM 2.0 — chat renderer
+   PRISM 2.0 chat renderer
    Consumes Stream Manager's "chat" effects channel (contract v1,
    see stream_manager/chatfeed.py) and draws it.
 
-   No framework, no build step, no dependency — same house style as
+   No framework, no build step, no dependency: same house style as
    prism-engine.js. Everything tunable lives in CFG at the top.
 
    Placement is NOT set here. The page fills whatever box OBS gives the
@@ -73,7 +73,7 @@
 
   // Chat is untrusted input from strangers, and this page shares an origin
   // with the Stream Manager dashboard and its control endpoints. Nothing in
-  // the message path touches innerHTML — text nodes and createElement only.
+  // the message path touches innerHTML; text nodes and createElement only.
   function build(m) {
     var item = el("div", "pc-item");
     item.setAttribute("data-id", m.id || "");
@@ -92,7 +92,7 @@
     if (m.bits > 0) item.classList.add("pc-cheer");
     // Phase 5: subs, resubs, gifts, raids and cheers carry an `event` and get
     // a card line above the (optional) message. Type is whitelisted before it
-    // becomes a class name — it's server-built, but the class list is ours.
+    // becomes a class name: it's server-built, but the class list is ours.
     var ev = m.event;
     var EV_TYPES = { sub: 1, resub: 1, gift: 1, giftbomb: 1, raid: 1, cheer: 1, announcement: 1 };
     if (ev && EV_TYPES[ev.type]) item.classList.add("pc-event", "pc-ev-" + ev.type);
@@ -188,7 +188,7 @@
   function drop(node) {
     if (!node || !node.isConnected || node.classList.contains("pc-leaving")) return;
     node.classList.add("pc-leaving");
-    // Messages leave, they don't vanish — a node disappearing between two
+    // Messages leave, they don't vanish: a node disappearing between two
     // frames reads as a rendering glitch to viewers.
     setTimeout(function () {
       if (node.parentNode) node.parentNode.removeChild(node);
@@ -202,7 +202,7 @@
   }
 
   function add(m) {
-    // Dedupe the backfill/poll overlap — but only on a real id. An empty id
+    // Dedupe the backfill/poll overlap, but only on a real id. An empty id
     // would match every id-less message and silently swallow the lot.
     if (m.id && feed.querySelector('[data-id="' + cssEscape(m.id) + '"]:not(.pc-leaving)')) return;
     var node = build(m);
@@ -245,7 +245,7 @@
       return;
     }
     // Unknown kind: a later phase's event reaching an older overlay. Ignore it
-    // rather than warn — the version check above already gates real breakage.
+    // rather than warn; the version check above already gates real breakage.
   }
 
   function cssEscape(s) {
@@ -281,7 +281,7 @@
   }
 
   // Stream Manager numbers effects from 1 on every start, and within one run
-  // the id it reports is monotonic — so a last_id BELOW our high-water mark
+  // the id it reports is monotonic, so a last_id BELOW our high-water mark
   // can only mean it restarted. Without this the overlay waits for an id the
   // new process will not reach for hours: chat goes silently dead for the rest
   // of the stream while the poll loop hammers a 25s long poll forever.
@@ -318,7 +318,7 @@
     get("/api/effects/chat?since=" + lastId).then(function (d) {
       errDelay = 0;
       if (restarted(d.last_id)) {
-        warnOnce("Stream Manager restarted — resyncing the chat feed");
+        warnOnce("Stream Manager restarted, resyncing the chat feed");
         lastId = 0;
         clearAll();
         return backfill().catch(function () { lastId = 0; });
@@ -329,7 +329,7 @@
       }
       // ALWAYS take a higher last_id, events or not. Effect ids are global and
       // monotonic, so anything the chat channel emits later is numbered above
-      // whatever the server reports now — advancing loses nothing.
+      // whatever the server reports now; advancing loses nothing.
       //
       // Not advancing is what made this loop spin. The endpoint reports the
       // GLOBAL id whenever the chat channel has no ring buffer yet, so once any

@@ -1,6 +1,6 @@
 // PRISM config/scene integrity test (no dependencies).
 // Verifies prism-config.js is well-formed and every engine scene loads the
-// config before the engine — the invariant the socials refactor depends on.
+// config before the engine, the invariant the socials refactor depends on.
 import fs from 'node:fs';
 
 const url = (p) => new URL(p, import.meta.url);
@@ -27,7 +27,7 @@ const iconKeys = [...engineSrc.matchAll(/^\s*'([a-z0-9.\-]+)':\s*'M/gim)].map(m 
 if (iconKeys.length === 0) fail('no inline brand icons found in prism-engine.js');
 (cfg?.socials || []).forEach((s, i) => {
   if (!s.svg && !iconKeys.includes(s.icon)) {
-    fail(`socials[${i}] ("${s.icon}") has no inline icon — add one to ICONS or give it an svg path`);
+    fail(`socials[${i}] ("${s.icon}") has no inline icon; add one to ICONS or give it an svg path`);
   }
 });
 
@@ -47,7 +47,7 @@ for (const f of scenes) {
 
 // 4) 2.0 sets (themes/<name>/): every canonical scene exists, anything that
 //    uses a core module loads the config first, and every local file a scene
-//    links to exists — a wrong ../../ path would 404 inside OBS silently.
+//    links to exists. A wrong ../../ path would 404 inside OBS silently.
 const THEME_SCENES = ['starting-soon', 'be-right-back', 'stream-ending', 'tech-difficulties',
   'webcam-frame', 'wallpaper', 'chat-preview', 'thank-you', 'gameplay'];
 const themesDir = url('../themes/');
@@ -108,7 +108,7 @@ for (const f of [...themes.flatMap(t => ['chat', 'shoutout', 'nowplaying', 'rede
   }
 }
 
-// 6) Chat guards earned the hard way — each of these was a real defect.
+// 6) Chat guards earned the hard way; each of these was a real defect.
 {
   const js = fs.readFileSync(url('../core/prism-chat.js'), 'utf8');
   const base = fs.readFileSync(url('../core/prism-chat-base.css'), 'utf8');
@@ -116,34 +116,34 @@ for (const f of [...themes.flatMap(t => ['chat', 'shoutout', 'nowplaying', 'rede
   // The fade ramp must be capped below the newest message, or ?max=1 renders
   // the only message on screen at 30% opacity.
   if (!/Math\.min\(CFG\.fade\.length,\s*n\s*-\s*1\)/.test(js)) {
-    fail('prism-chat.js: the fade ramp is not capped at n-1 — the newest message can be dimmed');
+    fail('prism-chat.js: the fade ramp is not capped at n-1, so the newest message can be dimmed');
   }
   // A hung fetch has no timeout of its own: without the abort, one half-open
   // request freezes chat for the rest of the stream.
   if (!js.includes('AbortController')) {
-    fail('prism-chat.js: no fetch watchdog — a hung poll would never recover');
+    fail('prism-chat.js: no fetch watchdog, so a hung poll would never recover');
   }
   // Effect ids restart at 1, so the overlay must notice last_id going backwards.
   if (!/function restarted\(/.test(js)) {
-    fail('prism-chat.js: no restart detection — chat dies silently if Stream Manager restarts');
+    fail('prism-chat.js: no restart detection, so chat dies silently if Stream Manager restarts');
   }
   // The backfill must route through handle(), or a CLEARMSG still in the ring
   // buffer is ignored and a deleted message comes back on an OBS refresh.
   if (!/\(d\.messages \|\| \[\]\)\.forEach\(handle\)/.test(js)) {
-    fail('prism-chat.js: backfill does not replay moderation events — deleted messages would return');
+    fail('prism-chat.js: backfill does not replay moderation events, so deleted messages would return');
   }
   if (!/m\.kind === "clearmsg"/.test(js) || !/m\.kind === "clearchat"/.test(js)) {
-    fail('prism-chat.js: no CLEARMSG/CLEARCHAT handling — deleted messages stay on stream');
+    fail('prism-chat.js: no CLEARMSG/CLEARCHAT handling, so deleted messages stay on stream');
   }
   // Nothing in the message path may touch innerHTML: chat is untrusted input
   // and this page shares an origin with the dashboard's control endpoints.
-  // Comments are stripped first — the file explains this rule in prose, and
+  // Comments are stripped first: the file explains this rule in prose, and
   // matching its own comment made the guard fire on correct code.
   const jsCode = js.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   if (/\binnerHTML\b|\bouterHTML\b|insertAdjacentHTML|document\.write/.test(jsCode)) {
-    fail('prism-chat.js: uses innerHTML — chat text is untrusted and same-origin with the dashboard');
+    fail('prism-chat.js: uses innerHTML, but chat text is untrusted and same-origin with the dashboard');
   }
-  if (!/\.pc-action\b/.test(base)) fail('prism-chat-base.css: no .pc-action rule — /me would render upright');
+  if (!/\.pc-action\b/.test(base)) fail('prism-chat-base.css: no .pc-action rule, so /me would render upright');
   // The base layer has to stand alone: a theme failing to load has happened.
   for (const v of ['--pc-msg-size', '--pc-name-size', '--pc-ink', '--pc-panel', '--pc-accent']) {
     // The DECLARATION, not a var() reference: a plain includes() was satisfied
@@ -158,10 +158,10 @@ for (const f of [...themes.flatMap(t => ['chat', 'shoutout', 'nowplaying', 'rede
     if (!fs.existsSync(pth)) continue;
     const css = fs.readFileSync(pth, 'utf8');
     if (/#pc-feed\s*\{[^}]*(justify-content|flex-direction)/.test(css)) {
-      fail(`${f}: a skin must not set the column's structure — that is the base layer's job`);
+      fail(`${f}: a skin must not set the column's structure; that is the base layer's job`);
     }
     if (/animation:[^;]*\bboth\b/.test(css)) {
-      fail(`${f}: animation fill-mode 'both' pins opacity at 1 and kills the fade ramp — use 'backwards'`);
+      fail(`${f}: animation fill-mode 'both' pins opacity at 1 and kills the fade ramp; use 'backwards'`);
     }
   }
 }
@@ -195,7 +195,7 @@ let setsChecked = 0;
   if (!Array.isArray(offered)) {
     // Never silent: a check that quietly verifies nothing is worse than no
     // check, because the summary line still says everything passed.
-    console.warn('  ! scene-set check skipped — stream-manager config.json not found'
+    console.warn('  ! scene-set check skipped: stream-manager config.json not found'
                  + ' (set SM_CONFIG=/path/to/config.json to enable)');
   } else {
     for (const name of offered) {
@@ -208,7 +208,7 @@ let setsChecked = 0;
       const missing = CANON.filter(c => !fs.existsSync(new URL(c + '.html', dir)));
       if (missing.length) {
         fail(`overlays/${name}/ is offered in config.json but is missing ${missing.length} of `
-           + `${CANON.length} scenes (${missing.join(', ')}) — picking it from the dashboard `
+           + `${CANON.length} scenes (${missing.join(', ')}), and picking it from the dashboard `
            + `breaks those OBS sources mid-stream`);
       }
     }
@@ -217,7 +217,7 @@ let setsChecked = 0;
 
 // 8) The SoundAlerts stopgap is retired. PRISM has rendered chat itself since
 //    2.1.0, but the preview scenes went on linking the stopgap sheets and
-//    telling you to paste them into someone else's widget — for two releases,
+//    telling you to paste them into someone else's widget for two releases,
 //    including one whose whole point was fixing that same claim in the README.
 {
   const RETIRED = /prism-chat-(?:signal|soft)\.css/;
@@ -240,7 +240,7 @@ let setsChecked = 0;
     // Only pages, not stylesheets or scripts: a CSS header that explains why
     // it replaced the old third-party sheet is accurate history and should
     // stay. A *page* that tells the viewer to go and use that widget is the
-    // defect — that is what shipped in every set for two releases.
+    // defect: that is what shipped in every set for two releases.
     if (/\.html$/.test(rel) && /soundalert/i.test(body)) {
       fail(`${rel}: a page still points the viewer at the retired third-party chat widget`);
     }
@@ -253,13 +253,13 @@ let setsChecked = 0;
   for (const rel of ['themes/signal/prism-chat-signal.css', 'themes/soft/prism-chat-soft.css',
                      'core/prism-chat-holo-iridescent.css']) {
     if (fs.existsSync(url('../' + rel))) {
-      console.warn(`  ! ${rel}: retired and shipped by nothing — safe to delete`);
+      console.warn(`  ! ${rel}: retired and shipped by nothing, safe to delete`);
     }
   }
 
   // Strip comments before asking "does this file actually do X". A guard that
   // matches the comment explaining the fix passes on a file that no longer
-  // applies it — this has now caught itself three times in one release.
+  // applies it. This has now caught itself three times in one release.
   const code = (t) => t.replace(/<!--[\s\S]*?-->/g, '')
                        .replace(/\/\*[\s\S]*?\*\//g, '')
                        .replace(/^\s*\/\/.*$/gm, '');
@@ -274,19 +274,19 @@ let setsChecked = 0;
     if (!fs.existsSync(p2)) continue;
     const h = code(fs.readFileSync(p2, 'utf8'));
     const links = [...h.matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]);
-    if (!links.some(l => l.endsWith('prism-chat-base.css'))) fail(`${rel}: does not LINK prism-chat-base.css — it is not previewing the real overlay`);
+    if (!links.some(l => l.endsWith('prism-chat-base.css'))) fail(`${rel}: does not LINK prism-chat-base.css, so it is not previewing the real overlay`);
     if (!links.some(l => l.endsWith(skin.split('/').pop()))) fail(`${rel}: does not link ${skin}`);
-    if (!/id="pc-feed"/.test(h)) fail(`${rel}: has no #pc-feed — the renderer and the demo both target it`);
+    if (!/id="pc-feed"/.test(h)) fail(`${rel}: has no #pc-feed, and the renderer and the demo both target it`);
   }
 
   // The demo feed must build the same DOM the renderer does, or the preview
   // shows unstyled markup while every file still "exists".
   const demo = code(fs.readFileSync(url('../core/prism-chat-demo.js'), 'utf8'));
   for (const cls of ['pc-item', 'pc-inner', 'pc-meta', 'pc-name', 'pc-body', 'pc-newest']) {
-    if (!demo.includes(cls)) fail(`prism-chat-demo.js: never builds .${cls} — the preview will not match the real overlay`);
+    if (!demo.includes(cls)) fail(`prism-chat-demo.js: never builds .${cls}, so the preview will not match the real overlay`);
   }
   if (/chat__/.test(demo)) fail('prism-chat-demo.js: still builds the retired third-party markup');
-  if (/\.innerHTML\s*=/.test(demo)) fail('prism-chat-demo.js: assigns innerHTML — build nodes, like the renderer does');
+  if (/\.innerHTML\s*=/.test(demo)) fail('prism-chat-demo.js: assigns innerHTML; build nodes, like the renderer does');
 }
 
 // 9) Nothing the build copies may be dead. prism-chat-holo-iridescent.css was
@@ -316,6 +316,6 @@ function walk2(dir) {
 }
 
 console.log(ok
-  ? `✓ config OK — ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified, chat overlay + ${chatRefs} refs OK, ${setsChecked} offered set(s) complete`
+  ? `✓ config OK: ${cfg.socials.length} socials (all with inline icons), ${scenes.length} scenes verified (config→engine order), ${themes.length} 2.0 sets / ${themeScenes} scenes verified, chat overlay + ${chatRefs} refs OK, ${setsChecked} offered set(s) complete`
   : '✗ integrity checks failed');
 process.exit(ok ? 0 : 1);

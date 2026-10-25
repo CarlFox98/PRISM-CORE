@@ -25,7 +25,7 @@ git diff --cached --quiet
 if %errorlevel%==0 (
   echo Nothing new to commit.
 ) else (
-  git commit -m "%MSG%" -m "Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>" -m "Claude-Session: https://claude.ai/code/session_01BhZC2kXnnmGgNsAxePTeBh"
+  git commit -m "%MSG%"
   if errorlevel 1 goto fail
 )
 

@@ -32,7 +32,7 @@ FILES = {
     os.path.join("core", "prism-chat-base.css"): "prism-chat-base.css",
 }
 # The sources reference siblings already, so nothing to rewrite today; kept
-# for the same reason build-obs-set.py keeps it — a ../core/ creeping in
+# for the same reason build-obs-set.py keeps it: a ../core/ creeping in
 # should flatten rather than 404.
 FLATTEN = [("../core/", ""), ("../chat/", ""), ("./core/", "")]
 TEXT_EXT = (".html", ".css", ".js")

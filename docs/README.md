@@ -93,7 +93,7 @@ No set folder is named plain `prism`: Windows paths are case-insensitive, so
 | `thank-you` | Thank-a-follower card | Space / `?auto` / `?hidebar` / `?demo` |
 | `chat-preview` | Preview of the set's chat CSS | |
 
-Chat is a PRISM overlay of its own — see **[Chat](#chat)** below, and
+Chat is a PRISM overlay of its own (see **[Chat](#chat)** below), and
 `chat-preview` previews exactly that: the real `.pc-*` markup under
 `prism-chat-base.css` and the set's `chat-theme.css`. Until 2.2.2 it previewed
 the retired third-party stopgap instead and told you to paste that sheet into
@@ -116,7 +116,7 @@ surface. Requires **stream-manager v0.11.1 or newer**.
 | File | Role |
 | --- | --- |
 | `chat/prism-chat.html` | the page OBS loads |
-| `core/prism-chat.js` | the renderer — no framework, no build step, no dependency |
+| `core/prism-chat.js` | the renderer: no framework, no build step, no dependency |
 | `core/prism-chat-base.css` | structure and sizing; readable with no theme at all |
 | `themes/<set>/chat-theme.css` | the skin, re-read every 60s so a set switch restyles chat live |
 | `widgets/theme-holo-chat.css` | holo's skin, built to `chat-theme.css` by the set build |
@@ -134,7 +134,7 @@ to a set:
 http://localhost:5000/static/chat/chat.html
 ```
 
-Placement is the OBS transform, per scene — the page fills whatever box the
+Placement is the OBS transform, per scene; the page fills whatever box the
 source is given. Only orientation and behaviour come from the URL:
 
 | Option | Default | Effect |
@@ -152,7 +152,7 @@ an OBS source refresh. If Stream Manager restarts, chat notices and resyncs on
 its own rather than going silent.
 
 Because it is served from `localhost`, chat is blank when Stream Manager is not
-running — unlike a cloud-hosted widget. Keep the old chat source in OBS, hidden,
+running, unlike a cloud-hosted widget. Keep the old chat source in OBS, hidden,
 as the rollback.
 
 ## Design system
@@ -165,7 +165,7 @@ per scene.
 
 | File | Role |
 |------|------|
-| `prism-config.js` | **Single source of truth** — channel name, socials, follower goal (`goal` + `goalStep`), Spotify client id, avatar fallback. Change identity here and every scene in every set follows. |
+| `prism-config.js` | **Single source of truth**: channel name, socials, follower goal (`goal` + `goalStep`), Spotify client id, avatar fallback. Change identity here and every scene in every set follows. |
 | `prism-theme.css` | Shared look for the full-screen scenes (palette `--c1`…`--c5`, backdrop, motes, holo components). |
 | `prism-engine.js` | Particle motes + live Twitch data via DecAPI (no secrets), and renders socials from config. Degrades gracefully offline; respects `prefers-reduced-motion`. |
 | `prism-panels.css` | Shared look for the standalone Twitch info panels. |
@@ -183,34 +183,35 @@ Shared scene modules in `core/` (used by the 2.0 sets): `prism-countdown.js`,
 `prism-techcheck.js`, `prism-thankyou.js`, `prism-wallpaper.js`,
 `prism-chat-demo.js`. Each documents its markup hooks at the top.
 
-## Holo scenes (1.x) — `scenes/` (load `../core/prism-theme.css` + `prism-config.js` + `prism-engine.js`)
+## Holo scenes (1.x): `scenes/` (load `../core/prism-theme.css` + `prism-config.js` + `prism-engine.js`)
 
-- `prism-starting-soon.html` — countdown (configurable via `?timer=` or the gear)
+- `prism-starting-soon.html`: countdown (configurable via `?timer=` or the gear)
 - `prism-be-right-back.html`
 - `prism-stream-ending.html`
 - `prism-tech-difficulties.html`
 - `prism-wallpaper.html`
 - `prism-webcam-frame.html`
-- `prism-chat-preview.html` — previews the real chat overlay: `../core/prism-chat-base.css` plus holo's skin
-- `prism-thank-you.html` — random-follower shout (reads `../data/prism-followers.json`)
+- `prism-chat-preview.html`: previews the real chat overlay: `../core/prism-chat-base.css` plus holo's skin
+- `prism-thank-you.html`: random-follower shout (reads `../data/prism-followers.json`)
 
-## Info panels — `panels/` (standalone, load `../core/prism-panels.css`)
+## Info panels: `panels/` (standalone, load `../core/prism-panels.css`)
 
 `prism-about.html` · `prism-rules.html` · `prism-schedule.html` ·
 `prism-setup.html` · `prism-faq.html`
 PNG exports for Twitch upload live in `twitch-panels/`.
 
-## Widgets — `widgets/`
+## Widgets: `widgets/`
 
-- **`prism-nowplaying.html`** — standalone Spotify now-playing card. Self-hosted
+- **`prism-nowplaying.html`**: standalone Spotify now-playing card. Self-hosted
   OAuth; see `PRISM-NOWPLAYING-README.md`. Its Spotify client id must match
   `spotifyClientId` in `prism-config.js`.
-- **`prism-shoutout.html`** — a mod types `!so @user` in chat and a PRISM card
+- **`prism-shoutout.html`**: a mod types `!so @user` in chat and a PRISM card
   slides in with the streamer's avatar, last category, and an autoplaying recent
   clip. Gold "Raid · N viewers" variant for raids; falls back to the streamer's
-  offline banner when there's no clip. It connects to the driving service over
-  `ws://127.0.0.1:8777` and is driven by Stream Manager's `shoutout` module —
-  see [Shoutout service](#shoutout-service) below. Test it headlessly with
+  offline banner when there's no clip. This copy is the WebSocket build
+  (`ws://127.0.0.1:8777`), kept as the reference; OBS loads Stream Manager's
+  copy instead; see [Shoutout service](#shoutout-service) below and
+  `PRISM-SHOUTOUT-README.md`. Test it headlessly with
   `node scripts/test-shoutout-overlay.mjs`, or open it with `?demo`.
 
 ## Shoutout service
@@ -225,14 +226,14 @@ What stays in this repo is the presentation half:
 
 | Here | There |
 |------|-------|
-| `widgets/prism-shoutout.html` — the card | chat reader, `!so` and mod controls |
-| `scripts/test-shoutout-overlay.mjs` — 32 headless checks | Twitch lookups, clip selection, chat commands |
+| `widgets/prism-shoutout.html` (the card) | chat reader, `!so` and mod controls |
+| `scripts/test-shoutout-overlay.mjs` (32 headless checks) | Twitch lookups, clip selection, chat commands |
 
 **There are two cards, not one, and OBS loads the other one.** Stream Manager
 ships its own copy at `static/interactive/shoutout.html`, served over HTTP and
 fed by a long-poll on `/api/effects/shoutout`; that is what the OBS scenes
 actually load. The card here is the WebSocket build (`ws://127.0.0.1:8777`),
-which nothing currently serves — it is kept as the reference implementation and
+which nothing currently serves. It is kept as the reference implementation and
 as the thing the harness is written against.
 
 So a change to the card has to be made **in both files**, and the harness is
@@ -244,7 +245,7 @@ node scripts/test-shoutout-overlay.mjs "<stream-manager>/static/interactive/shou
 ```
 
 Both must pass the same 32 checks. Audio ducking is **not** implemented on
-either side — Stream Manager dropped it deliberately; see the note above
+either side. Stream Manager dropped it deliberately; see the note above
 `set_clip_playing()` there before reaching for it again.
 
 ## Hosting
@@ -299,9 +300,9 @@ drifting from source.
 
 Helper scripts (run on your machine):
 
-- `tools\refresh-followers.bat` — pull your real follower list from Twitch into
+- `tools\refresh-followers.bat`: pull your real follower list from Twitch into
   `prism-followers.json` (needs the `moderator:read:followers` scope).
-- `tools\fetch-fonts.bat` — download the fonts into `fonts/` for fully offline overlays.
+- `tools\fetch-fonts.bat`: download the fonts into `fonts/` for fully offline overlays.
 
 The engine also caches last-good avatar / follower count / latest follower in
 `localStorage`, so brief DecAPI outages don't blank the overlay.
@@ -311,7 +312,7 @@ Versioning follows [SemVer](https://semver.org); see [CHANGELOG.md](CHANGELOG.md
 The shoutout **service** lives in stream-manager (see
 [Shoutout service](#shoutout-service)); only the overlay is versioned here. Run
 `node scripts/test-shoutout-overlay.mjs` after touching
-`widgets/prism-shoutout.html` — it drives the card through a stubbed DOM on a
+`widgets/prism-shoutout.html`; it drives the card through a stubbed DOM on a
 controlled clock and covers the queue rules and every way a clip can die. Pass a
 path to run it against Stream Manager's copy of the card, which is the one OBS
 loads; both are expected to pass.
@@ -332,7 +333,7 @@ checks, that VERSION matches the changelog, the local fonts, whether the hosted
 overlays and every built scene set match their source, the launchers, and
 DecAPI reachability. Then it clears stray `__pycache__` and prunes old logs. Every
 run writes a timestamped report to `maintenance-logs/` (gitignored). It's
-read-only apart from that housekeeping — it never pulls, pushes, or edits code.
+read-only apart from that housekeeping: it never pulls, pushes, or edits code.
 
 ## License
 
