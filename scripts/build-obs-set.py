@@ -10,16 +10,16 @@ and copies the chosen one into overlays/active/, which OBS points at as
 That means a set has to be a FLAT, self-contained folder of scene .html files
 using the shared scene names. PRISM's source repo is organised for humans
 (scenes/, core/, ...), so this script flattens and renames it into the set
-folder — the same source-vs-deployed split used for github-pages.
+folder. It is the same source-vs-deployed split used for github-pages.
 
 Re-runnable and destructive only inside the target set folder.
 
 PRISM ships four sets, each its own folder next to modern/ and retro/:
 
     prism-holo     the 1.x holo-glass scenes      (source: scenes/)
-    prism-signal   2.0 Signal — sci-fi HUD        (source: themes/signal/)
-    prism-soft     2.0 Soft Holo — pastel/sticker (source: themes/soft/)
-    prism-haunt    2.5 Haunt — Halloween, foxfire (source: themes/haunt/)
+    prism-signal   2.0 Signal: sci-fi HUD        (source: themes/signal/)
+    prism-soft     2.0 Soft Holo: pastel/sticker (source: themes/soft/)
+    prism-haunt    2.5 Haunt: Halloween, foxfire (source: themes/haunt/)
 
 Each name must also be listed in stream-manager's config.json "scene_sets"
 for the dashboard to offer it (restart Stream Manager after editing that).
@@ -35,14 +35,14 @@ import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# NOTE: the set folder must NOT be called "prism" — Windows paths are
+# NOTE: the set folder must NOT be called "prism". Windows paths are
 # case-insensitive, so overlays/prism would resolve to the overlays/PRISM
 # source repo itself and this script would wipe it. Keep a distinct name.
 SET_NAME = "prism-holo"          # the default for --out, kept for old habits
 
 
 def overlays_dir():
-    """The stream-manager overlays/ folder — the parent that holds the sets."""
+    """The stream-manager overlays/ folder: the parent that holds the sets."""
     parent = os.path.abspath(os.path.join(REPO, ".."))
     markers = ("modern", "retro", "active")
     if any(os.path.isdir(os.path.join(parent, m)) for m in markers):
@@ -69,7 +69,7 @@ SCENES = {
     "prism-thank-you.html":         "thank-you.html",
 }
 
-# Shared assets the scenes reference by relative name — copied as-is so the
+# Shared assets the scenes reference by relative name, copied as-is so the
 # set folder works standalone once stream-manager copies it into active/.
 ASSETS = [
     "prism-theme.css",
@@ -206,11 +206,11 @@ def plan_set(name):
 
 def build(name, out, dry):
     if _same_or_inside(out, REPO):
-        print("ERROR: refusing to build into '%s' — that is the PRISM source repo.\n"
+        print("ERROR: refusing to build into '%s': that is the PRISM source repo.\n"
               "       Choose a set folder with a different name (e.g. %s)." % (out, name))
         return 1
     if os.path.isdir(os.path.join(out, ".git")):
-        print("ERROR: refusing to clear '%s' — it contains a git repository." % out)
+        print("ERROR: refusing to clear '%s': it contains a git repository." % out)
         return 1
     files, dirs, missing = plan_set(name)
     if missing:
@@ -222,7 +222,7 @@ def build(name, out, dry):
     for s_, d in dirs:
         print("  %-38s -> %s/" % (os.path.relpath(s_, REPO) + "/", d))
     if dry:
-        print("  (dry run — nothing written)\n")
+        print("  (dry run, nothing written)\n")
         return 0
     os.makedirs(out, exist_ok=True)
     # clear only what we own, so a stray file in the set folder can't linger
@@ -235,7 +235,7 @@ def build(name, out, dry):
         copy_flat(s_, os.path.join(out, d))
     for s_, d in dirs:
         shutil.copytree(s_, os.path.join(out, d))
-        # the fonts css is text too — nothing to rewrite today, but keep it consistent
+        # the fonts css is text too; nothing to rewrite today, but keep it consistent
     n = sum(1 for _, d in files if d.endswith(".html"))
     print("  wrote %d scene file(s) + assets.\n" % n)
     return 0
@@ -246,7 +246,7 @@ def main():
     ap.add_argument("--set", choices=sorted(SETS), default=None,
                     help="build only this set (default: all)")
     ap.add_argument("--out", default=None,
-                    help="target folder — only with --set (default: <overlays>/<set>)")
+                    help="target folder, only with --set (default: <overlays>/<set>)")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
 

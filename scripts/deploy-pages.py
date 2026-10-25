@@ -3,7 +3,7 @@
 Copy the hosted overlays into github-pages/.
 
 GitHub Pages serves a FLAT folder, while the source repo keeps shared assets in
-core/ and data/. This flattens the relative paths on copy — same source-vs-
+core/ and data/. This flattens the relative paths on copy, the same source-vs-
 deployed split as scripts/build-obs-set.py.
 
     python scripts/deploy-pages.py [--dry-run]
@@ -66,7 +66,7 @@ def main():
     for src, dst in DIRS.items():
         src_dir = os.path.join(REPO, src)
         if not os.path.isdir(src_dir):
-            print("  WARNING: %s/ not found — skipping" % src)
+            print("  WARNING: %s/ not found, skipping" % src)
             continue
         names = [f for f in sorted(os.listdir(src_dir))
                  if os.path.isfile(os.path.join(src_dir, f))]
@@ -82,10 +82,10 @@ def main():
             stale = [f for f in sorted(os.listdir(out_dir))
                      if os.path.isfile(os.path.join(out_dir, f)) and f not in names]
             for f in stale:
-                print("    NOTE: %s/%s is no longer in the source — remove it by hand" % (dst, f))
+                print("    NOTE: %s/%s is no longer in the source; remove it by hand" % (dst, f))
             copied_dirs += 1
 
-    print("\n(dry run — nothing written)" if a.dry_run
+    print("\n(dry run, nothing written)" if a.dry_run
           else "\nDeployed %d file(s) and %d folder(s) into github-pages/."
                % (len(FILES), copied_dirs))
     return 0

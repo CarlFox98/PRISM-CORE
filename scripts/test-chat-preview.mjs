@@ -8,7 +8,7 @@
 // This exists because the source-level guards in test-socials.mjs check that
 // the fixes are still *spelled* right, and for two releases every set shipped a
 // chat-preview that linked a retired third-party stopgap and had no DOM in
-// common with the overlay — while every file it referenced existed, so nothing
+// common with the overlay, while every file it referenced existed, so nothing
 // noticed. Files existing is not the same as a page working.
 //
 //   npm i -D playwright && npx playwright install chromium
@@ -83,7 +83,7 @@ for (const set of SETS) {
   // test's business. Anything else 404ing is.
   const fonts = missed.filter(u => u.startsWith('/fonts/'));
   const real = missed.filter(u => !u.startsWith('/fonts/'));
-  if (fonts.length) console.log(`  ·    (${fonts.length} font file(s) absent in this checkout — ignored)`);
+  if (fonts.length) console.log(`  ·    (${fonts.length} font file(s) absent in this checkout, ignored)`);
   ok(real.length === 0, `nothing 404s${real.length ? ': ' + real.slice(0, 3).join(', ') : ''}`);
 
   const items = await page.$$eval('.pc-item', ns => ns.length);

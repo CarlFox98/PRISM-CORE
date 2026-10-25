@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PRISM maintenance — weekly health check + cleanup.
+PRISM maintenance: weekly health check + cleanup.
 
 Runs a series of non-destructive checks and light housekeeping, writes a
 timestamped log to maintenance-logs/, and prints a summary. Designed to be run
@@ -161,7 +161,7 @@ def check_fonts():
         return
     body = open(css, encoding="utf-8").read()
     if "googleapis" in body:
-        add("OK", "Fonts", "online mode (Google import) — run fetch-fonts to vendor them")
+        add("OK", "Fonts", "online mode (Google import); run fetch-fonts to vendor them")
         return
     refs = re.findall(r"url\('([^']+)'\)", body)
     missing = [r for r in refs if not os.path.isfile(os.path.join(REPO, "fonts", r))]
@@ -199,7 +199,7 @@ def check_pages_sync():
     if drift:
         problems.append("stale: " + ", ".join(drift))
     add("WARN" if problems else "OK", "Hosted overlays",
-        ("; ".join(problems) + " — run deploy-to-pages.bat") if problems
+        ("; ".join(problems) + "; run deploy-to-pages.bat") if problems
         else "all %d in sync with source" % len(pairs))
 
 
@@ -275,10 +275,10 @@ def check_obs_set():
             if txt != open(d, encoding="utf-8").read():
                 stale.append("%s/%s" % (name, dst))
     if not built:
-        add("OK", "OBS scene sets", "not built here — run scripts/build-obs-set.py")
+        add("OK", "OBS scene sets", "not built here; run scripts/build-obs-set.py")
         return
     add("WARN" if stale else "OK", "OBS scene sets",
-        ("stale: %s — run scripts/build-obs-set.py" % ", ".join(stale)) if stale
+        ("stale: %s; run scripts/build-obs-set.py" % ", ".join(stale)) if stale
         else "%s in sync with source" % ", ".join(built))
 
 
@@ -319,7 +319,7 @@ def main():
     counts = {"OK": 0, "WARN": 0, "FAIL": 0}
     for lvl, _, _ in RESULTS:
         counts[lvl] = counts.get(lvl, 0) + 1
-    header = "PRISM maintenance — %s" % ts.strftime("%Y-%m-%d %H:%M:%S")
+    header = "PRISM maintenance, %s" % ts.strftime("%Y-%m-%d %H:%M:%S")
     lines = [header, "=" * len(header)]
     for lvl, name, detail in RESULTS:
         lines.append("[%-4s] %-20s %s" % (lvl, name, detail))

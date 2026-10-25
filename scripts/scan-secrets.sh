@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-#  PRISM — secret scanner
+#  PRISM secret scanner
 #  Blocks credentials from being committed. Used by the
 #  pre-commit hook (staged files) and by CI (all tracked files).
 #

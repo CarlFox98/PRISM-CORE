@@ -1,13 +1,13 @@
 # ============================================================
-#  PRISM — repository hygiene
+#  PRISM repository hygiene
 # ============================================================
 
-# Python virtual environment — never commit; regenerate with:
+# Python virtual environment. Never commit it; regenerate with:
 #   py -m venv prismenv
 #   prismenv\Scripts\python.exe -m pip install websockets requests
 prismenv/
 
-# Secrets — real Twitch credentials live only on the local machine
+# Secrets: real Twitch credentials live only on the local machine
 prism-secrets.json
 **/prism-secrets.json
 *.secret
@@ -41,5 +41,5 @@ Claude outputs/
 # Node dev dependencies. scripts/test-chat-overlay.mjs needs playwright to run
 # the overlay's behaviour tests; the browsers it downloads live outside the repo
 # (in %LOCALAPPDATA%\ms-playwright). package.json and the lockfile ARE tracked so
-# the test setup is reproducible — only the installed tree is ignored.
+# the test setup is reproducible; only the installed tree is ignored.
 node_modules/
