@@ -208,9 +208,10 @@ PNG exports for Twitch upload live in `twitch-panels/`.
 - **`prism-shoutout.html`** — a mod types `!so @user` in chat and a PRISM card
   slides in with the streamer's avatar, last category, and an autoplaying recent
   clip. Gold "Raid · N viewers" variant for raids; falls back to the streamer's
-  offline banner when there's no clip. It connects to the driving service over
-  `ws://127.0.0.1:8777` and is driven by Stream Manager's `shoutout` module —
-  see [Shoutout service](#shoutout-service) below. Test it headlessly with
+  offline banner when there's no clip. This copy is the WebSocket build
+  (`ws://127.0.0.1:8777`), kept as the reference; OBS loads Stream Manager's
+  copy instead — see [Shoutout service](#shoutout-service) below and
+  `PRISM-SHOUTOUT-README.md`. Test it headlessly with
   `node scripts/test-shoutout-overlay.mjs`, or open it with `?demo`.
 
 ## Shoutout service
