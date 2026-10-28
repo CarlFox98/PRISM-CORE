@@ -23,6 +23,8 @@
 [data-prism-countdown].done .stone .n{ color:#FFD9A8; text-shadow:0 0 22px rgba(255,138,42,.9), 0 2px 0 rgba(0,0,0,.6); }
 .foot{ left:140px; right:150px; bottom:76px; display:flex; align-items:flex-end; justify-content:space-between; gap:40px; }
 .foot .goal{ width:430px; }
+/* signpost under the avatar: clear of the countdown and of OBS's Spotify slot (x 700+, y 925+) */
+.signs{ left:150px; top:668px; }
 </style>
 </head>
 <body>
@@ -34,7 +36,7 @@
   </div>
   <div class="main" data-prism-countdown>
     <div class="tag rise d1"><svg class="skull" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.5 2 3 5.8 3 10.5c0 3 1.4 5 3.5 6.2V20a1 1 0 0 0 1 1h2v-2h1v2h3v-2h1v2h2a1 1 0 0 0 1-1v-3.3c2.1-1.2 3.5-3.2 3.5-6.2C21 5.8 17.5 2 12 2zM8.5 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>something stirs in the woods</div>
-    <div class="title flicker rise d2">Starting<br>Soon</div>
+    <div class="title glint flicker rise d2">Starting<br>Soon</div>
     <div class="lede rise d3 js-game-wrap" hidden>Tonight's haunting: <b class="js-game"></b></div>
     <div class="clock rise d4">
       <div class="stone"><span class="n engraved js-cd-min">05</span></div>
@@ -44,9 +46,10 @@
       <button class="gear js-cd-settings" title="Set countdown length">⚙</button>
     </div>
   </div>
+  <div class="signs socials post" data-prism-socials></div>
   <div class="foot rise d5">
-    <div class="socials" data-prism-socials></div>
-    <div class="goal"><div class="top"><span class="k">souls claimed</span><span><span class="js-goal-now">-</span> / <span class="js-goal-target">-</span></span></div><div class="track"><div class="fill js-goal-fill"></div></div></div>
+    <div></div>
+    <div class="goal"><div class="top"><span class="k">souls claimed</span><span><span class="js-goal-now js-roll">-</span> / <span class="js-goal-target">-</span></span></div><div class="track"><div class="fill js-goal-fill"></div></div></div>
   </div>
 </div>
 <script src="haunt-scene.js"></script>

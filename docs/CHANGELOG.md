@@ -3,6 +3,43 @@
 All notable changes to PRISM. Loosely follows [Keep a Changelog](https://keepachangelog.com)
 and [Semantic Versioning](https://semver.org).
 
+## [2.6.0] - 2026-10-27
+
+Haunt refinement: smoother motion and room for the fifth social.
+
+### Added
+- **Fluid motion across the Haunt scenes.** Everything moves with transform
+  and opacity only, so OBS composites it on the GPU instead of repainting.
+  - The avatar's foxfire ring turns slowly (its own layer; the old ring
+    animated box-shadow, which repaints every frame).
+  - A band of moonlight glints across each title every 11 seconds.
+  - The dead tree sways a fraction of a degree from its trunk, and the fox
+    breathes from its paws. Each has a layer sized to its shape.
+  - Wisps drift on curved, looping paths and flicker independently.
+  - Countdown digits and follower counts roll up out of the fog when they
+    change (only on a real change; the countdown rewrites the same text four
+    times a second).
+  - A soft light sweeps along the follower goal bar.
+  - A shooting star crosses the sky every 18 to 42 seconds (not in `?calm`).
+  - The social signpost rows slide in one after another; entrances use a
+    longer, softer ease.
+- **Signpost socials.** With five socials (Discord was added on Oct 23) the
+  footer chips collided with the countdown on Starting Soon and the
+  headstones on Stream Ending. Socials are now a vertical list in the left
+  column (`.socials.post`), clear of the countdown and of the OBS Spotify slot.
+
+### Fixed
+- **Titles showed a dark hole in "OO"** (SOON, MOON). Cinzel Decorative's
+  kerning overlaps the two letters and gradient-clipped text renders the
+  overlap as a hole. Titles now use `font-kerning:none`; ligature and `calt`
+  switches and letter-spacing were tried and do not fix it.
+
+### Performance
+- Measured in headless Chromium (software rendering, so relative only):
+  Starting Soon 57.6 fps against 57.9 on 2.5.1, Stream Ending 59.3 against 59.9.
+  A pulsing moon halo was tried and removed: scaling the 1600px glow cost
+  about 9 fps.
+
 ## [2.5.1] - 2026-10-14
 
 ### Fixed

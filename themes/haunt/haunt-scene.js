@@ -24,7 +24,8 @@
    Motion budget: slow ambient drift (wisps, fog, clouds) runs always;
    sudden things (eyes, bats, lightning) are rare and never strobe.
      ?still   freezes everything (so does Windows' "reduce motion")
-     ?calm    keeps the drift, drops eyes, bats and lightning
+     ?calm    keeps the drift, drops eyes, bats, lightning and shooting stars
+   Also: the tree sways, the fox breathes, numbers roll when they change.
    ============================================================ */
 (function(){
   "use strict";
@@ -116,7 +117,7 @@
   }
 
   /* ---- the ridge, the dead tree, the fox ---- */
-  var near = '';
+  var near = '', treeSvg = '', treeOrigin = '', treeBox = null, foxSvg = '', foxOrigin = '', foxBox = null;
   var fx = knob('--fox-x', 1560), fy = knob('--fox-y', 862);
   if(has('pines') || has('fox') || has('tree')){
     // the ridge peaks under the fox, so it always has somewhere to sit
@@ -125,7 +126,7 @@
       ' C ' + (fx + 150) + ' ' + (fy - 4) + ' ' + (fx + 270) + ' ' + (fy + 40) + ' 1920 ' + (fy + 66) + ' L1920 1080 Z"/>';
   }
   if(has('tree')){
-    var tx = knob('--tree-x', 1905), segs = '';
+    var tx = knob('--tree-x', 1905), segs = '', bx0 = 1e9, bx1 = -1e9, by0 = 1e9;
     var branch = function(x, y, ang, len, wdt, depth){
       if(depth === 0 || len < 8) return;
       var x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
@@ -133,6 +134,7 @@
       if(has('fox') && x2 > fx - 200 && x2 < fx + 150 && y2 > fy - 340) return;
       // a slight kink mid-branch so nothing is ruler-straight
       var kx = (x + x2) / 2 + r(-len, len) * 0.12, ky = (y + y2) / 2 + r(-len, len) * 0.12;
+      bx0 = Math.min(bx0, x, x2, kx); bx1 = Math.max(bx1, x, x2, kx); by0 = Math.min(by0, y, y2, ky);
       segs += '<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + ' Q' + kx.toFixed(1) + ' ' + ky.toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '" stroke-width="' + wdt.toFixed(1) + '"/>';
       var n = depth > 4 ? 2 : (rnd() < 0.7 ? 2 : 3);
       for(var b = 0; b < n; b++){
@@ -143,12 +145,17 @@
     };
     branch(tx, 1010, -Math.PI / 2 - 0.16, 230, 46, 7);
     branch(tx - 30, 760, -Math.PI / 2 - 0.95, 130, 18, 5);
-    near += '<g fill="none" stroke="' + NEAR + '" stroke-linecap="round">' + segs + '</g>';
+    // the whole tree sways a fraction of a degree from the base of its trunk
+    treeSvg = '<g fill="none" stroke="' + NEAR + '" stroke-linecap="round">' + segs + '</g>';
+    treeBox = [Math.floor(bx0 - 30), Math.floor(by0 - 30), Math.ceil(Math.min(W, bx1 + 30)), H];
+    treeOrigin = (tx - treeBox[0]) + 'px ' + (1010 - treeBox[1]) + 'px';
   }
   if(has('fox')){
     var sc = knob("--fox-scale", 1.75);
     // sitting fox in profile, muzzle raised to the moon, brush curled at its paws
-    near += '<g transform="translate(' + (fx + 8) + ' ' + (fy + 3) + ') scale(' + sc + ')" fill="' + NEAR + '">' +
+    foxBox = [Math.floor(fx + 8 - 105 * sc), Math.floor(fy + 3 - 170 * sc), Math.ceil(fx + 8 + 50 * sc), Math.ceil(fy + 3 + 6)];
+    foxOrigin = (fx + 8 - foxBox[0]) + 'px ' + (fy + 3 - foxBox[1]) + 'px';   // the paws: it breathes from the ground up
+    foxSvg = '<g transform="translate(' + (fx + 8) + ' ' + (fy + 3) + ') scale(' + sc + ')" fill="' + NEAR + '">' +
       '<path d="M-70 0 C-94 -2 -100 -24 -86 -36 C-74 -46 -54 -40 -42 -26 C-50 -50 -44 -74 -30 -88 C-22 -98 -16 -106 -14 -116 ' +
       'C-14 -122 -16 -128 -18 -134 L-17 -156 L-6 -140 L1 -161 L9 -140 C16 -141 24 -146 32 -151 L41 -155 C39 -149 35 -143 29 -139 ' +
       'C23 -135 17 -129 15 -121 C21 -113 23 -103 17 -94 C15 -84 17 -70 17 -56 C17 -36 15 -16 15 0 L6 0 C6 -10 4 -18 0 -24 C-4 -16 -6 -8 -6 0 Z"/></g>';
@@ -162,6 +169,16 @@
     near += g(gx, gy, 84, 122, -6, 'R.I.P.') + g(gx + 112, gy + 8, 58, 84, 6, '') + g(gx + 186, gy + 12, 70, 102, -3, 'LAG');
   }
   if(near) svg('h-layer h-near', near);
+  /* The tree and the fox get layers of their own, moved with transform, so the
+     GPU just shifts a texture. Animating shapes inside the shared SVG made the
+     whole 1920x1080 layer re-rasterise every frame. */
+  function boxed(cls, inner, b, origin){   // a layer only as big as what it holds
+    var d = svg(cls, inner, b[0] + ' ' + b[1] + ' ' + (b[2] - b[0]) + ' ' + (b[3] - b[1]));
+    d.style.cssText = 'left:' + b[0] + 'px;top:' + b[1] + 'px;width:' + (b[2] - b[0]) + 'px;height:' + (b[3] - b[1]) + 'px;transform-origin:' + origin;
+    return d;
+  }
+  if(treeSvg) boxed('h-near h-tree', treeSvg, treeBox, treeOrigin);
+  if(foxSvg) boxed('h-near h-foxbody', foxSvg, foxBox, foxOrigin);
 
   /* ---- fog, wisps ---- */
   div('h-fog f1'); div('h-fog f2');
@@ -201,5 +218,35 @@
       }, r(250, 700));
     };
     setTimeout(flyBat, r(2500, 7000));
+  }
+
+  /* ---- a shooting star now and then (not in ?calm or ?still) ---- */
+  var calm = document.documentElement.classList.contains('h-calm');
+  if(!still && !calm){
+    var shoot = function(){
+      setTimeout(shoot, r(18000, 42000));
+      if(document.hidden) return;
+      var st = document.createElement('div');
+      st.className = 'h-shoot';
+      st.style.cssText = 'left:' + (r(500, 1800) | 0) + 'px;top:' + (r(40, 300) | 0) + 'px;--ang:' + r(-28, -12).toFixed(1) + 'deg;--len:' + (-r(380, 640) | 0) + 'px';
+      stage.insertBefore(st, stage.querySelector('.h-flash, .h-layer') || null);
+      st.addEventListener('animationend', function(){ st.remove(); });
+    };
+    setTimeout(shoot, r(6000, 14000));
+  }
+
+  /* ---- numbers that change roll up into place (countdown, counts) ----
+     Only when the value really changes: the countdown rewrites the same
+     text four times a second. Off when motion is frozen, because a frozen
+     animation would hold the number at its invisible first frame. */
+  if(!still && window.MutationObserver){
+    Array.prototype.forEach.call(document.querySelectorAll('.js-cd-min, .js-cd-sec, .js-roll'), function(el){
+      var last = el.textContent;
+      new MutationObserver(function(){
+        if(el.textContent === last) return;
+        last = el.textContent;
+        el.classList.remove('roll'); void el.offsetWidth; el.classList.add('roll');
+      }).observe(el, { childList:true, characterData:true, subtree:true });
+    });
   }
 })();

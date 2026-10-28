@@ -13,7 +13,8 @@
 .main .title{ font-size:150px; }
 .latest{ margin-top:8px; display:flex; flex-direction:column; gap:6px; min-width:420px; }
 .latest .who-name{ font-family:var(--serif); font-size:52px; font-weight:900; color:var(--bone); text-shadow:0 0 22px rgba(109,255,196,.35); }
-.foot{ left:150px; right:150px; bottom:80px; display:flex; align-items:center; justify-content:space-between; }
+.foot{ left:150px; right:150px; bottom:80px; display:flex; align-items:center; justify-content:flex-end; }
+.signs{ left:160px; top:752px; }
 .chan{ font-family:var(--serif); font-weight:900; font-size:30px; letter-spacing:3px; color:var(--bone); text-shadow:0 0 18px rgba(109,255,196,.35); }
 .chan span{ color:var(--fire); }
 .prints{ z-index:7; left:0; top:0; width:1920px; height:1080px; pointer-events:none; }
@@ -31,11 +32,12 @@
   </div>
   <div class="main">
     <div class="tag fire rise d1">the fox wandered into the woods</div>
-    <div class="title flicker rise d2">Be Right<br>Back</div>
+    <div class="title glint flicker rise d2">Be Right<br>Back</div>
     <div class="lede rise d3 js-game-wrap" hidden>Still haunting <b class="js-game"></b></div>
     <div class="card latest rise d4 js-latest-wrap" hidden><span class="label">newest soul in the pack</span><div class="who-name js-latest"></div></div>
   </div>
-  <div class="foot rise d5"><div class="socials" data-prism-socials></div><div class="chan">twitch.tv/<span class="js-name">NeoTheFox98</span></div></div>
+  <div class="signs socials post" data-prism-socials></div>
+  <div class="foot rise d5"><div class="chan">twitch.tv/<span class="js-name">NeoTheFox98</span></div></div>
 </div>
 <script>
 /* paw prints from the empty ridge, fading as they go into the trees */

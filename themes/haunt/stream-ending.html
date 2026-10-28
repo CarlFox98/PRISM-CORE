@@ -10,14 +10,15 @@
 .main{ left:150px; top:130px; width:1250px; display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
 .main .title{ font-size:150px; }
 .lede.sign{ margin-top:4px; }
-.row{ left:150px; top:592px; display:flex; gap:40px; align-items:flex-end; }
+.row{ left:520px; top:592px; display:flex; gap:30px; align-items:flex-end; }
+.signs{ left:150px; top:600px; }
 .row .stone{ width:320px; height:262px; padding:44px 26px 18px; gap:4px; }
 .row .stone .label{ color:#ACA3D2; }
 .row .stone .big{ font-family:var(--serif); font-size:88px; font-weight:900; line-height:1; }
-.row .stone.wide{ width:480px; }
-.row .stone.wide .big{ font-size:56px; line-height:1.15; white-space:nowrap; max-width:400px; }
+.row .stone.wide{ width:440px; }
+.row .stone.wide .big{ font-size:56px; line-height:1.15; white-space:nowrap; max-width:370px; }
 .row .stone .rip{ font-family:var(--serif); font-size:22px; letter-spacing:6px; color:#8F86BC; }
-.foot{ left:150px; right:150px; bottom:80px; display:flex; align-items:center; justify-content:space-between; }
+.foot{ left:150px; right:150px; bottom:80px; display:flex; align-items:center; justify-content:flex-end; }
 .chan{ font-family:var(--serif); font-weight:900; font-size:30px; letter-spacing:3px; color:var(--bone); text-shadow:0 0 18px rgba(109,255,196,.35); }
 </style>
 </head>
@@ -25,14 +26,15 @@
 <div class="stage" data-haunt="moon tree fox pines eyes wisps bats web" data-seed="23">
   <div class="main">
     <div class="tag rise">the candles burn low</div>
-    <div class="title flicker rise d1">Until Next<br>Full Moon</div>
+    <div class="title glint flicker rise d1">Until Next<br>Full Moon</div>
     <div class="lede sign rise d2">Thanks for haunting with me tonight.</div>
   </div>
   <div class="row">
-    <div class="stone rise d3"><span class="label">souls claimed</span><div class="big engraved js-followcount">-</div><span class="rip">R · I · P</span></div>
+    <div class="stone rise d3"><span class="label">souls claimed</span><div class="big engraved js-followcount js-roll">-</div><span class="rip">R · I · P</span></div>
     <div class="stone wide rise d4 js-latest-wrap" hidden><span class="label">newest soul</span><div class="big engraved js-latest"></div><span class="rip">welcome to the pack</span></div>
   </div>
-  <div class="foot rise d5"><div class="socials" data-prism-socials></div><div class="chan">sleep tight…</div></div>
+  <div class="signs socials post" data-prism-socials></div>
+  <div class="foot rise d5"><div class="chan">sleep tight…</div></div>
 </div>
 <script>
 /* shrink the newest follower's name until it fits its headstone */
